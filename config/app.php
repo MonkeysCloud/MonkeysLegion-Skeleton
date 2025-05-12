@@ -2,6 +2,8 @@
 declare(strict_types=1);
 
 use MonkeysLegion\Database\MySQL\Connection;
+use MonkeysLegion\Entity\Scanner\EntityScanner;
+use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Router\RouteCollection;
 use MonkeysLegion\Router\Router;
 use MonkeysLegion\Core\Routing\RouteLoader;
@@ -9,6 +11,7 @@ use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Mlc\Parser      as MlcParser;
 use MonkeysLegion\Mlc\Loader      as MlcLoader;
 use MonkeysLegion\Mlc\Config      as MlcConfig;
+use MonkeysLegion\Cli\Command\ClearCacheCommand;
 use MonkeysLegion\Cli\Command\MigrateCommand;
 use MonkeysLegion\Cli\Command\RollbackCommand;
 use MonkeysLegion\Cli\Command\DatabaseMigrationCommand;
@@ -79,8 +82,8 @@ return [
     ),
     DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
         $c->get(Connection::class),
-        $c->get(\MonkeysLegion\Entity\Scanner\EntityScanner::class),
-        $c->get(\MonkeysLegion\Migration\MigrationGenerator::class)
+        $c->get(EntityScanner::class),
+        $c->get(MigrationGenerator::class)
     ),
     KeyGenerateCommand::class       => fn()    => new KeyGenerateCommand(),
 
@@ -91,6 +94,7 @@ return [
             RollbackCommand::class,
             DatabaseMigrationCommand::class,
             KeyGenerateCommand::class,
+            ClearCacheCommand::class,
         ]
     ),
 
