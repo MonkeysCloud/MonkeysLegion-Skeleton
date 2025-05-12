@@ -30,7 +30,7 @@
     "post-install-cmd": [
       "@php vendor/bin/ml key:generate --if-missing"
     ],
-    "serve": "php bin/dev-server",
+    "serve": "./bin/dev-server",
     "test": "phpunit"
   },
   "bin": [
