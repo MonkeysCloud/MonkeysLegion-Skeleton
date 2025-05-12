@@ -9,6 +9,10 @@ use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Mlc\Parser      as MlcParser;
 use MonkeysLegion\Mlc\Loader      as MlcLoader;
 use MonkeysLegion\Mlc\Config      as MlcConfig;
+use MonkeysLegion\Cli\Command\MigrateCommand;
+use MonkeysLegion\Cli\Command\RollbackCommand;
+use MonkeysLegion\Cli\Command\DatabaseMigrationCommand;
+use MonkeysLegion\Cli\CliKernel;
 
 return [
 
@@ -20,7 +24,6 @@ return [
         $c->get(MlcParser::class),
         base_path('config')
     ),
-    // Load app.mlc and cors.mlc (later files override)
     MlcConfig::class => fn($c) => $c
         ->get(MlcLoader::class)
         ->load(['app','cors']),
@@ -61,6 +64,33 @@ return [
             is_array($origin)  ? implode(',', $origin)  : $origin,
             is_array($methods) ? implode(',', $methods) : $methods,
             is_array($headers) ? implode(',', $headers) : $headers
+        );
+    },
+
+    // ------------------------------------------------------------------------
+    // CLI migration commands + kernel
+    // ------------------------------------------------------------------------
+
+    MigrateCommand::class           => fn($c) => new MigrateCommand(
+        $c->get(Connection::class)
+    ),
+    RollbackCommand::class          => fn($c) => new RollbackCommand(
+        $c->get(Connection::class)
+    ),
+    DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
+        $c->get(Connection::class),
+        $c->get(\MonkeysLegion\Entity\Scanner\EntityScanner::class),
+        $c->get(\MonkeysLegion\Migration\MigrationGenerator::class)
+    ),
+
+    CliKernel::class => function($c) {
+        return new CliKernel(
+            $c,
+            [
+                $c->get(MigrateCommand::class),
+                $c->get(RollbackCommand::class),
+                $c->get(DatabaseMigrationCommand::class),
+            ]
         );
     },
 ];
