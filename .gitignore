@@ -1,0 +1,35 @@
+# Composer dependencies
+/vendor/
+/composer.lock
+
+# Build / distribution artifacts
+/build/
+/dist/
+/*.phar
+
+# Logs and runtime cache
+/logs/
+/cache/
+/tmp/
+/coverage/
+
+# IDE / editor settings
+/.idea/
+/.vscode/
+/nbproject/
+/*.sublime-workspace
+/*.sublime-project
+
+# Environment files
+.env
+.env.*.local
+.env.local
+.env.testing
+
+# PHPUnit and test artifacts
+/phpunit.xml
+/phpunit.result.cache
+
+# OS-specific files
+.DS_Store
+Thumbs.db
