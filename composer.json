@@ -30,12 +30,13 @@
     "post-install-cmd": [
       "@php vendor/bin/ml key:generate --if-missing"
     ],
-    "serve": "./bin/dev-server",
+    "serve": "php vendor/bin/dev-server",
     "test": "phpunit"
   },
   "bin": [
     "bin/ml",
-    "bin/dev-server"
+    "bin/dev-server",
+    "bin/dev-router.php"
   ],
   "extra": {
     "branch-alias": {
