@@ -12,6 +12,7 @@ use MonkeysLegion\Mlc\Config      as MlcConfig;
 use MonkeysLegion\Cli\Command\MigrateCommand;
 use MonkeysLegion\Cli\Command\RollbackCommand;
 use MonkeysLegion\Cli\Command\DatabaseMigrationCommand;
+use MonkeysLegion\Cli\Command\KeyGenerateCommand;
 use MonkeysLegion\Cli\CliKernel;
 
 return [
@@ -68,9 +69,8 @@ return [
     },
 
     // ------------------------------------------------------------------------
-    // CLI migration commands + kernel
+    // CLI commands + kernel
     // ------------------------------------------------------------------------
-
     MigrateCommand::class           => fn($c) => new MigrateCommand(
         $c->get(Connection::class)
     ),
@@ -82,16 +82,16 @@ return [
         $c->get(\MonkeysLegion\Entity\Scanner\EntityScanner::class),
         $c->get(\MonkeysLegion\Migration\MigrationGenerator::class)
     ),
+    KeyGenerateCommand::class       => fn()    => new KeyGenerateCommand(),
 
+    CliKernel::class => fn($c) => new CliKernel(
+        $c,
+        [
+            MigrateCommand::class,
+            RollbackCommand::class,
+            DatabaseMigrationCommand::class,
+            KeyGenerateCommand::class,
+        ]
+    ),
 
-    CliKernel::class => function($c) {
-        return new CliKernel(
-            $c,
-            [
-                MigrateCommand::class,
-                RollbackCommand::class,
-                DatabaseMigrationCommand::class,
-            ]
-        );
-    },
 ];
