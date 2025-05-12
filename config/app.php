@@ -83,13 +83,14 @@ return [
         $c->get(\MonkeysLegion\Migration\MigrationGenerator::class)
     ),
 
+
     CliKernel::class => function($c) {
         return new CliKernel(
             $c,
             [
-                $c->get(MigrateCommand::class),
-                $c->get(RollbackCommand::class),
-                $c->get(DatabaseMigrationCommand::class),
+                MigrateCommand::class,
+                RollbackCommand::class,
+                DatabaseMigrationCommand::class,
             ]
         );
     },
