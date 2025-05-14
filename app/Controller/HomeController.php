@@ -6,20 +6,22 @@ namespace App\Controller;
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
-use MonkeysLegion\Template\Renderer;     // ← inject this
+use MonkeysLegion\Template\Renderer;
 
 final class HomeController
 {
     #[Route('GET', '/')]
-    public function index(Renderer $view): Response
+    public function index(): Response
     {
-        // Render the `home.ml.php` template, passing any variables:
+        /** @var Renderer $view */
+        $view = ML_CONTAINER->get(Renderer::class);
+
         $html = $view->render('home', [
-            'title' => 'Home'
+            'title' => 'Home',
         ]);
 
         return new Response(
-            Stream::createFromString($html), // body first
+            Stream::createFromString($html),
             200,
             ['Content-Type' => 'text/html']
         );
