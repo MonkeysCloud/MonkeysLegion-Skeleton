@@ -1,4 +1,4 @@
-<x-layout title="Home">
+<x-layout title="{{ $title }}">
 
     @slot('header')
     <h1>Welcome to MonkeysLegion!</h1>
