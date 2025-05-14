@@ -40,7 +40,9 @@ return [
     // Template engine wiring
     // ------------------------------------------------------------------------
     TemplateParser::class   => fn() => new TemplateParser(),
-    TemplateCompiler::class => fn() => new TemplateCompiler(),
+    TemplateCompiler::class => fn($c) => new TemplateCompiler(
+        $c->get(TemplateParser::class)
+    ),
     TemplateLoader::class   => fn() => new TemplateLoader(
         base_path('resources/views'),
         base_path('var/cache/views')
