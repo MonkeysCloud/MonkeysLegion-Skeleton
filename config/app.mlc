@@ -7,8 +7,3 @@ database {
     user   "root"
     pass   "secret"
 }
-
-# NEW: Toggle template caching on/off
-cache {
-    enabled false   # set to `true` to enable, `false` to always recompile in memory
-}

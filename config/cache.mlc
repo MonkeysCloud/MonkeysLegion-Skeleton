@@ -1,0 +1,6 @@
+# Cache settings (MonkeysLegion template engine)
+cache {
+    # true = write compiled templates to disk under var/cache/views
+    # false = always compile in-memory (no disk I/O)
+    enabled false
+}
