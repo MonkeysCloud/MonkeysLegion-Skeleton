@@ -9,12 +9,12 @@ use MonkeysLegion\Router\RouteCollection;
 use MonkeysLegion\Router\Router;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
-use MonkeysLegion\Mlc\Parser as MlcParser;
-use MonkeysLegion\Mlc\Loader as MlcLoader;
-use MonkeysLegion\Mlc\Config as MlcConfig;
-use MonkeysLegion\Template\Parser as TemplateParser;
+use MonkeysLegion\Mlc\Parser        as MlcParser;
+use MonkeysLegion\Mlc\Loader        as MlcLoader;
+use MonkeysLegion\Mlc\Config        as MlcConfig;
+use MonkeysLegion\Template\Parser   as TemplateParser;
 use MonkeysLegion\Template\Compiler as TemplateCompiler;
-use MonkeysLegion\Template\Loader as TemplateLoader;
+use MonkeysLegion\Template\Loader   as TemplateLoader;
 use MonkeysLegion\Template\Renderer as TemplateRenderer;
 use MonkeysLegion\Cli\Command\ClearCacheCommand;
 use MonkeysLegion\Cli\Command\MigrateCommand;
@@ -34,7 +34,7 @@ return [
     ),
     MlcConfig::class => fn($c) => $c
         ->get(MlcLoader::class)
-        ->load(['app','cors']),
+        ->load(['app', 'cors', 'cache']),
 
     // ------------------------------------------------------------------------
     // Template engine wiring
@@ -50,7 +50,9 @@ return [
     TemplateRenderer::class => fn($c) => new TemplateRenderer(
         $c->get(TemplateParser::class),
         $c->get(TemplateCompiler::class),
-        $c->get(TemplateLoader::class)
+        $c->get(TemplateLoader::class),
+        // Pass cache.enabled flag from config:
+        (bool) $c->get(MlcConfig::class)->get('cache.enabled', true)
     ),
 
     // ------------------------------------------------------------------------
