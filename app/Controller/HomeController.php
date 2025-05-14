@@ -13,9 +13,11 @@ final class HomeController
     #[Route('GET', '/')]
     public function index(): Response
     {
+        // Pull the Renderer from the global container
         /** @var Renderer $view */
         $view = ML_CONTAINER->get(Renderer::class);
 
+        // Render the 'home' template, passing the $title variable
         $html = $view->render('home', [
             'title' => 'Home',
         ]);
