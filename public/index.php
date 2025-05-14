@@ -1,16 +1,18 @@
 <?php
 declare(strict_types=1);
 
-// 1) Define base path and include Composer’s autoloader
 use Psr\Http\Message\ServerRequestInterface;
 
 define('ML_BASE_PATH', dirname(__DIR__));
 require ML_BASE_PATH . '/vendor/autoload.php';
 
 // 2) Build the DI container
-$container = (new MonkeysLegion\DI\ContainerBuilder())
+$container = new MonkeysLegion\DI\ContainerBuilder()
     ->addDefinitions(require ML_BASE_PATH . '/config/app.php')
     ->build();
+
+// **Expose it globally for controllers to pull services from**
+define('ML_CONTAINER', $container);
 
 // 3) Auto‑discover and register any #[Route] controllers
 $container
@@ -29,4 +31,4 @@ $response = $cors(
 );
 
 // 6) Emit the HTTP response
-(new MonkeysLegion\Http\Emitter\SapiEmitter())->emit($response);
+new MonkeysLegion\Http\Emitter\SapiEmitter()->emit($response);
