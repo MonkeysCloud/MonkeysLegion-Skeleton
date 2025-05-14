@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use MonkeysLegion\Database\MySQL\Connection;
@@ -8,9 +9,13 @@ use MonkeysLegion\Router\RouteCollection;
 use MonkeysLegion\Router\Router;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
-use MonkeysLegion\Mlc\Parser      as MlcParser;
-use MonkeysLegion\Mlc\Loader      as MlcLoader;
-use MonkeysLegion\Mlc\Config      as MlcConfig;
+use MonkeysLegion\Mlc\Parser as MlcParser;
+use MonkeysLegion\Mlc\Loader as MlcLoader;
+use MonkeysLegion\Mlc\Config as MlcConfig;
+use MonkeysLegion\Template\Parser as TemplateParser;
+use MonkeysLegion\Template\Compiler as TemplateCompiler;
+use MonkeysLegion\Template\Loader as TemplateLoader;
+use MonkeysLegion\Template\Renderer as TemplateRenderer;
 use MonkeysLegion\Cli\Command\ClearCacheCommand;
 use MonkeysLegion\Cli\Command\MigrateCommand;
 use MonkeysLegion\Cli\Command\RollbackCommand;
@@ -19,7 +24,6 @@ use MonkeysLegion\Cli\Command\KeyGenerateCommand;
 use MonkeysLegion\Cli\CliKernel;
 
 return [
-
     // ------------------------------------------------------------------------
     // MonkeysLegion Config (.mlc) support
     // ------------------------------------------------------------------------
@@ -31,6 +35,21 @@ return [
     MlcConfig::class => fn($c) => $c
         ->get(MlcLoader::class)
         ->load(['app','cors']),
+
+    // ------------------------------------------------------------------------
+    // Template engine wiring
+    // ------------------------------------------------------------------------
+    TemplateParser::class   => fn() => new TemplateParser(),
+    TemplateCompiler::class => fn() => new TemplateCompiler(),
+    TemplateLoader::class   => fn() => new TemplateLoader(
+        base_path('resources/views'),
+        base_path('var/cache/views')
+    ),
+    TemplateRenderer::class => fn($c) => new TemplateRenderer(
+        $c->get(TemplateParser::class),
+        $c->get(TemplateCompiler::class),
+        $c->get(TemplateLoader::class)
+    ),
 
     // ------------------------------------------------------------------------
     // Database connection (MySQL 8.4+)
@@ -58,8 +77,7 @@ return [
     // ------------------------------------------------------------------------
     CorsMiddleware::class => function($c) {
         /** @var MlcConfig $cfg */
-        $cfg = $c->get(MlcConfig::class);
-
+        $cfg     = $c->get(MlcConfig::class);
         $origin  = $cfg->get('cors.allow_origin', '*');
         $methods = $cfg->get('cors.allow_methods', ['GET','POST','OPTIONS']);
         $headers = $cfg->get('cors.allow_headers', ['Content-Type','Authorization']);
@@ -74,11 +92,11 @@ return [
     // ------------------------------------------------------------------------
     // CLI commands + kernel
     // ------------------------------------------------------------------------
-    ClearCacheCommand::class       => fn() => new ClearCacheCommand(),   // ← added!
-    MigrateCommand::class          => fn($c) => new MigrateCommand(
+    ClearCacheCommand::class        => fn() => new ClearCacheCommand(),
+    MigrateCommand::class           => fn($c) => new MigrateCommand(
         $c->get(Connection::class)
     ),
-    RollbackCommand::class         => fn($c) => new RollbackCommand(
+    RollbackCommand::class          => fn($c) => new RollbackCommand(
         $c->get(Connection::class)
     ),
     DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
@@ -86,7 +104,7 @@ return [
         $c->get(EntityScanner::class),
         $c->get(MigrationGenerator::class)
     ),
-    KeyGenerateCommand::class      => fn() => new KeyGenerateCommand(),
+    KeyGenerateCommand::class       => fn() => new KeyGenerateCommand(),
 
     CliKernel::class => fn($c) => new CliKernel(
         $c,
@@ -98,5 +116,4 @@ return [
             DatabaseMigrationCommand::class,
         ]
     ),
-
 ];
