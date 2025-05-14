@@ -7,15 +7,17 @@ use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
 use MonkeysLegion\Template\Renderer;
-use Psr\Http\Message\ServerRequestInterface;
 
 final class HomeController
 {
     #[Route('GET', '/')]
-    public function index(
-        ServerRequestInterface $request,
-        Renderer               $view
-    ): Response {
+    public function index(): Response
+    {
+        // Grab the view renderer from the global container
+        /** @var Renderer $view */
+        $view = ML_CONTAINER->get(Renderer::class);
+
+        // Render the 'home' template, passing the title
         $html = $view->render('home', [
             'title' => 'Home',
         ]);
