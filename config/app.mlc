@@ -7,9 +7,3 @@ database {
     user   "root"
     pass   "secret"
 }
-
-cors {
-    allow_origin  ["*"]
-    allow_methods ["GET","POST","OPTIONS"]
-    allow_headers ["Content-Type","Authorization"]
-}
