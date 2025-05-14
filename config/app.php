@@ -74,10 +74,11 @@ return [
     // ------------------------------------------------------------------------
     // CLI commands + kernel
     // ------------------------------------------------------------------------
-    MigrateCommand::class           => fn($c) => new MigrateCommand(
+    ClearCacheCommand::class       => fn() => new ClearCacheCommand(),   // ← added!
+    MigrateCommand::class          => fn($c) => new MigrateCommand(
         $c->get(Connection::class)
     ),
-    RollbackCommand::class          => fn($c) => new RollbackCommand(
+    RollbackCommand::class         => fn($c) => new RollbackCommand(
         $c->get(Connection::class)
     ),
     DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
@@ -85,16 +86,16 @@ return [
         $c->get(EntityScanner::class),
         $c->get(MigrationGenerator::class)
     ),
-    KeyGenerateCommand::class       => fn()    => new KeyGenerateCommand(),
+    KeyGenerateCommand::class      => fn() => new KeyGenerateCommand(),
 
     CliKernel::class => fn($c) => new CliKernel(
         $c,
         [
+            ClearCacheCommand::class,
+            KeyGenerateCommand::class,
             MigrateCommand::class,
             RollbackCommand::class,
             DatabaseMigrationCommand::class,
-            KeyGenerateCommand::class,
-            ClearCacheCommand::class,
         ]
     ),
 
