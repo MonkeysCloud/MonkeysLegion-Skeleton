@@ -21,6 +21,7 @@ use MonkeysLegion\Cli\Command\MigrateCommand;
 use MonkeysLegion\Cli\Command\RollbackCommand;
 use MonkeysLegion\Cli\Command\DatabaseMigrationCommand;
 use MonkeysLegion\Cli\Command\KeyGenerateCommand;
+use MonkeysLegion\Cli\Command\MakeEntityCommand;
 use MonkeysLegion\Cli\CliKernel;
 
 return [
@@ -109,6 +110,7 @@ return [
         $c->get(MigrationGenerator::class)
     ),
     KeyGenerateCommand::class       => fn() => new KeyGenerateCommand(),
+    MakeEntityCommand::class => fn() => new MakeEntityCommand(),
 
     CliKernel::class => fn($c) => new CliKernel(
         $c,
@@ -118,6 +120,7 @@ return [
             MigrateCommand::class,
             RollbackCommand::class,
             DatabaseMigrationCommand::class,
+            MakeEntityCommand::class,
         ]
     ),
 ];
