@@ -31,7 +31,8 @@ use MonkeysLegion\Http\{CoreRequestHandler,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
-    Emitter\SapiEmitter};
+    Emitter\SapiEmitter,
+    RouteRequestHandler};
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
     Config as MlcConfig,
@@ -138,8 +139,12 @@ return [
         $c->get(CoreRequestHandler::class)
     ),
 
+    RouteRequestHandler::class => fn($c) => new RouteRequestHandler(
+        $c->get(Router::class)
+    ),
+
     CoreRequestHandler::class => fn($c) => new CoreRequestHandler(
-        $c->get(Router::class),
+        $c->get(RouteRequestHandler::class),
         $c->get(ResponseFactoryInterface::class)
     ),
 
