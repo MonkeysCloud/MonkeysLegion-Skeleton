@@ -65,18 +65,27 @@ use MonkeysLegion\Template\{
 };
 
 /*
-|-------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 | Dependency-injection definitions
-|-------------------------------------------------------------------------
+|--------------------------------------------------------------------------
 */
 return [
 
-    LoggerInterface::class => fn() => tap(
-        new Logger('app'),
-        fn(Logger $log) => $log->pushHandler(
-            new StreamHandler(base_path('var/log/app.log'), Logger::DEBUG)
-        )
-    ),
+    /*
+    |--------------------------------------------------------------------------
+    | PSR-3 Logger (Monolog)
+    |--------------------------------------------------------------------------
+    */
+    LoggerInterface::class => function() {
+        $log = new Logger('app');
+        $log->pushHandler(
+            new StreamHandler(
+                base_path('var/log/app.log'),
+                Logger::DEBUG
+            )
+        );
+        return $log;
+    },
 
     /* ----------------------------------------------------------------- */
     /* PSR-17 factories                                                   */
@@ -169,9 +178,9 @@ return [
     /* ----------------------------------------------------------------- */
     RateLimitMiddleware::class => fn($c) => new RateLimitMiddleware(
         $c->get(ResponseFactoryInterface::class),
-        $c->get(CacheInterface::class),  // comment out to force in-memory only
-        100,                              // max 100 requests
-        60                                // per 60s window
+        $c->get(CacheInterface::class),
+        100,  // max 100 requests
+        60    // per 60s window
     ),
 
     /* ----------------------------------------------------------------- */
@@ -181,13 +190,15 @@ return [
         $c->get(ResponseFactoryInterface::class),
         'Protected',
         (string) $c->get(MlcConfig::class)->get('auth.token'),
-        ['/']                           // public paths
+        ['/']  // public paths
     ),
 
     /* ----------------------------------------------------------------- */
     /* Simple logging middleware                                          */
     /* ----------------------------------------------------------------- */
-    LoggingMiddleware::class    => fn() => new LoggingMiddleware(),
+    LoggingMiddleware::class    => fn() => new LoggingMiddleware(
+    // you can inject LoggerInterface here if your middleware takes it
+    ),
 
     /* ----------------------------------------------------------------- */
     /* PSR-15 minimal middleware pipeline                                 */
