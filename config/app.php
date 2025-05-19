@@ -66,6 +66,14 @@ use MonkeysLegion\Template\{
     Renderer as TemplateRenderer
 };
 
+use Prometheus\Storage\APC;               // or Redis
+use MonkeysLegion\Telemetry\{
+    MetricsInterface,
+    NullMetrics,
+    PrometheusMetrics,
+    StatsDMetrics
+};
+
 /*
 |--------------------------------------------------------------------------
 | Dependency-injection definitions
@@ -108,6 +116,18 @@ return [
     CacheInterface::class               => fn() => new SimpleFileCache(
         __DIR__ . '/../var/cache/rate_limit'
     ),
+
+    /* ----------------------------------------------------------------- */
+    /* Metrics / Telemetry (choose one)                                   */
+    /* ----------------------------------------------------------------- */
+    // 1) No-op (default)
+    MetricsInterface::class => fn() => new NullMetrics(),
+
+    // 2) Prometheus (APC in dev – swap to Redis in prod)
+    //MetricsInterface::class => fn() => new PrometheusMetrics(new APC()),
+
+    // 3) StatsD
+    //MetricsInterface::class => fn() => new StatsDMetrics('127.0.0.1', 8125),
 
     /* ----------------------------------------------------------------- */
     /* .mlc config support                                                */
