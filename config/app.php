@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
-
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
