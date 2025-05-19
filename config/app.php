@@ -7,12 +7,16 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use Laminas\Diactoros\UriFactory;
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use MonkeysLegion\Http\SimpleFileCache;
 
@@ -66,6 +70,13 @@ use MonkeysLegion\Template\{
 |-------------------------------------------------------------------------
 */
 return [
+
+    LoggerInterface::class => fn() => tap(
+        new Logger('app'),
+        fn(Logger $log) => $log->pushHandler(
+            new StreamHandler(base_path('var/log/app.log'), Logger::DEBUG)
+        )
+    ),
 
     /* ----------------------------------------------------------------- */
     /* PSR-17 factories                                                   */
