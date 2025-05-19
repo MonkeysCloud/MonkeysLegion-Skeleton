@@ -115,28 +115,13 @@ return [
     /* --------------------------------------------------------------------- */
     /*  Routing                                                              */
     /* --------------------------------------------------------------------- */
-    RouteCollection::class               => fn()   => new RouteCollection(),
-    Router::class                        => fn($c) => new Router(
-        $c->get(RouteCollection::class)
-    ),
-    RouteLoader::class                   => fn($c) => new RouteLoader(
+    RouteCollection::class => fn() => new RouteCollection(),
+    Router::class          => fn($c) => new Router($c->get(RouteCollection::class)),
+    RouteLoader::class     => fn($c) => new RouteLoader(
         $c->get(Router::class),
         $c,
         base_path('app/Controller'),
         'App\\Controller'
-    ),
-
-    /* ------------------------------------------------------------------- */
-    /*  PSR-15 minimal middleware pipeline                                  */
-    /* ------------------------------------------------------------------- */
-    MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
-        [
-            $c->get(CorsMiddleware::class),
-            $c->get(AuthMiddleware::class),
-            $c->get(LoggingMiddleware::class),
-            $c->get(RateLimitMiddleware::class),
-        ],
-        $c->get(CoreRequestHandler::class)
     ),
 
     RouteRequestHandler::class => fn($c) => new RouteRequestHandler(
@@ -146,6 +131,16 @@ return [
     CoreRequestHandler::class => fn($c) => new CoreRequestHandler(
         $c->get(RouteRequestHandler::class),
         $c->get(ResponseFactoryInterface::class)
+    ),
+
+    MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
+        [
+            $c->get(CorsMiddleware::class),
+            $c->get(AuthMiddleware::class),
+            $c->get(LoggingMiddleware::class),
+            $c->get(RateLimitMiddleware::class),
+        ],
+        $c->get(CoreRequestHandler::class)
     ),
 
     SapiEmitter::class => fn() => new SapiEmitter(),
