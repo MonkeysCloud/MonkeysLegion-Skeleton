@@ -13,6 +13,9 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 
+use MonkeysLegion\Http\SimpleFileCache;
+use Psr\SimpleCache\CacheInterface;
+
 use MonkeysLegion\Cli\CliKernel;
 use MonkeysLegion\Cli\Command\{
     ClearCacheCommand,
@@ -26,13 +29,15 @@ use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
-use MonkeysLegion\Http\{CoreRequestHandler,
+use MonkeysLegion\Http\{
+    CoreRequestHandler,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
     Emitter\SapiEmitter,
-    RouteRequestHandler};
+    RouteRequestHandler
+};
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
     Config as MlcConfig,
@@ -69,6 +74,13 @@ return [
     /*  PSR-7 ServerRequest (one-off from globals)                           */
     /* --------------------------------------------------------------------- */
     ServerRequestInterface::class        => fn() => new ServerRequestFactory()->fromGlobals(),
+
+    /* --------------------------------------------------------------------- */
+    /*  PSR-16 Cache (for rate-limiting)                                      */
+    /* --------------------------------------------------------------------- */
+    CacheInterface::class => fn() => new SimpleFileCache(
+        __DIR__ . '/../var/cache/rate_limit'
+    ),
 
     /* --------------------------------------------------------------------- */
     /*  Config (.mlc) support                                                */
@@ -115,24 +127,30 @@ return [
     /* --------------------------------------------------------------------- */
     /*  Routing                                                              */
     /* --------------------------------------------------------------------- */
-    RouteCollection::class => fn() => new RouteCollection(),
-    Router::class          => fn($c) => new Router($c->get(RouteCollection::class)),
-    RouteLoader::class     => fn($c) => new RouteLoader(
+    RouteCollection::class               => fn()   => new RouteCollection(),
+    Router::class                        => fn($c) => new Router(
+        $c->get(RouteCollection::class)
+    ),
+    RouteLoader::class                   => fn($c) => new RouteLoader(
         $c->get(Router::class),
         $c,
         base_path('app/Controller'),
         'App\\Controller'
     ),
 
-    RouteRequestHandler::class => fn ($c) => new RouteRequestHandler(
-        $c->get(MonkeysLegion\Router\Router::class)
+    RouteRequestHandler::class           => fn($c) => new RouteRequestHandler(
+        $c->get(Router::class)
     ),
 
-    CoreRequestHandler::class => fn($c) => new CoreRequestHandler(
+    CoreRequestHandler::class            => fn($c) => new CoreRequestHandler(
+    // final PSR-15 handler is the RouteRequestHandler (adapts Router to RequestHandlerInterface)
         $c->get(RouteRequestHandler::class),
         $c->get(ResponseFactoryInterface::class)
     ),
 
+    /* ------------------------------------------------------------------- */
+    /*  PSR-15 minimal middleware pipeline                                  */
+    /* ------------------------------------------------------------------- */
     MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
         [
             $c->get(CorsMiddleware::class),
@@ -143,7 +161,17 @@ return [
         $c->get(CoreRequestHandler::class)
     ),
 
-    SapiEmitter::class => fn() => new SapiEmitter(),
+    /* --------------------------------------------------------------------- */
+    /*  Rate-limit middleware                                                */
+    /* --------------------------------------------------------------------- */
+    RateLimitMiddleware::class           => fn($c) => new RateLimitMiddleware(
+        $c->get(ResponseFactoryInterface::class),
+        $c->get(CacheInterface::class),  // comment out for in-memory only
+        100,   // max 100 requests
+        60     // per 60s window
+    ),
+
+    SapiEmitter::class                   => fn() => new SapiEmitter(),
 
     /* --------------------------------------------------------------------- */
     /*  CORS middleware                                                      */
