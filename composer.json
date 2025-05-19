@@ -33,6 +33,7 @@
       "@php vendor/bin/ml key:generate --if-missing"
     ],
     "serve": "php vendor/bin/dev-server",
+    "server:stop": "php vendor/bin/dev-server stop",
     "test": "phpunit"
   },
   "bin": [
