@@ -124,8 +124,8 @@ return [
         'App\\Controller'
     ),
 
-    RouteRequestHandler::class => fn($c) => new RouteRequestHandler(
-        $c->get(Router::class)
+    RouteRequestHandler::class => fn ($c) => new RouteRequestHandler(
+        $c->get(MonkeysLegion\Router\Router::class)
     ),
 
     CoreRequestHandler::class => fn($c) => new CoreRequestHandler(
