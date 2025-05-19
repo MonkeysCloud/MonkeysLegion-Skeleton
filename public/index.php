@@ -37,7 +37,8 @@ $responseFactory = $container->get(ResponseFactoryInterface::class);
 /* -------------------------------------------------
  | 4) Build PSR-15 middleware pipeline
  * ------------------------------------------------*/
-$core = new CoreRequestHandler($router, $responseFactory);
+$routeHandler = $container->get(MonkeysLegion\Http\RouteRequestHandler::class);
+$core         = new MonkeysLegion\Http\CoreRequestHandler($routeHandler, $responseFactory);
 
 /* pipe middlewares in the **order you want them to run**  */
 $core->pipe($container->get(MonkeysLegion\Core\Middleware\CorsMiddleware::class));
