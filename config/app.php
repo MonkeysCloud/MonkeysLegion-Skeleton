@@ -12,6 +12,7 @@ use Laminas\Diactoros\UriFactory;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -74,6 +75,11 @@ use MonkeysLegion\Telemetry\{
     StatsDMetrics
 };
 
+use MonkeysLegion\Events\{
+    ListenerProvider,
+    EventDispatcher
+};
+
 /*
 |--------------------------------------------------------------------------
 | Dependency-injection definitions
@@ -128,6 +134,25 @@ return [
 
     // 3) StatsD
     //MetricsInterface::class => fn() => new StatsDMetrics('127.0.0.1', 8125),
+
+    /* ———————————————————————————————————————————————
+    *  Event dispatcher (PSR-14)
+    * ——————————————————————————————————————————————— */
+    ListenerProvider::class        => fn () => new ListenerProvider(),
+    EventDispatcherInterface::class => fn ($c) => new EventDispatcher(
+        $c->get(ListenerProvider::class)
+    ),
+
+    // Example: register a listener right here (commented)
+    /*
+    App\Listeners\AuditLogger::class => function ($c) {
+        $cb = [$c->get(LoggerInterface::class), 'info'];
+        $c->get(ListenerProvider::class)
+           ->add(App\Events\UserDeleted::class, $cb, priority: 10);
+
+        return new App\Listeners\AuditLogger();
+    },
+    */
 
     /* ----------------------------------------------------------------- */
     /* .mlc config support                                                */
