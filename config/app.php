@@ -227,12 +227,13 @@ return [
     /* ----------------------------------------------------------------- */
     /* Rate-limit middleware                                              */
     /* ----------------------------------------------------------------- */
-    RateLimitMiddleware::class => fn($c) => new RateLimitMiddleware(
-        $c->get(ResponseFactoryInterface::class),
-        $c->get(CacheInterface::class),
-        100,  // max 100 requests
-        60    // per 60s window
-    ),
+    RateLimitMiddleware::class =>
+        fn($c) => new RateLimitMiddleware(
+            $c->get(ResponseFactoryInterface::class),
+            $c->get(CacheInterface::class),
+            200,   // limit
+            60     // window (seconds)
+        ),
 
     /* ----------------------------------------------------------------- */
     /* Authentication middleware                                          */
