@@ -38,15 +38,14 @@ use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
 
-use MonkeysLegion\Http\{
-    CoreRequestHandler,
+use MonkeysLegion\Http\{CoreRequestHandler,
+    Middleware\ContentNegotiationMiddleware,
     RouteRequestHandler,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
-    Emitter\SapiEmitter
-};
+    Emitter\SapiEmitter};
 
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
@@ -79,6 +78,11 @@ use MonkeysLegion\Events\{
     ListenerProvider,
     EventDispatcher
 };
+
+use MonkeysLegion\Validation\ValidatorInterface;
+use MonkeysLegion\Validation\AttributeValidator;
+use MonkeysLegion\Validation\DtoBinder;
+use MonkeysLegion\Validation\Middleware\ValidationMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -248,6 +252,27 @@ return [
     ),
 
     /* ----------------------------------------------------------------- */
+    /* Validation layer                                                  */
+    /* ----------------------------------------------------------------- */
+    ValidatorInterface::class => fn() => new AttributeValidator(),
+
+    DtoBinder::class          => fn($c) => new DtoBinder(
+        $c->get(ValidatorInterface::class)
+    ),
+
+    /**
+     * Map <router-name ⇒ DTO class>.  Adjust to your routes.
+     * Example assumes you have a CreateUserRequest DTO.
+     */
+    ValidationMiddleware::class => fn($c) => new ValidationMiddleware(
+        $c->get(DtoBinder::class),
+        [
+            // 'user_create' => \App\Http\Dto\CreateUserRequest::class,
+            // 'order_create' => \App\Http\Dto\CreateOrderRequest::class,
+        ]
+    ),
+
+    /* ----------------------------------------------------------------- */
     /* PSR-15 minimal middleware pipeline                                 */
     /* ----------------------------------------------------------------- */
     MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
@@ -256,6 +281,8 @@ return [
             $c->get(RateLimitMiddleware::class),
             $c->get(AuthMiddleware::class),
             $c->get(LoggingMiddleware::class),
+            $c->get(ContentNegotiationMiddleware::class),
+            $c->get(ValidationMiddleware::class),
         ],
         $c->get(CoreRequestHandler::class)
     ),
