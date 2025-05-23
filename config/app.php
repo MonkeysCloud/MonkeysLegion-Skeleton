@@ -79,6 +79,11 @@ use MonkeysLegion\Events\{
     EventDispatcher
 };
 
+use MonkeysLegion\Http\OpenApi\{
+    OpenApiGenerator,
+    OpenApiMiddleware
+};
+
 use MonkeysLegion\Validation\ValidatorInterface;
 use MonkeysLegion\Validation\AttributeValidator;
 use MonkeysLegion\Validation\DtoBinder;
@@ -273,6 +278,18 @@ return [
         ]
     ),
 
+    /*----------------------------------------------------*/
+    /*  OpenAPI                                           */
+    /*----------------------------------------------------*/
+    OpenApiGenerator::class => fn($c) => new MonkeysLegion\Http\OpenApi\OpenApiGenerator(
+        $c->get(RouteCollection::class)
+    ),
+
+    OpenApiMiddleware::class => fn($c) => new MonkeysLegion\Http\OpenApi\OpenApiMiddleware(
+        $c->get(OpenApiGenerator::class),
+        $c->get(ResponseFactoryInterface::class)
+    ),
+
     /* ----------------------------------------------------------------- */
     /* PSR-15 minimal middleware pipeline                                 */
     /* ----------------------------------------------------------------- */
@@ -284,6 +301,7 @@ return [
             $c->get(LoggingMiddleware::class),
             $c->get(ContentNegotiationMiddleware::class),
             $c->get(ValidationMiddleware::class),
+            $c->get(OpenApiMiddleware::class),
         ],
         $c->get(CoreRequestHandler::class)
     ),

@@ -1,183 +1,214 @@
-# MonkeysLegion Skeleton
+# MonkeysLegion Skeleton
 
-A starter project for building web applications with the MonkeysLegion PHP framework.  
+**A production‑ready starter for building web apps & APIs with the MonkeysLegion framework.**
+
 Includes:
 
-- **PSR‑11 DI Container** with config-driven definitions
-- **PSR‑7 HTTP Layer** (ServerRequest, Response, Emitter)
-- **Attribute‑based Routing** (`#[Route]`)
-- **MLView** templating engine with components & slots
-- **Dev‑server** with hot‑reload
-- **CLI tools** for migrations, cache, key generation, code scaffolding
-- **Entity → Migration** SQL diff generator
+* **PSR‑11 DI Container** with config‑first definitions
+* **PSR‑7/15 HTTP stack** (Request, Response, Middleware, Emitter)
+* **Attribute‑based Router v2** with auto‑discovery
+* **Live OpenAPI 3.1 & Swagger UI** (`/openapi.json`, `/docs`)
+* **Validation layer** (DTO binding + attribute constraints)
+* **Sliding‑window Rate‑Limiter** (IP + User buckets)
+* **MLView** component templating
+* **CLI toolbox** (migrations, cache, key‑gen, scaffolding)
+* **Entity → SQL Migration** diff generator
+* **Dev‑server** with hot reload
 
 ---
 
-## 🚀 Quickstart
+## 🚀 Quick‑start
 
-1. **Create project**
-   ```bash
-   composer create-project \
-   --stability=dev \
-   monkeyscloud/monkeyslegion-skeleton \
-   my-app \
-   "dev-main"
-   ```
-   
-2. **Environment**
-   ```bash
-   cp .env.example .env
-   composer install
-   php vendor/bin/ml key:generate
-   ```
-   
-3. **Run dev server**
-   ```bash
-   composer serve
-   # or
-   php vendor/bin/dev-server
-   ```
-   
-4. **Browse**
-   Open http://127.0.0.1:8000 in your browser.
+```bash
+composer create-project --stability=dev \
+    monkeyscloud/monkeyslegion-skeleton my-app "dev-main"
+cd my-app
 
-## 🔧 Configuration
+cp .env.example .env       # configure DB, secrets
+composer install
+php vendor/bin/ml key:generate
 
-All services are wired in config/app.php.
-
-You can customize:
-
-- Database DSN & credentials (config/database.php)
-- CORS settings (.mlc files in config/)
-- Template cache path, extensions
-- CLI commands registered in DI
-
-## 📁 Project Structure
-
-```aiignore
-my-app/
-├── app/  
-│   ├── Controller/       # HTTP controllers with #[Route]  
-│   ├── Entity/           # Your Doctrine‑style entity classes  
-│   └── ...  
-├── config/  
-│   ├── app.php           # DI definitions  
-│   ├── database.php      # DB config  
-│   └── *.mlc             # MonkeysLegion‑LC config files  
-├── public/               # Document root (index.php + assets)  
-├── resources/  
-│   └── views/            # MLView templates (`.ml.php`)  
-├── var/  
-│   ├── cache/            # Compiled templates & cache  
-│   └── migrations/       # Auto‑generated SQL diffs  
-├── vendor/               # Composer dependencies  
-├── bin/                  # Local executables (ml, dev-server)  
-├── composer.json  
-└── README.md
+composer serve             # or php vendor/bin/dev-server
+open http://127.0.0.1:8000 # your first MonkeysLegion page
 ```
 
-## ⚙️ Routing & Controllers
-Declare routes with PHP attributes:
+---
+
+## 📁 Project layout
+
+```text
+my-app/
+├─ app/
+│  ├─ Controller/     # HTTP controllers (auto‑scanned)
+│  ├─ Dto/            # Request DTOs with validation attributes
+│  └─ Entity/         # DB entities
+├─ config/
+│  ├─ app.php         # DI definitions (services & middleware)
+│  ├─ database.php    # DSN + creds
+│  └─ *.mlc           # key‑value config (CORS, cache, auth,…)
+├─ public/            # Web root (index.php, assets)
+├─ resources/
+│  └─ views/          # MLView templates & components
+├─ var/
+│  ├─ cache/          # Twig, rate‑limit buckets, etc.
+│  └─ migrations/     # Auto‑generated SQL
+├─ vendor/            # Composer deps
+├─ bin/               # Dev helpers (ml, dev‑server)
+└─ README.md
+```
+
+---
+
+## ⚙️ Routing & Controllers
+
+### Attribute syntax v2
 
 ```php
-namespace App\Controller;
-
 use MonkeysLegion\Router\Attributes\Route;
-use MonkeysLegion\Http\Message\Response;
-use MonkeysLegion\Http\Message\Stream;
+use Psr\Http\Message\ResponseInterface;
 
-final class HomeController
+final class UserController
 {
-    #[Route('GET', '/')]
-    public function index(): Response
-    {
-        $html = /* use Renderer to render a view */;
-        return new Response(
-            Stream::createFromString($html),
-            200,
-            ['Content-Type' => 'text/html']
-        );
-    }
+    #[Route('GET', '/users', summary: 'List users', tags: ['User'])]
+    public function index(): ResponseInterface { /* … */ }
+
+    #[Route('POST', '/login', name: 'user_login', tags: ['Auth'])]
+    public function login(): ResponseInterface { /* … */ }
+
+    #[Route(['PUT','PATCH'], '/users/{id}', summary: 'Update user')]
+    public function update(string $id): ResponseInterface { /* … */ }
 }
 ```
-The DI container auto‑discovers all controllers under app/Controller.
 
-## 🖼 MLView Templating
+* Controllers under `app/Controller` are auto‑registered at boot.
+* Imperative routes are still possible via `$router->add()`.
 
-Place templates in resources/views/ with .ml.php extension.
+### Live API docs
 
-### Layout + Component
+| Endpoint            | Description                                              |
+| ------------------- | -------------------------------------------------------- |
+| `GET /openapi.json` | Machine‑readable OpenAPI 3.1 spec generated from routes. |
+| `GET /docs`         | Swagger UI consuming that spec.                          |
 
-resources/views/layouts/app.ml.php:
+---
+
+## 🔒 Validation Layer
 
 ```php
+namespace App\Dto;
+
+use MonkeysLegion\Validation\Attributes as Assert;
+
+final readonly class SignupRequest
+{
+    public function __construct(
+        #[Assert\NotBlank, Assert\Email]
+        public string $email,
+
+        #[Assert\Length(min: 8, max: 64)]
+        public string $password,
+    ) {}
+}
+```
+
+* Middleware binds JSON + query params into DTO → auto‑validates.
+* On failure returns **400** with `errors[]` array.
+
+---
+
+## 🚦 Rate Limiting
+
+* **Hybrid buckets**: per‑user (`uid` attribute) or per‑IP (anonymous).
+* Defaults: **200 req / 60 s**. Change in `config/app.php`.
+
+Headers returned:
+
+```
+X-RateLimit-Limit: 200
+X-RateLimit-Remaining: 123
+X-RateLimit-Reset: 1716509930
+```
+
+429 responses include `Retry-After`.
+
+---
+
+## 🖼 MLView Templating
+
+`resources/views/layouts/app.ml.php`:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>{{ $title }}</title>
-</head>
+<head><title>{{ $title }}</title></head>
 <body>
-  <?= $slots['header']() ?>
-  <main><?= $slotContent ?></main>
+  {{ $slots['header']() }}
+  <main>{{ $slotContent }}</main>
 </body>
 </html>
 ```
 
-resources/views/home.ml.php:
-```php
-<x-layout title="{{ $title }}">
-  @slot('header')
-    <h1>Welcome, {{ $title }}!</h1>
-  @endslot
+`resources/views/home.ml.php`:
 
-  <p>This is the home page content.</p>
+```html
+<x-layout title="Home">
+  @slot('header')<h1>Hello World!</h1>@endslot
+  <p>Welcome to MonkeysLegion.</p>
 </x-layout>
 ```
 
-- {{ }} escapes output
-- {!! !!} renders raw HTML
-- <x-foo> includes views/components/foo.ml.php
-- @slot('name')…@endslot defines named slots
+* `{{ }}` → escaped, `{!! !!}` → raw.
+* `<x-foo>` includes `views/components/foo.ml.php`.
+* `@slot('name') … @endslot` for named slots.
 
-## 💾 Entities & Migrations
-Define entities in app/Entity/ using attributes:
+---
+
+## 💾 Entities & Migrations
+
 ```php
-namespace App\Entity;
-
 use MonkeysLegion\Entity\Attributes\Field;
 
 class User
 {
     #[Field(type: 'string', length: 255)]
     private string $email;
-
-    // … getters/setters …
 }
 ```
-### Generate Migration
+
 ```bash
+php vendor/bin/ml make:migration   # diff & SQL → var/migrations/
+php vendor/bin/ml migrate          # apply
+```
+
+---
+
+## 🛠 CLI Cheatsheet
+
+```bash
+php vendor/bin/ml key:generate     # 32‑byte APP_KEY
+php vendor/bin/ml cache:clear
+php vendor/bin/ml make:entity User
 php vendor/bin/ml make:migration
+php vendor/bin/ml migrate
+php vendor/bin/ml rollback
+php vendor/bin/ml route:list       # table of all routes
+php vendor/bin/ml openapi:export   # → stdout
 ```
-This creates an SQL file in var/migrations/ reflecting schema changes.
 
-## 🛠 CLI Commands
-- php vendor/bin/ml key:generate
-- php vendor/bin/ml cache:clear
-- php vendor/bin/ml make:entity [Name] (scaffold & update Entity)
-- php vendor/bin/ml make:migration
-- php vendor/bin/ml migrate
-- php vendor/bin/ml rollback
+---
 
-## ✅ Testing
+## ✅ Testing
+
 ```bash
-composer test
+composer test   # runs PHPUnit in tests/
 ```
-Runs PHPUnit against the tests/ directory.
 
-## 🤝 Contributing
-	1.	Fork this repository
-	2.	Create a feature branch
-	3.	Submit a PR
+---
 
-Happy hacking with MonkeysLegion!
+## 🤝 Contributing
+
+1. Fork 🍴
+2. Create a feature branch 🌱
+3. Submit a PR 🚀
+
+Happy hacking with **MonkeysLegion**! 🎉
