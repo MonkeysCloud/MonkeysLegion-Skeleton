@@ -30,7 +30,9 @@ use MonkeysLegion\Cli\Command\{
     KeyGenerateCommand,
     MakeEntityCommand,
     MigrateCommand,
-    RollbackCommand
+    RollbackCommand,
+    RouteListCommand,
+    OpenApiExportCommand
 };
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
@@ -324,6 +326,12 @@ return [
         $c->get(MigrationGenerator::class)
     ),
     MakeEntityCommand::class        => fn() => new MakeEntityCommand(),
+    RouteListCommand::class         => fn($c) => new RouteListCommand(
+            $c->get(RouteCollection::class)
+    ),
+    OpenApiExportCommand::class     => fn($c) => new OpenApiExportCommand(
+            $c->get(OpenApiGenerator::class)
+    ),
 
     CliKernel::class                => fn($c) => new CliKernel(
         $c,
@@ -334,6 +342,8 @@ return [
             RollbackCommand::class,
             DatabaseMigrationCommand::class,
             MakeEntityCommand::class,
+            RouteListCommand::class,
+            OpenApiExportCommand::class,
         ]
     ),
 ];

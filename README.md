@@ -191,8 +191,9 @@ php vendor/bin/ml make:entity User
 php vendor/bin/ml make:migration
 php vendor/bin/ml migrate
 php vendor/bin/ml rollback
-php vendor/bin/ml route:list       # table of all routes
-php vendor/bin/ml openapi:export   # → stdout
+php vendor/bin/ml route:list
+php vendor/bin/ml openapi:export
+php vendor/bin/ml openapi:export api.json
 ```
 
 ---
