@@ -1,23 +1,25 @@
-# MonkeysLegion Skeleton
+# MonkeysLegion Skeleton
 
-**A production‑ready starter for building web apps & APIs with the MonkeysLegion framework.**
+**A production-ready starter for building web apps & APIs with the MonkeysLegion framework.**
 
 Includes:
 
-* **PSR‑11 DI Container** with config‑first definitions
-* **PSR‑7/15 HTTP stack** (Request, Response, Middleware, Emitter)
-* **Attribute‑based Router v2** with auto‑discovery
-* **Live OpenAPI 3.1 & Swagger UI** (`/openapi.json`, `/docs`)
+* **PSR-11 DI Container** with config-first definitions
+* **PSR-7/15 HTTP stack** (Request, Response, Middleware, Emitter)
+* **Attribute-based Router v2** with auto-discovery
+* **Live OpenAPI 3.1 & Swagger UI** (`/openapi.json`, `/docs`)
 * **Validation layer** (DTO binding + attribute constraints)
-* **Sliding‑window Rate‑Limiter** (IP + User buckets)
+* **Sliding-window Rate-Limiter** (IP + User buckets)
 * **MLView** component templating
-* **CLI toolbox** (migrations, cache, key‑gen, scaffolding)
-* **Entity → SQL Migration** diff generator
-* **Dev‑server** with hot reload
+* **CLI toolbox** (migrations, cache, key-gen, scaffolding)
+* **Entity → Migration** SQL diff generator
+* **Schema auto-update** (`schema:update`)
+* **Fixtures & Seeds** commands
+* **Dev-server** with hot reload
 
 ---
 
-## 🚀 Quick‑start
+## 🚀 Quick-start
 
 ```bash
 composer create-project --stability=dev \
@@ -34,32 +36,48 @@ open http://127.0.0.1:8000 # your first MonkeysLegion page
 
 ---
 
-## 📁 Project layout
+## 📁 Project layout
 
 ```text
 my-app/
 ├─ app/
-│  ├─ Controller/     # HTTP controllers (auto‑scanned)
+│  ├─ Controller/     # HTTP controllers (auto-scanned)
 │  ├─ Dto/            # Request DTOs with validation attributes
 │  └─ Entity/         # DB entities
 ├─ config/
 │  ├─ app.php         # DI definitions (services & middleware)
 │  ├─ database.php    # DSN + creds
-│  └─ *.mlc           # key‑value config (CORS, cache, auth,…)
+│  └─ *.mlc           # key-value config (CORS, cache, auth,…)
 ├─ public/            # Web root (index.php, assets)
 ├─ resources/
 │  └─ views/          # MLView templates & components
 ├─ var/
-│  ├─ cache/          # Twig, rate‑limit buckets, etc.
-│  └─ migrations/     # Auto‑generated SQL
+│  ├─ cache/          # compiled templates, rate-limit buckets
+│  └─ migrations/     # auto-generated SQL
+├─ database/
+│  └─ seeders/        # generated seeder stubs
+├─ tests/             # PHPUnit integration/unit tests
+│  └─ IntegrationTestCase.php
 ├─ vendor/            # Composer deps
-├─ bin/               # Dev helpers (ml, dev‑server)
+├─ bin/               # Dev helpers (ml, dev-server)
+├─ phpunit.xml        # PHPUnit config
 └─ README.md
 ```
 
 ---
 
-## ⚙️ Routing & Controllers
+## 🔨 Configuration & DI
+
+All services are wired in **`config/app.php`**. Customize:
+
+* Database DSN & credentials (`config/database.php`)
+* CORS, cache, auth (`.mlc` files)
+* Middleware order, validation, rate-limit thresholds
+* CLI commands registered in `CliKernel`
+
+---
+
+## ⚙️ Routing & Controllers
 
 ### Attribute syntax v2
 
@@ -76,23 +94,23 @@ final class UserController
     public function login(): ResponseInterface { /* … */ }
 
     #[Route(['PUT','PATCH'], '/users/{id}', summary: 'Update user')]
-    public function update(string $id): ResponseInterface { /* … */ }
+    public function update(string \$id): ResponseInterface { /* … */ }
 }
 ```
 
-* Controllers under `app/Controller` are auto‑registered at boot.
-* Imperative routes are still possible via `$router->add()`.
+* Controllers under `app/Controller` auto-registered.
+* Imperative routes via `$router->add()` still available.
 
-### Live API docs
+### Live API docs
 
-| Endpoint            | Description                                              |
-| ------------------- | -------------------------------------------------------- |
-| `GET /openapi.json` | Machine‑readable OpenAPI 3.1 spec generated from routes. |
-| `GET /docs`         | Swagger UI consuming that spec.                          |
+| Endpoint            | Description                  |
+| ------------------- | ---------------------------- |
+| `GET /openapi.json` | OpenAPI 3.1 spec (generated) |
+| `GET /docs`         | Swagger UI                   |
 
 ---
 
-## 🔒 Validation Layer
+## 🔒 Validation Layer
 
 ```php
 namespace App\Dto;
@@ -103,67 +121,45 @@ final readonly class SignupRequest
 {
     public function __construct(
         #[Assert\NotBlank, Assert\Email]
-        public string $email,
+        public string \$email,
 
         #[Assert\Length(min: 8, max: 64)]
-        public string $password,
+        public string \$password,
     ) {}
 }
 ```
 
-* Middleware binds JSON + query params into DTO → auto‑validates.
-* On failure returns **400** with `errors[]` array.
+* Binds JSON & query params into DTOs.
+* On validation failure returns **400** with `{ "errors": […] }`.
 
 ---
 
-## 🚦 Rate Limiting
+## 🚦 Rate Limiting
 
-* **Hybrid buckets**: per‑user (`uid` attribute) or per‑IP (anonymous).
-* Defaults: **200 req / 60 s**. Change in `config/app.php`.
+* Hybrid buckets: per-user (`uid`) or per-IP.
+* Defaults: **200 req / 60 s**. Configurable in `config/app.php`.
+* Headers:
 
-Headers returned:
-
-```
-X-RateLimit-Limit: 200
-X-RateLimit-Remaining: 123
-X-RateLimit-Reset: 1716509930
-```
-
-429 responses include `Retry-After`.
+  ```
+  X-RateLimit-Limit: 200
+  X-RateLimit-Remaining: 123
+  X-RateLimit-Reset: 1716509930
+  ```
+* 429 responses include `Retry-After`.
 
 ---
 
-## 🖼 MLView Templating
+## 🖼 MLView Templating
 
-`resources/views/layouts/app.ml.php`:
+See `resources/views/…` for examples. Supports:
 
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head><title>{{ $title }}</title></head>
-<body>
-  {{ $slots['header']() }}
-  <main>{{ $slotContent }}</main>
-</body>
-</html>
-```
-
-`resources/views/home.ml.php`:
-
-```html
-<x-layout title="Home">
-  @slot('header')<h1>Hello World!</h1>@endslot
-  <p>Welcome to MonkeysLegion.</p>
-</x-layout>
-```
-
-* `{{ }}` → escaped, `{!! !!}` → raw.
-* `<x-foo>` includes `views/components/foo.ml.php`.
-* `@slot('name') … @endslot` for named slots.
+* Escaped (`{{ }}`) & raw (`{!! !!}`) output
+* Components (`<x-foo>`) & named slots
+* Layouts via `<x-layout>` and `@slot('…')`
 
 ---
 
-## 💾 Entities & Migrations
+## 💾 Entities & Migrations
 
 ```php
 use MonkeysLegion\Entity\Attributes\Field;
@@ -171,21 +167,32 @@ use MonkeysLegion\Entity\Attributes\Field;
 class User
 {
     #[Field(type: 'string', length: 255)]
-    private string $email;
+    private string \$email;
 }
 ```
 
 ```bash
-php vendor/bin/ml make:migration   # diff & SQL → var/migrations/
-php vendor/bin/ml migrate          # apply
+php vendor/bin/ml make:migration   # diff → var/migrations/
+php vendor/bin/ml migrate          # apply migrations
+php vendor/bin/ml rollback         # revert last migration
 ```
 
 ---
 
-## 🛠 CLI Cheatsheet
+## 🌱 Fixtures & Seeds
 
 ```bash
-php vendor/bin/ml key:generate     # 32‑byte APP_KEY
+php vendor/bin/ml make:seeder UsersTable  # create App/Database/Seeders/UsersTableSeeder.php
+php vendor/bin/ml db:seed                 # run all seeders
+php vendor/bin/ml db:seed UsersTable      # run only UsersTableSeeder
+```
+
+---
+
+## 🛠 CLI Cheatsheet
+
+```bash
+php vendor/bin/ml key:generate
 php vendor/bin/ml cache:clear
 php vendor/bin/ml make:entity User
 php vendor/bin/ml make:migration
@@ -193,28 +200,81 @@ php vendor/bin/ml migrate
 php vendor/bin/ml rollback
 php vendor/bin/ml route:list
 php vendor/bin/ml openapi:export
-php vendor/bin/ml openapi:export api.json
 php vendor/bin/ml schema:update --dump
 php vendor/bin/ml schema:update --force
 php vendor/bin/ml make:seeder UsersTable
 php vendor/bin/ml db:seed
-php vendor/bin/ml db:seed UsersTable
 ```
 
 ---
 
-## ✅ Testing
+## ✅ Testing & Build
 
-```bash
-composer test   # runs PHPUnit in tests/
+### Test Harness
+
+A base PHPUnit class **`tests/IntegrationTestCase.php`** provides:
+
+* **DI bootstrapping** from `config/app.php`
+* **PSR-15 pipeline** via `MiddlewareDispatcher`
+* `createRequest($method, $uri, $headers, $body)` to craft HTTP requests
+* `dispatch($request)` to get a `ResponseInterface`
+* **Assertions**:
+
+    * `assertStatus(Response, int)`
+    * `assertJsonResponse(Response, array)`
+
+**Example**:
+
+```php
+namespace Tests\Controller;
+
+use Tests\IntegrationTestCase;
+
+final class HomeControllerTest extends IntegrationTestCase
+{
+    public function testIndexReturnsHtml(): void
+    {
+        \$request  = \$this->createRequest('GET', '/');
+        \$response = \$this->dispatch(\$request);
+
+        \$this->assertStatus(\$response, 200);
+        \$this->assertStringContainsString('<h1>', (string)\$response->getBody());
+    }
+
+    public function testApiReturnsJson(): void
+    {
+        \$request  = \$this->createRequest(
+            'GET', '/api/users', ['Accept'=>'application/json']
+        );
+        \$response = \$this->dispatch(\$request);
+
+        \$this->assertStatus(\$response, 200);
+        \$this->assertJsonResponse(\$response, [ /* expected data */ ]);
+    }
+}
 ```
+
+### Setup
+
+1. Add test autoload in `composer.json`:
+
+   ```jsonc
+   "autoload-dev": { "psr-4": { "Tests\\": "tests/" } }
+   ```
+2. Create `phpunit.xml` pointing to `tests/` with bootstrap `vendor/autoload.php`.
+3. Run:
+
+   ```bash
+   composer dump-autoload
+   ./vendor/bin/phpunit
+   ```
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributing
 
-1. Fork 🍴
-2. Create a feature branch 🌱
-3. Submit a PR 🚀
+1. Fork 🍴
+2. Create a feature branch 🌱
+3. Submit a PR 🚀
 
 Happy hacking with **MonkeysLegion**! 🎉
