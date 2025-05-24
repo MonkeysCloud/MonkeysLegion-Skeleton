@@ -196,6 +196,9 @@ php vendor/bin/ml openapi:export
 php vendor/bin/ml openapi:export api.json
 php vendor/bin/ml schema:update --dump
 php vendor/bin/ml schema:update --force
+php vendor/bin/ml make:seeder UsersTable
+php vendor/bin/ml db:seed
+php vendor/bin/ml db:seed UsersTable
 ```
 
 ---

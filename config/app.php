@@ -30,11 +30,13 @@ use MonkeysLegion\Cli\Command\{ClearCacheCommand,
     DatabaseMigrationCommand,
     KeyGenerateCommand,
     MakeEntityCommand,
+    MakeSeederCommand,
     MigrateCommand,
     RollbackCommand,
     RouteListCommand,
     OpenApiExportCommand,
-    SchemaUpdateCommand};
+    SchemaUpdateCommand,
+    SeedCommand};
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
@@ -347,6 +349,10 @@ return [
         $c->get(EntityScanner::class),
         $c->get(MigrationGenerator::class)
     ),
+    MakeSeederCommand::class => fn()        => new MakeSeederCommand(),
+    SeedCommand::class      => fn($c)      => new SeedCommand(
+        $c->get(Connection::class)
+    ),
 
     CliKernel::class                => fn($c) => new CliKernel(
         $c,
@@ -360,6 +366,8 @@ return [
             RouteListCommand::class,
             OpenApiExportCommand::class,
             SchemaUpdateCommand::class,
+            MakeSeederCommand::class,
+            SeedCommand::class,
         ]
     ),
 ];
