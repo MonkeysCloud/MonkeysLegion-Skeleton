@@ -8,10 +8,18 @@ use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
 use MonkeysLegion\Template\Renderer;
 
+/**
+ * HomeController is responsible for rendering the home page.
+ */
 final class HomeController
 {
     public function __construct(private Renderer $renderer) {}
 
+    /**
+     * Render the home page.
+     *
+     * @return Response
+     */
     #[Route(
         methods: 'GET',
         path:    '/',
