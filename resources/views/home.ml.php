@@ -1,11 +1,15 @@
-<x-layout title="{{ $title }}">
+@extends('layouts.app')
 
-    @slot('header')
-    <h1>Welcome to MonkeysLegion!</h1>
-    @endslot
+@section('title')
+<?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?>
+@endsection
 
-    <section>
-        <p>This is your home page. Use this area to introduce visitors to your app.</p>
-    </section>
+@section('header')
+<h1>Welcome to MonkeysLegion!</h1>
+@endsection
 
-</x-layout>
+@section('content')
+<section>
+    <p>This is your home page. Use this area to introduce visitors to your app.</p>
+</section>
+@endsection
