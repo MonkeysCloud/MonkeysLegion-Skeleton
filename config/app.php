@@ -36,7 +36,8 @@ use MonkeysLegion\Cli\Command\{ClearCacheCommand,
     RouteListCommand,
     OpenApiExportCommand,
     SchemaUpdateCommand,
-    SeedCommand};
+    SeedCommand,
+    TinkerCommand};
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
@@ -353,6 +354,7 @@ return [
     SeedCommand::class      => fn($c)      => new SeedCommand(
         $c->get(Connection::class)
     ),
+    TinkerCommand::class => fn() => new TinkerCommand(),
 
     CliKernel::class                => fn($c) => new CliKernel(
         $c,
@@ -368,6 +370,7 @@ return [
             SchemaUpdateCommand::class,
             MakeSeederCommand::class,
             SeedCommand::class,
+            TinkerCommand::class,
         ]
     ),
 ];
