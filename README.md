@@ -151,11 +151,17 @@ final readonly class SignupRequest
 
 ## 🖼 MLView Templating
 
-See `resources/views/…` for examples. Supports:
+Place templates in `resources/views/` with `.ml.php` extension. MLView supports:
 
-* Escaped (`{{ }}`) & raw (`{!! !!}`) output
-* Components (`<x-foo>`) & named slots
-* Layouts via `<x-layout>` and `@slot('…')`
+- **Escaped output**: `{{ $var }}`
+- **Raw output**: `{!! $html !!}`
+- **Components**: `<x-foo>` includes `views/components/foo.ml.php`
+- **Slots**: `<x-layout>…</x-layout>` with `@slot('name')…@endslot`
+- **Layout inheritance**:
+    - Child views start with `@extends('layouts.app')`
+    - Define blocks in the child with `@section('name')…@endsection`
+    - In the parent layout, use `@yield('name')` to inject each block
+- **Control structures**: `@if … @endif`, `@foreach … @endforeach`
 
 ---
 

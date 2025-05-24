@@ -75,6 +75,8 @@ use MonkeysLegion\Template\{
     Renderer as TemplateRenderer
 };
 
+use MonkeysLegion\I18n\Translator;
+
 use Prometheus\Storage\APC;               // or Redis
 use MonkeysLegion\Telemetry\{
     MetricsInterface,
@@ -198,6 +200,13 @@ return [
         $c->get(TemplateCompiler::class),
         $c->get(TemplateLoader::class),
         (bool) $c->get(MlcConfig::class)->get('cache.enabled', true)
+    ),
+
+    Translator::class => fn($c) => new Translator(
+    // fetch locale from env or request (here default 'en')
+        $c->get(MlcConfig::class)->get('app.locale', 'en'),
+        base_path('resources/lang'),
+        'en'
     ),
 
     /* ----------------------------------------------------------------- */

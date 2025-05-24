@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ $title }}</title>
-    <link rel="stylesheet" href="/assets/css/app.css">
+    <link rel="stylesheet" href="<?= asset('css/app.css') ?>">
+    <script src="<?= asset('js/app.js') ?>"></script>
 </head>
 <body>
 <nav>
