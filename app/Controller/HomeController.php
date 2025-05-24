@@ -10,20 +10,28 @@ use MonkeysLegion\Template\Renderer;
 
 final class HomeController
 {
-    #[Route('GET', '/')]
+    public function __construct(private Renderer $renderer) {}
+
+    #[Route(
+        methods: 'GET',
+        path:    '/',
+        name:    'home',
+        summary: 'Render home page',
+        tags:    ['Page']
+    )]
     public function index(): Response
     {
-        // Grab the view renderer from the global container
-        /** @var Renderer $view */
-        $view = ML_CONTAINER->get(Renderer::class);
-
-        // Render the 'home' template, passing the title
-        $html = $view->render('home', [
+        // 1) Render template
+        $html = $this->renderer->render('home', [
             'title' => 'Home',
         ]);
 
+        // 2) Build a Stream from the HTML
+        $body = Stream::createFromString($html);
+
+        // 3) Return the MonkeysLegion PSR-7 Response
         return new Response(
-            Stream::createFromString($html),
+            $body,
             200,
             ['Content-Type' => 'text/html']
         );
