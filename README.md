@@ -195,6 +195,9 @@ php vendor/bin/ml db:seed UsersTable      # run only UsersTableSeeder
 php vendor/bin/ml key:generate
 php vendor/bin/ml cache:clear
 php vendor/bin/ml make:entity User
+php vendor/bin/ml make:controller User
+php vendor/bin/ml make:middleware Auth
+php vendor/bin/ml make:policy User
 php vendor/bin/ml make:migration
 php vendor/bin/ml migrate
 php vendor/bin/ml rollback

@@ -29,7 +29,10 @@ use MonkeysLegion\Cli\CliKernel;
 use MonkeysLegion\Cli\Command\{ClearCacheCommand,
     DatabaseMigrationCommand,
     KeyGenerateCommand,
+    MakeControllerCommand,
     MakeEntityCommand,
+    MakeMiddlewareCommand,
+    MakePolicyCommand,
     MakeSeederCommand,
     MigrateCommand,
     RollbackCommand,
@@ -327,36 +330,43 @@ return [
     SapiEmitter::class          => fn() => new SapiEmitter(),
 
     /* ----------------------------------------------------------------- */
-    /* CLI commands + kernel                                              */
+    /* CLI commands + kernel                                            */
     /* ----------------------------------------------------------------- */
     ClearCacheCommand::class        => fn() => new ClearCacheCommand(),
     KeyGenerateCommand::class       => fn() => new KeyGenerateCommand(),
-    MigrateCommand::class           => fn($c) => new MigrateCommand($c->get(Connection::class)),
-    RollbackCommand::class          => fn($c) => new RollbackCommand($c->get(Connection::class)),
+    MigrateCommand::class           => fn($c) => new MigrateCommand(
+        $c->get(Connection::class)
+    ),
+    RollbackCommand::class          => fn($c) => new RollbackCommand(
+        $c->get(Connection::class)
+    ),
     DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
         $c->get(Connection::class),
         $c->get(EntityScanner::class),
         $c->get(MigrationGenerator::class)
     ),
     MakeEntityCommand::class        => fn() => new MakeEntityCommand(),
+    MakeControllerCommand::class    => fn() => new MakeControllerCommand(),
+    MakeMiddlewareCommand::class    => fn() => new MakeMiddlewareCommand(),
+    MakePolicyCommand::class        => fn() => new MakePolicyCommand(),
     RouteListCommand::class         => fn($c) => new RouteListCommand(
-            $c->get(RouteCollection::class)
+        $c->get(RouteCollection::class)
     ),
     OpenApiExportCommand::class     => fn($c) => new OpenApiExportCommand(
-            $c->get(OpenApiGenerator::class)
+        $c->get(OpenApiGenerator::class)
     ),
-    SchemaUpdateCommand::class => fn($c) => new SchemaUpdateCommand(
+    SchemaUpdateCommand::class      => fn($c) => new SchemaUpdateCommand(
         $c->get(Connection::class),
         $c->get(EntityScanner::class),
         $c->get(MigrationGenerator::class)
     ),
-    MakeSeederCommand::class => fn()        => new MakeSeederCommand(),
-    SeedCommand::class      => fn($c)      => new SeedCommand(
+    MakeSeederCommand::class        => fn() => new MakeSeederCommand(),
+    SeedCommand::class              => fn($c) => new SeedCommand(
         $c->get(Connection::class)
     ),
-    TinkerCommand::class => fn() => new TinkerCommand(),
+    TinkerCommand::class            => fn() => new TinkerCommand(),
 
-    CliKernel::class                => fn($c) => new CliKernel(
+    CliKernel::class => fn($c) => new CliKernel(
         $c,
         [
             ClearCacheCommand::class,
@@ -365,6 +375,9 @@ return [
             RollbackCommand::class,
             DatabaseMigrationCommand::class,
             MakeEntityCommand::class,
+            MakeControllerCommand::class,
+            MakeMiddlewareCommand::class,
+            MakePolicyCommand::class,
             RouteListCommand::class,
             OpenApiExportCommand::class,
             SchemaUpdateCommand::class,
