@@ -194,6 +194,8 @@ php vendor/bin/ml rollback
 php vendor/bin/ml route:list
 php vendor/bin/ml openapi:export
 php vendor/bin/ml openapi:export api.json
+php vendor/bin/ml schema:update --dump
+php vendor/bin/ml schema:update --force
 ```
 
 ---

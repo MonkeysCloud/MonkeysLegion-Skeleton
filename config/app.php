@@ -9,6 +9,8 @@ use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use Laminas\Diactoros\UriFactory;
 
+use MonkeysLegion\Query\QueryBuilder;
+use MonkeysLegion\Repository\RepositoryFactory;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
 
@@ -24,16 +26,15 @@ use Psr\SimpleCache\CacheInterface;
 use MonkeysLegion\Http\SimpleFileCache;
 
 use MonkeysLegion\Cli\CliKernel;
-use MonkeysLegion\Cli\Command\{
-    ClearCacheCommand,
+use MonkeysLegion\Cli\Command\{ClearCacheCommand,
     DatabaseMigrationCommand,
     KeyGenerateCommand,
     MakeEntityCommand,
     MigrateCommand,
     RollbackCommand,
     RouteListCommand,
-    OpenApiExportCommand
-};
+    OpenApiExportCommand,
+    SchemaUpdateCommand};
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
@@ -125,7 +126,7 @@ return [
     /* ----------------------------------------------------------------- */
     /* PSR-7 ServerRequest (create once from globals)                    */
     /* ----------------------------------------------------------------- */
-    ServerRequestInterface::class       => fn() => (new ServerRequestFactory())->fromGlobals(),
+    ServerRequestInterface::class       => fn() => new ServerRequestFactory()->fromGlobals(),
 
     /* ----------------------------------------------------------------- */
     /* PSR-16 Cache (file-based fallback for rate-limiting)              */
@@ -197,6 +198,15 @@ return [
     /* Database                                                            */
     /* ----------------------------------------------------------------- */
     Connection::class         => fn() => new Connection(require __DIR__ . '/database.php'),
+
+    /* ----------------------------------------------------------------- */
+    /* Query Builder & Repositories                                       */
+    /* ----------------------------------------------------------------- */
+    QueryBuilder::class   => fn($c) => new QueryBuilder($c->get(Connection::class)),
+
+    RepositoryFactory::class => fn($c) => new RepositoryFactory(
+        $c->get(QueryBuilder::class)
+    ),
 
     /* ----------------------------------------------------------------- */
     /* Entity scanner + migration generator                               */
@@ -332,6 +342,11 @@ return [
     OpenApiExportCommand::class     => fn($c) => new OpenApiExportCommand(
             $c->get(OpenApiGenerator::class)
     ),
+    SchemaUpdateCommand::class => fn($c) => new SchemaUpdateCommand(
+        $c->get(Connection::class),
+        $c->get(EntityScanner::class),
+        $c->get(MigrationGenerator::class)
+    ),
 
     CliKernel::class                => fn($c) => new CliKernel(
         $c,
@@ -344,6 +359,7 @@ return [
             MakeEntityCommand::class,
             RouteListCommand::class,
             OpenApiExportCommand::class,
+            SchemaUpdateCommand::class,
         ]
     ),
 ];
