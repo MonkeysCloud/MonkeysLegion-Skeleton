@@ -3,12 +3,20 @@ declare(strict_types=1);
 if (function_exists('opcache_reset')) {
     opcache_reset();
 }
+
+use App\Repository\UserRepository;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\StreamFactory;
 use Laminas\Diactoros\UploadedFileFactory;
 use Laminas\Diactoros\UriFactory;
 
+use MonkeysLegion\Auth\AuthService;
+use MonkeysLegion\Auth\JwtService;
+use MonkeysLegion\Auth\Middleware\AuthorizationMiddleware;
+use MonkeysLegion\Auth\Middleware\JwtAuthMiddleware;
+use MonkeysLegion\Auth\PasswordHasher;
+use MonkeysLegion\AuthService\AuthorizationService;
 use MonkeysLegion\Query\QueryBuilder;
 use MonkeysLegion\Repository\RepositoryFactory;
 use Monolog\Logger;
@@ -284,6 +292,31 @@ return [
     // you can inject LoggerInterface here if your middleware takes it
     ),
 
+    PasswordHasher::class => fn() => new PasswordHasher(),
+    JwtService::class      => fn($c) => new JwtService(
+        $c->get(MlcConfig::class)->get('auth.jwt_secret'),
+        (int)$c->get(MlcConfig::class)->get('auth.jwt_ttl', 3600)
+    ),
+    AuthService::class     => fn($c) => new AuthService(
+        $c->get(UserRepository::class),
+        $c->get(PasswordHasher::class),
+        $c->get(JwtService::class)
+    ),
+    JwtAuthMiddleware::class => fn($c) => new JwtAuthMiddleware(
+        $c->get(JwtService::class),
+        $c->get(ResponseFactoryInterface::class)
+    ),
+
+    // Authorization service & middleware
+    //    AuthorizationService::class => fn() => tap(new AuthorizationService(), function($svc) {
+    //        $svc->registerPolicy(App\Entity\Post::class, App\Policy\PostPolicy::class);
+    //        // register more policies here...
+    //    }),
+
+    AuthorizationMiddleware::class => fn($c) => new AuthorizationMiddleware(
+        $c->get(AuthorizationService::class)
+    ),
+
     /* ----------------------------------------------------------------- */
     /* Validation layer                                                  */
     /* ----------------------------------------------------------------- */
@@ -329,6 +362,8 @@ return [
             $c->get(ContentNegotiationMiddleware::class),
             $c->get(ValidationMiddleware::class),
             $c->get(OpenApiMiddleware::class),
+            $c->get(JwtAuthMiddleware::class),
+            $c->get(AuthorizationMiddleware::class),
         ],
         $c->get(CoreRequestHandler::class)
     ),

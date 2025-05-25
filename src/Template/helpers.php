@@ -14,6 +14,7 @@ declare(strict_types=1);
  */
 
 use MonkeysLegion\I18n\Translator;
+use Psr\Http\Message\ServerRequestInterface;
 
 if (! function_exists('asset')) {
     function asset(string $path): string
@@ -78,5 +79,21 @@ if (! function_exists('csrf_field')) {
     {
         $token = htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
         return '<input type="hidden" name="_csrf" value="' . $token . '" />';
+    }
+}
+
+if (!function_exists('auth_user_id')) {
+    function auth_user_id(): ?int
+    {
+        /** @var ServerRequestInterface $req */
+        $req = ML_CONTAINER->get(ServerRequestInterface::class);
+        return $req->getAttribute('userId');
+    }
+}
+
+if (!function_exists('auth_check')) {
+    function auth_check(): bool
+    {
+        return auth_user_id() !== null;
     }
 }
