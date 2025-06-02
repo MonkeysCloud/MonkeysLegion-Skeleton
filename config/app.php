@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 if (function_exists('opcache_reset')) {
     opcache_reset();
@@ -34,7 +35,8 @@ use Psr\SimpleCache\CacheInterface;
 use MonkeysLegion\Http\SimpleFileCache;
 
 use MonkeysLegion\Cli\CliKernel;
-use MonkeysLegion\Cli\Command\{ClearCacheCommand,
+use MonkeysLegion\Cli\Command\{
+    ClearCacheCommand,
     DatabaseMigrationCommand,
     KeyGenerateCommand,
     MakeControllerCommand,
@@ -48,21 +50,24 @@ use MonkeysLegion\Cli\Command\{ClearCacheCommand,
     OpenApiExportCommand,
     SchemaUpdateCommand,
     SeedCommand,
-    TinkerCommand};
+    TinkerCommand
+};
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
 
-use MonkeysLegion\Http\{CoreRequestHandler,
+use MonkeysLegion\Http\{
+    CoreRequestHandler,
     Middleware\ContentNegotiationMiddleware,
     RouteRequestHandler,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
-    Emitter\SapiEmitter};
+    Emitter\SapiEmitter
+};
 
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
@@ -102,7 +107,8 @@ use MonkeysLegion\Http\OpenApi\{
     OpenApiGenerator,
     OpenApiMiddleware
 };
-
+use MonkeysLegion\Stripe\Provider\StripeServiceProvider;
+use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Validation\ValidatorInterface;
 use MonkeysLegion\Validation\AttributeValidator;
 use MonkeysLegion\Validation\DtoBinder;
@@ -113,6 +119,7 @@ use MonkeysLegion\Validation\Middleware\ValidationMiddleware;
 | Dependency-injection definitions
 |--------------------------------------------------------------------------
 */
+
 return [
 
     /*
@@ -120,7 +127,7 @@ return [
     | PSR-3 Logger (Monolog)
     |--------------------------------------------------------------------------
     */
-    LoggerInterface::class => function() {
+    LoggerInterface::class => function () {
         $log = new Logger('app');
         $log->pushHandler(
             new StreamHandler(
@@ -166,8 +173,8 @@ return [
     /* ———————————————————————————————————————————————
     *  Event dispatcher (PSR-14)
     * ——————————————————————————————————————————————— */
-    ListenerProvider::class        => fn () => new ListenerProvider(),
-    EventDispatcherInterface::class => fn ($c) => new EventDispatcher(
+    ListenerProvider::class        => fn() => new ListenerProvider(),
+    EventDispatcherInterface::class => fn($c) => new EventDispatcher(
         $c->get(ListenerProvider::class)
     ),
 
@@ -211,7 +218,7 @@ return [
     ),
 
     Translator::class => fn($c) => new Translator(
-    // fetch locale from env or request (here default 'en')
+        // fetch locale from env or request (here default 'en')
         $c->get(MlcConfig::class)->get('app.locale', 'en'),
         base_path('resources/lang'),
         'en'
@@ -268,12 +275,12 @@ return [
     /* Rate-limit middleware                                              */
     /* ----------------------------------------------------------------- */
     RateLimitMiddleware::class =>
-        fn($c) => new RateLimitMiddleware(
-            $c->get(ResponseFactoryInterface::class),
-            $c->get(CacheInterface::class),
-            200,   // limit
-            60     // window (seconds)
-        ),
+    fn($c) => new RateLimitMiddleware(
+        $c->get(ResponseFactoryInterface::class),
+        $c->get(CacheInterface::class),
+        200,   // limit
+        60     // window (seconds)
+    ),
 
     /* ----------------------------------------------------------------- */
     /* Authentication middleware                                          */
@@ -289,7 +296,7 @@ return [
     /* Simple logging middleware                                          */
     /* ----------------------------------------------------------------- */
     LoggingMiddleware::class    => fn() => new LoggingMiddleware(
-    // you can inject LoggerInterface here if your middleware takes it
+        // you can inject LoggerInterface here if your middleware takes it
     ),
 
     PasswordHasher::class => fn() => new PasswordHasher(),
@@ -430,4 +437,10 @@ return [
             TinkerCommand::class,
         ]
     ),
+
+    //Register Stripe Service Provider to work globally in service container
+    'stripe' => (function () {
+        $c = ServiceContainer::getInstance();
+        return (new StripeServiceProvider($c))->register();
+    })(),
 ];

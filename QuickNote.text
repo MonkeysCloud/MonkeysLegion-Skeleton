@@ -1,6 +1,5 @@
-php bin/key-helper.php
-Usage:
-  key-helper.php generate [KEY_NAME]   # Generate and save a new key (default: APP_KEY)
-  key-helper.php rotate [KEY_NAME]     # Rotate (replace) the key
-  key-helper.php validate [KEY_NAME]   # Validate the existing key
-  key-helper.php show [KEY_NAME]       # Show the current key
+Stripe publish config
+php vendor/monkeyscloud/monkeyslegion-stripe/publish.php 
+
+key helper
+php vendor/monkeyscloud/monkeyslegion-stripe/bin/key-helper.php
