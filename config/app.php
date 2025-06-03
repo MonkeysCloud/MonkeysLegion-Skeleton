@@ -107,6 +107,7 @@ use MonkeysLegion\Http\OpenApi\{
     OpenApiGenerator,
     OpenApiMiddleware
 };
+use MonkeysLegion\Stripe\Client\HttpClient;
 use MonkeysLegion\Stripe\Provider\StripeServiceProvider;
 use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Validation\ValidatorInterface;
@@ -438,9 +439,15 @@ return [
         ]
     ),
 
-    //Register Stripe Service Provider to work globally in service container
-    'stripe' => (function () {
+    (function () {
         $c = ServiceContainer::getInstance();
-        return (new StripeServiceProvider($c))->register();
+
+        // Register Stripe Service Provider to work globally in service container
+        (new StripeServiceProvider($c))->register();
+
+        // Register the HTTP client as a service
+        $c->set('http_client', function () {
+            return new HttpClient();
+        });
     })(),
 ];

@@ -1,5 +1,0 @@
-Stripe publish config
-php vendor/monkeyscloud/monkeyslegion-stripe/publish.php 
-
-key helper
-php vendor/monkeyscloud/monkeyslegion-stripe/bin/key-helper.php

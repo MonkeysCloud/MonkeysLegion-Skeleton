@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Controller;
@@ -22,10 +23,10 @@ final class HomeController
      */
     #[Route(
         methods: 'GET',
-        path:    '/',
-        name:    'home',
+        path: '/',
+        name: 'home',
         summary: 'Render home page',
-        tags:    ['Page']
+        tags: ['Page']
     )]
     public function index(): Response
     {
