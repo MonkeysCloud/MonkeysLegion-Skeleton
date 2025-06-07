@@ -200,7 +200,7 @@ return [
     ),
     MlcConfig::class                    => fn($c) => $c
         ->get(MlcLoader::class)
-        ->load(['app', 'cors', 'cache', 'auth']),
+        ->load(['app', 'cors', 'cache', 'auth', 'stripe']),
 
     /* ----------------------------------------------------------------- */
     /* Template engine                                                    */
