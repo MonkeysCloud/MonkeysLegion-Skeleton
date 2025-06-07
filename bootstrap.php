@@ -14,7 +14,7 @@ if (file_exists(__DIR__ . '/.env')) {
 }
 
 // ── Error / debug mode ────────────────────────────────────────────
-if ($_ENV['DEBUG_MODE'] ?? false) {
+if ($_ENV['APP_DEBUG'] ?? false) {
     ini_set('display_errors', '1');
     ini_set('display_startup_errors', '1');
     error_reporting(E_ALL);
