@@ -1,0 +1,9 @@
+{"timestamp":"2025-06-14 11:58:43","type":"SUCCESS","event_name":"Charge Succeeded","event_id":"evt_3RZseYP0DEEpnflM1KeLkfAI","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 11:58:43","type":"SUCCESS","event_name":"Payment Succeeded","event_id":"evt_3RZseYP0DEEpnflM1cDrAMKL","message":"Event processed successfully: Payment was successfully processed"}
+{"timestamp":"2025-06-14 11:58:43","type":"SUCCESS","event_name":"Payment Created","event_id":"evt_3RZseYP0DEEpnflM1hdUkQT8","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 11:58:45","type":"SUCCESS","event_name":"Charge Updated","event_id":"evt_3RZseYP0DEEpnflM1R6xnxOh","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 11:58:47","type":"SUCCESS","event_name":"Payment Created","event_id":"evt_3RZsT8P0DEEpnflM0bioZSUL","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 11:58:57","type":"DUPLICATE","event_name":"Already Processed Event","event_id":"evt_3RZsT8P0DEEpnflM0bioZSUL","message":"Event was already processed by the system ikhan"}
+{"timestamp":"2025-06-14 12:02:13","type":"SUCCESS","event_name":"Charge Failed","event_id":"evt_3RZshwP0DEEpnflM0Nmf68om","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 12:02:13","type":"SUCCESS","event_name":"Payment Created","event_id":"evt_3RZshwP0DEEpnflM0rAXjixa","message":"Event processed successfully: Event was processed successfully"}
+{"timestamp":"2025-06-14 12:02:13","type":"SUCCESS","event_name":"Payment Failed","event_id":"evt_3RZshwP0DEEpnflM0rtt3iNC","message":"Event processed successfully: Payment failure was properly handled"}

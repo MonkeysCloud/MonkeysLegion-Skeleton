@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -54,7 +55,8 @@ if (! function_exists('asset')) {
 }
 
 if (!function_exists('trans')) {
-    function trans(string $key, array $replace = []): string {
+    function trans(string $key, array $replace = []): string
+    {
         /** @var Translator $t */
         $t = ML_CONTAINER->get(Translator::class);
         return $t->trans($key, $replace);

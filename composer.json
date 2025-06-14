@@ -8,7 +8,7 @@
   "require": {
     "php": "^8.4",
     "monkeyscloud/monkeyslegion": "^1.0@dev",
-    "monkeyscloud/monkeyslegion-stripe": "*",
+    "monkeyscloud/monkeyslegion-stripe": "dev-main",
     "laminas/laminas-diactoros": "^3.6",
     "monolog/monolog": "^3.9",
     "guzzlehttp/guzzle": "^7.9",
@@ -29,8 +29,7 @@
   },
   "autoload": {
     "psr-4": {
-      "App\\": "app/",
-      "MonkeysLegion\\Stripe\\": "src/"
+      "App\\": "app/"
     },
     "files": [
       "src/Template/helpers.php"
@@ -51,7 +50,8 @@
     ],
     "serve": "php vendor/bin/dev-server",
     "server:stop": "php vendor/bin/dev-server stop",
-    "test": "phpunit"
+    "test": "phpunit",
+    "stripe": "php vendor/monkeyscloud/monkeyslegion-stripe/bin/key-helper.php"
   },
   "bin": [
     "bin/ml",
