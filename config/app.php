@@ -279,7 +279,7 @@ return [
     fn($c) => new RateLimitMiddleware(
         $c->get(ResponseFactoryInterface::class),
         $c->get(CacheInterface::class),
-        200,   // limit
+        5000,   // limit
         60     // window (seconds)
     ),
 
@@ -290,7 +290,45 @@ return [
         $c->get(ResponseFactoryInterface::class),
         'Protected',
         (string) $c->get(MlcConfig::class)->get('auth.token'),
-        ['/']  // public paths
+        [
+            // Home page
+            '/',
+
+            // Stripe-related paths
+            '/stripe/payment',
+            '/stripe/setup-intent',
+            '/stripe/payment-intent',
+            '/stripe/checkout-session',
+            '/stripe/checkout-url',
+            '/stripe/subscription',
+            '/stripe/subscription/cancel',
+            '/stripe/product',
+            '/stripe/product/update',
+            '/stripe/product/delete',
+
+            // Documentation paths
+            '/docs',
+            '/docs/payment-intent',
+            '/docs/setup-intent',
+            '/docs/checkout-session',
+            '/docs/subscription',
+            '/docs/product',
+
+            // Success/Cancel pages
+            '/success',
+            '/cancel',
+
+            '/posts',
+
+            // Webhook paths
+            '/webhook/demo',
+            '/webhook/stripe',
+            '/webhook/logs',
+            '/webhook/clear-logs',
+            '/webhook/test',
+            '/webhook/clear-store',
+            '/webhook/event/{id}',
+        ]  // public paths
     ),
 
     /* ----------------------------------------------------------------- */
@@ -442,10 +480,8 @@ return [
     (function () {
         $c = ServiceContainer::getInstance();
 
-        // Register Stripe Service Provider to work globally in service container
         (new StripeServiceProvider($c))->register();
 
-        // Register the HTTP client as a service
         $c->set('http_client', function () {
             return new HttpClient();
         });
