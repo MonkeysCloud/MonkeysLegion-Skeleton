@@ -5,11 +5,7 @@ if (function_exists('opcache_reset')) {
 }
 
 use App\Repository\UserRepository;
-use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UploadedFileFactory;
-use Laminas\Diactoros\UriFactory;
 
 use MonkeysLegion\Auth\AuthService;
 use MonkeysLegion\Auth\JwtService;
@@ -32,6 +28,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use MonkeysLegion\Http\SimpleFileCache;
+use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
 use MonkeysLegion\Cli\Command\{ClearCacheCommand,
@@ -134,15 +131,18 @@ return [
     /* ----------------------------------------------------------------- */
     /* PSR-17 factories                                                   */
     /* ----------------------------------------------------------------- */
-    ResponseFactoryInterface::class     => fn() => new ResponseFactory(),
-    StreamFactoryInterface::class       => fn() => new StreamFactory(),
-    UploadedFileFactoryInterface::class => fn() => new UploadedFileFactory(),
-    UriFactoryInterface::class          => fn() => new UriFactory(),
+    HttpFactory::class                  => fn() => new HttpFactory(),
+
+    ResponseFactoryInterface::class     => fn($c) => $c->get(HttpFactory::class),
+    StreamFactoryInterface::class       => fn($c) => $c->get(HttpFactory::class),
+    UploadedFileFactoryInterface::class => fn($c) => $c->get(HttpFactory::class),
+    UriFactoryInterface::class          => fn($c) => $c->get(HttpFactory::class),
 
     /* ----------------------------------------------------------------- */
     /* PSR-7 ServerRequest (create once from globals)                    */
     /* ----------------------------------------------------------------- */
-    ServerRequestInterface::class       => fn() => new ServerRequestFactory()->fromGlobals(),
+    ServerRequestInterface::class       => fn() =>
+    new ServerRequestFactory()->fromGlobals(),
 
     /* ----------------------------------------------------------------- */
     /* PSR-16 Cache (file-based fallback for rate-limiting)              */
