@@ -13,6 +13,7 @@ use MonkeysLegion\Auth\Middleware\AuthorizationMiddleware;
 use MonkeysLegion\Auth\Middleware\JwtAuthMiddleware;
 use MonkeysLegion\Auth\PasswordHasher;
 use MonkeysLegion\AuthService\AuthorizationService;
+use MonkeysLegion\Cli\Support\CommandFinder;
 use MonkeysLegion\Query\QueryBuilder;
 use MonkeysLegion\Repository\RepositoryFactory;
 use Monolog\Logger;
@@ -377,60 +378,8 @@ return [
     /* ----------------------------------------------------------------- */
     /* CLI commands + kernel                                            */
     /* ----------------------------------------------------------------- */
-    ClearCacheCommand::class        => fn() => new ClearCacheCommand(),
-    KeyGenerateCommand::class       => fn() => new KeyGenerateCommand(),
-    MigrateCommand::class           => fn($c) => new MigrateCommand(
-        $c->get(Connection::class)
-    ),
-    RollbackCommand::class          => fn($c) => new RollbackCommand(
-        $c->get(Connection::class)
-    ),
-    CreateDatabaseCommand::class    => fn() => new CreateDatabaseCommand(),
-    DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
-        $c->get(Connection::class),
-        $c->get(EntityScanner::class),
-        $c->get(MigrationGenerator::class)
-    ),
-    MakeEntityCommand::class        => fn() => new MakeEntityCommand(),
-    MakeControllerCommand::class    => fn() => new MakeControllerCommand(),
-    MakeMiddlewareCommand::class    => fn() => new MakeMiddlewareCommand(),
-    MakePolicyCommand::class        => fn() => new MakePolicyCommand(),
-    RouteListCommand::class         => fn($c) => new RouteListCommand(
-        $c->get(RouteCollection::class)
-    ),
-    OpenApiExportCommand::class     => fn($c) => new OpenApiExportCommand(
-        $c->get(OpenApiGenerator::class)
-    ),
-    SchemaUpdateCommand::class      => fn($c) => new SchemaUpdateCommand(
-        $c->get(Connection::class),
-        $c->get(EntityScanner::class),
-        $c->get(MigrationGenerator::class)
-    ),
-    MakeSeederCommand::class        => fn() => new MakeSeederCommand(),
-    SeedCommand::class              => fn($c) => new SeedCommand(
-        $c->get(Connection::class)
-    ),
-    TinkerCommand::class            => fn() => new TinkerCommand(),
-
     CliKernel::class => fn($c) => new CliKernel(
         $c,
-        [
-            CreateDatabaseCommand::class,
-            ClearCacheCommand::class,
-            KeyGenerateCommand::class,
-            MigrateCommand::class,
-            RollbackCommand::class,
-            DatabaseMigrationCommand::class,
-            MakeEntityCommand::class,
-            MakeControllerCommand::class,
-            MakeMiddlewareCommand::class,
-            MakePolicyCommand::class,
-            RouteListCommand::class,
-            OpenApiExportCommand::class,
-            SchemaUpdateCommand::class,
-            MakeSeederCommand::class,
-            SeedCommand::class,
-            TinkerCommand::class,
-        ]
+        MonkeysLegion\Cli\Support\CommandFinder::all()
     ),
 ];
