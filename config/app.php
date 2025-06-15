@@ -32,22 +32,6 @@ use MonkeysLegion\Http\SimpleFileCache;
 use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
-use MonkeysLegion\Cli\Command\{ClearCacheCommand,
-    CreateDatabaseCommand,
-    DatabaseMigrationCommand,
-    KeyGenerateCommand,
-    MakeControllerCommand,
-    MakeEntityCommand,
-    MakeMiddlewareCommand,
-    MakePolicyCommand,
-    MakeSeederCommand,
-    MigrateCommand,
-    RollbackCommand,
-    RouteListCommand,
-    OpenApiExportCommand,
-    SchemaUpdateCommand,
-    SeedCommand,
-    TinkerCommand};
 
 use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
@@ -237,7 +221,9 @@ return [
     /* Entity scanner + migration generator                               */
     /* ----------------------------------------------------------------- */
     EntityScanner::class      => fn() => new EntityScanner(base_path('app/Entity')),
-    MigrationGenerator::class => fn() => new MigrationGenerator(),
+    MigrationGenerator::class => fn($c) => new MigrationGenerator(
+        $c->get(Connection::class)
+    ),
 
     /* ----------------------------------------------------------------- */
     /* Routing                                                             */
@@ -380,6 +366,6 @@ return [
     /* ----------------------------------------------------------------- */
     CliKernel::class => fn($c) => new CliKernel(
         $c,
-        MonkeysLegion\Cli\Support\CommandFinder::all()
+        CommandFinder::all()
     ),
 ];
