@@ -32,6 +32,7 @@ use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
 use MonkeysLegion\Cli\Command\{ClearCacheCommand,
+    CreateDatabaseCommand,
     DatabaseMigrationCommand,
     KeyGenerateCommand,
     MakeControllerCommand,
@@ -384,6 +385,7 @@ return [
     RollbackCommand::class          => fn($c) => new RollbackCommand(
         $c->get(Connection::class)
     ),
+    CreateDatabaseCommand::class    => fn() => new CreateDatabaseCommand(),
     DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
         $c->get(Connection::class),
         $c->get(EntityScanner::class),
@@ -413,6 +415,7 @@ return [
     CliKernel::class => fn($c) => new CliKernel(
         $c,
         [
+            CreateDatabaseCommand::class,
             ClearCacheCommand::class,
             KeyGenerateCommand::class,
             MigrateCommand::class,
