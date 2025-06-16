@@ -33,13 +33,11 @@ use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
 
-use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
 
 use MonkeysLegion\Http\{CoreRequestHandler,
-    Middleware\ContentNegotiationMiddleware,
     RouteRequestHandler,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
@@ -176,9 +174,29 @@ return [
         $c->get(MlcParser::class),
         base_path('config')
     ),
-    MlcConfig::class                    => fn($c) => $c
-        ->get(MlcLoader::class)
-        ->load(['app', 'cors', 'cache', 'auth']),
+
+    /* -----------------------------------------------------------------
+     | Dynamic .mlc config loader
+     | – picks up every *.mlc file in config/ at runtime
+     * ---------------------------------------------------------------- */
+    MlcConfig::class => static function ($c) {
+        /** @var MlcLoader $loader */
+        $loader = $c->get(MlcLoader::class);
+
+        // 1 grab every *.mlc in the config dir
+        $files = glob(base_path('config/*.mlc')) ?: [];
+
+        // 2 turn "config/foo.mlc" into just "foo"
+        $names = array_map(
+            static fn (string $path) => pathinfo($path, PATHINFO_FILENAME),
+            $files
+        );
+
+        // 3 deterministic order (alpha) so overrides are stable
+        sort($names);
+
+        return $loader->load($names);
+    },
 
     /* ----------------------------------------------------------------- */
     /* Template engine                                                    */
@@ -338,23 +356,26 @@ return [
         $c->get(ResponseFactoryInterface::class)
     ),
 
-    /* ----------------------------------------------------------------- */
-    /* PSR-15 minimal middleware pipeline                                 */
-    /* ----------------------------------------------------------------- */
-    MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
-        [
-            $c->get(CorsMiddleware::class),
-            $c->get(RateLimitMiddleware::class),
-            $c->get(AuthMiddleware::class),
-            $c->get(LoggingMiddleware::class),
-            $c->get(ContentNegotiationMiddleware::class),
-            $c->get(ValidationMiddleware::class),
-            $c->get(OpenApiMiddleware::class),
-            $c->get(JwtAuthMiddleware::class),
-            $c->get(AuthorizationMiddleware::class),
-        ],
-        $c->get(CoreRequestHandler::class)
-    ),
+    /* -----------------------------------------------------------------
+     | PSR-15 pipeline — driven *solely* by config/middleware.mlc
+     * ---------------------------------------------------------------- */
+    MiddlewareDispatcher::class => static function ($c) {
+        $ids = $c->get(MlcConfig::class)->get('middleware.global', []);
+
+        // If the list is empty, fail fast so the bug is obvious
+        if ($ids === []) {
+            throw new RuntimeException(
+                'No middleware configured. Did you forget config/middleware.mlc?'
+            );
+        }
+
+        $stack = array_map([$c, 'get'], $ids);
+
+        return new MiddlewareDispatcher(
+            $stack,
+            $c->get(CoreRequestHandler::class)
+        );
+    },
 
     /* ----------------------------------------------------------------- */
     /* SAPI emitter                                                       */
