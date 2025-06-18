@@ -1,9 +1,7 @@
 <?php
 declare(strict_types=1);
 
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
-use MonkeysLegion\Http\CoreRequestHandler;
 
 define('ML_BASE_PATH', dirname(__DIR__));
 require ML_BASE_PATH . '/vendor/autoload.php';
@@ -11,12 +9,32 @@ require ML_BASE_PATH . '/vendor/autoload.php';
 /* -------------------------------------------------
  | 1) Build the DI-container
  * ------------------------------------------------*/
-$container = (new MonkeysLegion\DI\ContainerBuilder())
+$container = new MonkeysLegion\DI\ContainerBuilder()
     ->addDefinitions(require ML_BASE_PATH . '/config/app.php')
     ->build();
 
 /* expose it globally (legacy helpers/controllers still use it) */
 define('ML_CONTAINER', $container);
+
+/* -------------------------------------------------
+ | 1.1) Auto-register any MonkeysLegion “providers”
+ * ------------------------------------------------*/
+// read composer.json → extra.monkeyslegion.providers
+$composer = json_decode(
+    file_get_contents(ML_BASE_PATH . '/composer.json'),
+    true
+);
+
+$providers = $composer['extra']['monkeyslegion']['providers'] ?? [];
+foreach ($providers as $providerClass) {
+    if (
+        class_exists($providerClass)
+        && method_exists($providerClass, 'register')
+    ) {
+        // let the provider bind its services into $container
+        $providerClass::register($container);
+    }
+}
 
 /* -------------------------------------------------
  | 2) Route auto-discovery
@@ -40,7 +58,7 @@ $responseFactory = $container->get(ResponseFactoryInterface::class);
 $routeHandler = $container->get(MonkeysLegion\Http\RouteRequestHandler::class);
 $core         = new MonkeysLegion\Http\CoreRequestHandler($routeHandler, $responseFactory);
 
-/* pipe middlewares in the **order you want them to run**  */
+// pipe your middleware in the desired order
 $core->pipe($container->get(MonkeysLegion\Core\Middleware\CorsMiddleware::class));
 $core->pipe($container->get(MonkeysLegion\Http\Middleware\RateLimitMiddleware::class));
 $core->pipe($container->get(MonkeysLegion\Http\Middleware\AuthMiddleware::class));
