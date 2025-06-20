@@ -7,6 +7,9 @@ namespace App\Controller;
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
+use MonkeysLegion\Stripe\Client\CheckoutSession;
+use MonkeysLegion\Stripe\Client\SetupIntentService;
+use MonkeysLegion\Stripe\Client\StripeGateway;
 use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Template\Renderer;
 
@@ -21,10 +24,9 @@ final class StripeController
 
     public function __construct(private Renderer $renderer)
     {
-        $c = ServiceContainer::getInstance();
-        $this->StripeGateway = $c->get('StripeGateway');
-        $this->SetupIntentService = $c->get('SetupIntentService');
-        $this->CheckoutSessionService = $c->get('CheckoutSessionService');
+        $this->StripeGateway = ML_CONTAINER->get(StripeGateway::class);
+        $this->SetupIntentService = ML_CONTAINER->get(SetupIntentService::class);
+        $this->CheckoutSessionService = ML_CONTAINER->get(CheckoutSession::class);
     }
 
     /**

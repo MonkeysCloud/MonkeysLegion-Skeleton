@@ -22,9 +22,9 @@
 
 # Environment files
 .env
-.env.*.local
-.env.local
-.env.testing
+.env.dev
+.env.test
+.env.prod
 
 # PHPUnit and test artifacts
 /phpunit.xml

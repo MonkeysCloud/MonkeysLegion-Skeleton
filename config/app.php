@@ -6,11 +6,7 @@ if (function_exists('opcache_reset')) {
 }
 
 use App\Repository\UserRepository;
-use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\StreamFactory;
-use Laminas\Diactoros\UploadedFileFactory;
-use Laminas\Diactoros\UriFactory;
 
 use MonkeysLegion\Auth\AuthService;
 use MonkeysLegion\Auth\JwtService;
@@ -18,6 +14,7 @@ use MonkeysLegion\Auth\Middleware\AuthorizationMiddleware;
 use MonkeysLegion\Auth\Middleware\JwtAuthMiddleware;
 use MonkeysLegion\Auth\PasswordHasher;
 use MonkeysLegion\AuthService\AuthorizationService;
+use MonkeysLegion\Cli\Support\CommandFinder;
 use MonkeysLegion\Query\QueryBuilder;
 use MonkeysLegion\Repository\RepositoryFactory;
 use Monolog\Logger;
@@ -33,6 +30,7 @@ use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use MonkeysLegion\Http\SimpleFileCache;
+use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
 use MonkeysLegion\Cli\Command\{
@@ -53,21 +51,21 @@ use MonkeysLegion\Cli\Command\{
     TinkerCommand
 };
 
-use MonkeysLegion\Core\Middleware\CorsMiddleware;
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
 
 use MonkeysLegion\Http\{
     CoreRequestHandler,
-    Middleware\ContentNegotiationMiddleware,
     RouteRequestHandler,
+    Middleware\ContentNegotiationMiddleware,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
     Emitter\SapiEmitter
 };
+
 
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
@@ -142,15 +140,18 @@ return [
     /* ----------------------------------------------------------------- */
     /* PSR-17 factories                                                   */
     /* ----------------------------------------------------------------- */
-    ResponseFactoryInterface::class     => fn() => new ResponseFactory(),
-    StreamFactoryInterface::class       => fn() => new StreamFactory(),
-    UploadedFileFactoryInterface::class => fn() => new UploadedFileFactory(),
-    UriFactoryInterface::class          => fn() => new UriFactory(),
+    HttpFactory::class                  => fn() => new HttpFactory(),
+
+    ResponseFactoryInterface::class     => fn($c) => $c->get(HttpFactory::class),
+    StreamFactoryInterface::class       => fn($c) => $c->get(HttpFactory::class),
+    UploadedFileFactoryInterface::class => fn($c) => $c->get(HttpFactory::class),
+    UriFactoryInterface::class          => fn($c) => $c->get(HttpFactory::class),
 
     /* ----------------------------------------------------------------- */
     /* PSR-7 ServerRequest (create once from globals)                    */
     /* ----------------------------------------------------------------- */
-    ServerRequestInterface::class       => fn() => new ServerRequestFactory()->fromGlobals(),
+    ServerRequestInterface::class       => fn() =>
+    new ServerRequestFactory()->fromGlobals(),
 
     /* ----------------------------------------------------------------- */
     /* PSR-16 Cache (file-based fallback for rate-limiting)              */
@@ -198,9 +199,29 @@ return [
         $c->get(MlcParser::class),
         base_path('config')
     ),
-    MlcConfig::class                    => fn($c) => $c
-        ->get(MlcLoader::class)
-        ->load(['app', 'cors', 'cache', 'auth', 'stripe']),
+
+    /* -----------------------------------------------------------------
+     | Dynamic .mlc config loader
+     | – picks up every *.mlc file in config/ at runtime
+     * ---------------------------------------------------------------- */
+    MlcConfig::class => static function ($c) {
+        /** @var MlcLoader $loader */
+        $loader = $c->get(MlcLoader::class);
+
+        // 1 grab every *.mlc in the config dir
+        $files = glob(base_path('config/*.mlc')) ?: [];
+
+        // 2 turn "config/foo.mlc" into just "foo"
+        $names = array_map(
+            static fn (string $path) => pathinfo($path, PATHINFO_FILENAME),
+            $files
+        );
+
+        // 3 deterministic order (alpha) so overrides are stable
+        sort($names);
+
+        return $loader->load($names);
+    },
 
     /* ----------------------------------------------------------------- */
     /* Template engine                                                    */
@@ -243,7 +264,9 @@ return [
     /* Entity scanner + migration generator                               */
     /* ----------------------------------------------------------------- */
     EntityScanner::class      => fn() => new EntityScanner(base_path('app/Entity')),
-    MigrationGenerator::class => fn() => new MigrationGenerator(),
+    MigrationGenerator::class => fn($c) => new MigrationGenerator(
+        $c->get(Connection::class)
+    ),
 
     /* ----------------------------------------------------------------- */
     /* Routing                                                             */
@@ -396,23 +419,26 @@ return [
         $c->get(ResponseFactoryInterface::class)
     ),
 
-    /* ----------------------------------------------------------------- */
-    /* PSR-15 minimal middleware pipeline                                 */
-    /* ----------------------------------------------------------------- */
-    MiddlewareDispatcher::class => fn($c) => new MiddlewareDispatcher(
-        [
-            $c->get(CorsMiddleware::class),
-            $c->get(RateLimitMiddleware::class),
-            $c->get(AuthMiddleware::class),
-            $c->get(LoggingMiddleware::class),
-            $c->get(ContentNegotiationMiddleware::class),
-            $c->get(ValidationMiddleware::class),
-            $c->get(OpenApiMiddleware::class),
-            $c->get(JwtAuthMiddleware::class),
-            $c->get(AuthorizationMiddleware::class),
-        ],
-        $c->get(CoreRequestHandler::class)
-    ),
+    /* -----------------------------------------------------------------
+     | PSR-15 pipeline — driven *solely* by config/middleware.mlc
+     * ---------------------------------------------------------------- */
+    MiddlewareDispatcher::class => static function ($c) {
+        $ids = $c->get(MlcConfig::class)->get('middleware.global', []);
+
+        // If the list is empty, fail fast so the bug is obvious
+        if ($ids === []) {
+            throw new RuntimeException(
+                'No middleware configured. Did you forget config/middleware.mlc?'
+            );
+        }
+
+        $stack = array_map([$c, 'get'], $ids);
+
+        return new MiddlewareDispatcher(
+            $stack,
+            $c->get(CoreRequestHandler::class)
+        );
+    },
 
     /* ----------------------------------------------------------------- */
     /* SAPI emitter                                                       */
@@ -422,68 +448,8 @@ return [
     /* ----------------------------------------------------------------- */
     /* CLI commands + kernel                                            */
     /* ----------------------------------------------------------------- */
-    ClearCacheCommand::class        => fn() => new ClearCacheCommand(),
-    KeyGenerateCommand::class       => fn() => new KeyGenerateCommand(),
-    MigrateCommand::class           => fn($c) => new MigrateCommand(
-        $c->get(Connection::class)
-    ),
-    RollbackCommand::class          => fn($c) => new RollbackCommand(
-        $c->get(Connection::class)
-    ),
-    DatabaseMigrationCommand::class => fn($c) => new DatabaseMigrationCommand(
-        $c->get(Connection::class),
-        $c->get(EntityScanner::class),
-        $c->get(MigrationGenerator::class)
-    ),
-    MakeEntityCommand::class        => fn() => new MakeEntityCommand(),
-    MakeControllerCommand::class    => fn() => new MakeControllerCommand(),
-    MakeMiddlewareCommand::class    => fn() => new MakeMiddlewareCommand(),
-    MakePolicyCommand::class        => fn() => new MakePolicyCommand(),
-    RouteListCommand::class         => fn($c) => new RouteListCommand(
-        $c->get(RouteCollection::class)
-    ),
-    OpenApiExportCommand::class     => fn($c) => new OpenApiExportCommand(
-        $c->get(OpenApiGenerator::class)
-    ),
-    SchemaUpdateCommand::class      => fn($c) => new SchemaUpdateCommand(
-        $c->get(Connection::class),
-        $c->get(EntityScanner::class),
-        $c->get(MigrationGenerator::class)
-    ),
-    MakeSeederCommand::class        => fn() => new MakeSeederCommand(),
-    SeedCommand::class              => fn($c) => new SeedCommand(
-        $c->get(Connection::class)
-    ),
-    TinkerCommand::class            => fn() => new TinkerCommand(),
-
     CliKernel::class => fn($c) => new CliKernel(
         $c,
-        [
-            ClearCacheCommand::class,
-            KeyGenerateCommand::class,
-            MigrateCommand::class,
-            RollbackCommand::class,
-            DatabaseMigrationCommand::class,
-            MakeEntityCommand::class,
-            MakeControllerCommand::class,
-            MakeMiddlewareCommand::class,
-            MakePolicyCommand::class,
-            RouteListCommand::class,
-            OpenApiExportCommand::class,
-            SchemaUpdateCommand::class,
-            MakeSeederCommand::class,
-            SeedCommand::class,
-            TinkerCommand::class,
-        ]
+        CommandFinder::all()
     ),
-
-    (function () {
-        $c = ServiceContainer::getInstance();
-
-        (new StripeServiceProvider($c))->register();
-
-        $c->set('http_client', function () {
-            return new HttpClient();
-        });
-    })(),
 ];

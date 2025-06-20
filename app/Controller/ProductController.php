@@ -7,6 +7,7 @@ namespace App\Controller;
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
+use MonkeysLegion\Stripe\Client\Product;
 use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Template\Renderer;
 
@@ -19,8 +20,7 @@ final class ProductController
 
     public function __construct(private Renderer $renderer)
     {
-        $c = ServiceContainer::getInstance();
-        $this->ProductService = $c->get('ProductService');
+        $this->ProductService = ML_CONTAINER->get(Product::class);
     }
 
     /**

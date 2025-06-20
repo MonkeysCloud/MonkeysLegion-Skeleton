@@ -199,6 +199,7 @@ php vendor/bin/ml db:seed UsersTable      # run only UsersTableSeeder
 
 ```bash
 php vendor/bin/ml key:generate
+php vendor/bin/ml db:create
 php vendor/bin/ml cache:clear
 php vendor/bin/ml make:entity User
 php vendor/bin/ml make:controller User

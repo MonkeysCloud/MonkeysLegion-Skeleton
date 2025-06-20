@@ -7,6 +7,7 @@ namespace App\Controller;
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
+use MonkeysLegion\Stripe\Client\Subscription;
 use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Template\Renderer;
 
@@ -19,8 +20,7 @@ final class SubscriptionController
 
     public function __construct(private Renderer $renderer)
     {
-        $c = ServiceContainer::getInstance();
-        $this->SubscriptionService = $c->get('SubscriptionService');
+        $this->SubscriptionService = ML_CONTAINER->get(Subscription::class);
     }
 
     /**

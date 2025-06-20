@@ -1,0 +1,14 @@
+# Global PSR-15 middleware pipeline – order matters (first runs first)
+middleware {
+    global = [
+        "\\MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
+        "\\MonkeysLegion\\Core\\Middleware\\RateLimitMiddleware",
+        "\\MonkeysLegion\\Http\\Middleware\\AuthMiddleware",
+        "\\MonkeysLegion\\Http\\Middleware\\LoggingMiddleware",
+        "\\MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",
+        "\\MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
+        "\\MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware",
+        "\\MonkeysLegion\\Auth\\Middleware\\JwtAuthMiddleware",
+        "\\MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware"
+    ]
+}

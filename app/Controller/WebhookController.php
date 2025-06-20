@@ -8,6 +8,7 @@ use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
 use MonkeysLegion\Http\Message\Stream;
 use MonkeysLegion\Stripe\Service\ServiceContainer;
+use MonkeysLegion\Stripe\Webhook\WebhookController as WebhookWebhookController;
 use MonkeysLegion\Template\Renderer;
 
 /**
@@ -28,9 +29,8 @@ final class WebhookController
 
     public function __construct(private Renderer $renderer)
     {
-        // Initialize the Stripe webhook handler from service container
-        $c = ServiceContainer::getInstance();
-        $this->StripeWebhook = $c->get('webhook_controller');
+        // Initialize the Stripe webhook handler from ML_CONTAINER
+        $this->StripeWebhook = ML_CONTAINER->get(WebhookWebhookController::class);
 
         // Set up logging directory and file
         $this->logFile = base_path('var/log/stripe_webhooks.log');
