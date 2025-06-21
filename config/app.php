@@ -127,13 +127,24 @@ return [
     |--------------------------------------------------------------------------
     */
     LoggerInterface::class => function () {
+        $env = $_ENV['APP_ENV'] ?? 'dev';
+
+        $logLevel = match ($env) {
+            'dev'  => Logger::DEBUG,
+            'test' => Logger::NOTICE,
+            'prod' => Logger::WARNING,
+            default => Logger::ERROR,
+        };
+
         $log = new Logger('app');
+
         $log->pushHandler(
             new StreamHandler(
                 base_path('var/log/app.log'),
-                Logger::DEBUG
+                $logLevel
             )
         );
+
         return $log;
     },
 
@@ -213,7 +224,7 @@ return [
 
         // 2 turn "config/foo.mlc" into just "foo"
         $names = array_map(
-            static fn (string $path) => pathinfo($path, PATHINFO_FILENAME),
+            static fn(string $path) => pathinfo($path, PATHINFO_FILENAME),
             $files
         );
 
@@ -315,17 +326,31 @@ return [
         (string) $c->get(MlcConfig::class)->get('auth.token'),
         [
             // Home page
-            '/',
-
-            // Stripe-related paths
+            '/',            // Stripe-related paths
             '/stripe/payment',
             '/stripe/setup-intent',
+            '/stripe/setup-intent/retrieve',
+            '/stripe/setup-intent/confirm',
+            '/stripe/setup-intent/cancel',
+            '/stripe/setup-intent/list',
             '/stripe/payment-intent',
+            '/stripe/payment-intent/retrieve',
+            '/stripe/payment-intent/confirm',
+            '/stripe/payment-intent/cancel',
+            '/stripe/payment-intent/list',
             '/stripe/checkout-session',
+            '/stripe/checkout-session/retrieve',
+            '/stripe/checkout-session/list',
+            '/stripe/checkout-session/expire',
+            '/stripe/checkout-session/line-items',
             '/stripe/checkout-url',
             '/stripe/subscription',
+            '/stripe/subscription/retrieve',
+            '/stripe/subscription/list',
             '/stripe/subscription/cancel',
             '/stripe/product',
+            '/stripe/product/retrieve',
+            '/stripe/product/list',
             '/stripe/product/update',
             '/stripe/product/delete',
 

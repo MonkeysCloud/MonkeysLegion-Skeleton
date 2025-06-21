@@ -2,6 +2,7 @@
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Dotenv\Dotenv;
+use Psr\Log\LoggerInterface;
 
 define('ML_BASE_PATH', dirname(__DIR__));
 require ML_BASE_PATH . '/vendor/autoload.php';
@@ -58,6 +59,16 @@ foreach ($providers as $providerClass) {
 $container = $container->build();
 define('ML_CONTAINER', $container);
 
+$loggers = $composer['extra']['monkeyslegion']['loggers'] ?? [];
+foreach ($loggers as $loggerClass) {
+    if (
+        class_exists($loggerClass)
+        && method_exists($loggerClass, 'setLogger')
+    ) {
+        // let the provider bind its services into $container
+        $loggerClass::setLogger($container->get(LoggerInterface::class));
+    }
+}
 /* -------------------------------------------------
  | 2) Route auto-discovery
  * ------------------------------------------------*/
