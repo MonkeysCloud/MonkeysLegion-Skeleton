@@ -30,7 +30,7 @@ if (
 }
 
 /* -------------------------------------------------
- | 1) Build the DI-container
+ | 1) Create a mutable ContainerBuilder
  * ------------------------------------------------*/
 $container = new MonkeysLegion\DI\ContainerBuilder()
     ->addDefinitions(require ML_BASE_PATH . '/config/app.php');
@@ -72,8 +72,7 @@ foreach ($loggers as $loggerClass) {
 /* -------------------------------------------------
  | 2) Route auto-discovery
  * ------------------------------------------------*/
-$container
-    ->get(MonkeysLegion\Core\Routing\RouteLoader::class)
+$container->get(MonkeysLegion\Core\Routing\RouteLoader::class)
     ->loadControllers();
 
 /* -------------------------------------------------
@@ -85,11 +84,13 @@ $router   = $container->get(MonkeysLegion\Router\Router::class);
 /** @var ResponseFactoryInterface $responseFactory */
 $responseFactory = $container->get(ResponseFactoryInterface::class);
 
+
 /* -------------------------------------------------
  | 4) Build PSR-15 middleware pipeline
  * ------------------------------------------------*/
-$routeHandler = $container->get(MonkeysLegion\Http\RouteRequestHandler::class);
-$core         = new MonkeysLegion\Http\CoreRequestHandler($routeHandler, $responseFactory);
+$routeHandler    = $container->get(MonkeysLegion\Http\RouteRequestHandler::class);
+$responseFactory = $container->get(ResponseFactoryInterface::class);
+$core            = new MonkeysLegion\Http\CoreRequestHandler($routeHandler, $responseFactory);
 
 // pipe your middleware in the desired order
 $core->pipe($container->get(MonkeysLegion\Core\Middleware\CorsMiddleware::class));
