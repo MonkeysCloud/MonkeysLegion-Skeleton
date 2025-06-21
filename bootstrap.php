@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 define('ML_BASE_PATH', __DIR__);

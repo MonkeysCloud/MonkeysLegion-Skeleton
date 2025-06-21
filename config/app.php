@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 if (function_exists('opcache_reset')) {
     opcache_reset();
@@ -32,18 +33,39 @@ use MonkeysLegion\Http\SimpleFileCache;
 use MonkeysLegion\Http\Factory\HttpFactory;
 
 use MonkeysLegion\Cli\CliKernel;
+use MonkeysLegion\Cli\Command\{
+    ClearCacheCommand,
+    DatabaseMigrationCommand,
+    KeyGenerateCommand,
+    MakeControllerCommand,
+    MakeEntityCommand,
+    MakeMiddlewareCommand,
+    MakePolicyCommand,
+    MakeSeederCommand,
+    MigrateCommand,
+    RollbackCommand,
+    RouteListCommand,
+    OpenApiExportCommand,
+    SchemaUpdateCommand,
+    SeedCommand,
+    TinkerCommand
+};
 
 use MonkeysLegion\Core\Routing\RouteLoader;
 use MonkeysLegion\Database\MySQL\Connection;
 use MonkeysLegion\Entity\Scanner\EntityScanner;
 
-use MonkeysLegion\Http\{CoreRequestHandler,
+use MonkeysLegion\Http\{
+    CoreRequestHandler,
     RouteRequestHandler,
+    Middleware\ContentNegotiationMiddleware,
     Middleware\AuthMiddleware,
     Middleware\LoggingMiddleware,
     Middleware\RateLimitMiddleware,
     MiddlewareDispatcher,
-    Emitter\SapiEmitter};
+    Emitter\SapiEmitter
+};
+
 
 use MonkeysLegion\Migration\MigrationGenerator;
 use MonkeysLegion\Mlc\{
@@ -83,7 +105,9 @@ use MonkeysLegion\Http\OpenApi\{
     OpenApiGenerator,
     OpenApiMiddleware
 };
-
+use MonkeysLegion\Stripe\Client\HttpClient;
+use MonkeysLegion\Stripe\Provider\StripeServiceProvider;
+use MonkeysLegion\Stripe\Service\ServiceContainer;
 use MonkeysLegion\Validation\ValidatorInterface;
 use MonkeysLegion\Validation\AttributeValidator;
 use MonkeysLegion\Validation\DtoBinder;
@@ -94,6 +118,7 @@ use MonkeysLegion\Validation\Middleware\ValidationMiddleware;
 | Dependency-injection definitions
 |--------------------------------------------------------------------------
 */
+
 return [
 
     /*
@@ -101,14 +126,25 @@ return [
     | PSR-3 Logger (Monolog)
     |--------------------------------------------------------------------------
     */
-    LoggerInterface::class => function() {
+    LoggerInterface::class => function () {
+        $env = $_ENV['APP_ENV'] ?? 'dev';
+
+        $logLevel = match ($env) {
+            'dev'  => Logger::DEBUG,
+            'test' => Logger::NOTICE,
+            'prod' => Logger::WARNING,
+            default => Logger::ERROR,
+        };
+
         $log = new Logger('app');
+
         $log->pushHandler(
             new StreamHandler(
                 base_path('var/log/app.log'),
-                Logger::DEBUG
+                $logLevel
             )
         );
+
         return $log;
     },
 
@@ -150,8 +186,8 @@ return [
     /* ———————————————————————————————————————————————
     *  Event dispatcher (PSR-14)
     * ——————————————————————————————————————————————— */
-    ListenerProvider::class        => fn () => new ListenerProvider(),
-    EventDispatcherInterface::class => fn ($c) => new EventDispatcher(
+    ListenerProvider::class        => fn() => new ListenerProvider(),
+    EventDispatcherInterface::class => fn($c) => new EventDispatcher(
         $c->get(ListenerProvider::class)
     ),
 
@@ -188,7 +224,7 @@ return [
 
         // 2 turn "config/foo.mlc" into just "foo"
         $names = array_map(
-            static fn (string $path) => pathinfo($path, PATHINFO_FILENAME),
+            static fn(string $path) => pathinfo($path, PATHINFO_FILENAME),
             $files
         );
 
@@ -215,7 +251,7 @@ return [
     ),
 
     Translator::class => fn($c) => new Translator(
-    // fetch locale from env or request (here default 'en')
+        // fetch locale from env or request (here default 'en')
         $c->get(MlcConfig::class)->get('app.locale', 'en'),
         base_path('resources/lang'),
         'en'
@@ -274,12 +310,12 @@ return [
     /* Rate-limit middleware                                              */
     /* ----------------------------------------------------------------- */
     RateLimitMiddleware::class =>
-        fn($c) => new RateLimitMiddleware(
-            $c->get(ResponseFactoryInterface::class),
-            $c->get(CacheInterface::class),
-            200,   // limit
-            60     // window (seconds)
-        ),
+    fn($c) => new RateLimitMiddleware(
+        $c->get(ResponseFactoryInterface::class),
+        $c->get(CacheInterface::class),
+        5000,   // limit
+        60     // window (seconds)
+    ),
 
     /* ----------------------------------------------------------------- */
     /* Authentication middleware                                          */
@@ -288,14 +324,66 @@ return [
         $c->get(ResponseFactoryInterface::class),
         'Protected',
         (string) $c->get(MlcConfig::class)->get('auth.token'),
-        ['/']  // public paths
+        [
+            // Home page
+            '/',            // Stripe-related paths
+            '/stripe/payment',
+            '/stripe/setup-intent',
+            '/stripe/setup-intent/retrieve',
+            '/stripe/setup-intent/confirm',
+            '/stripe/setup-intent/cancel',
+            '/stripe/setup-intent/list',
+            '/stripe/payment-intent',
+            '/stripe/payment-intent/retrieve',
+            '/stripe/payment-intent/confirm',
+            '/stripe/payment-intent/cancel',
+            '/stripe/payment-intent/list',
+            '/stripe/checkout-session',
+            '/stripe/checkout-session/retrieve',
+            '/stripe/checkout-session/list',
+            '/stripe/checkout-session/expire',
+            '/stripe/checkout-session/line-items',
+            '/stripe/checkout-url',
+            '/stripe/subscription',
+            '/stripe/subscription/retrieve',
+            '/stripe/subscription/list',
+            '/stripe/subscription/cancel',
+            '/stripe/product',
+            '/stripe/product/retrieve',
+            '/stripe/product/list',
+            '/stripe/product/update',
+            '/stripe/product/delete',
+
+            // Documentation paths
+            '/docs',
+            '/docs/payment-intent',
+            '/docs/setup-intent',
+            '/docs/checkout-session',
+            '/docs/subscription',
+            '/docs/product',
+
+            // Success/Cancel pages
+            '/success',
+            '/cancel',
+
+            '/posts',
+
+            // Webhook paths
+            '/webhook/demo',
+            '/webhook/stripe',
+            '/webhook/logs',
+            '/webhook/clear-logs',
+            '/webhook/test',
+            '/webhook/clear-store',
+            '/webhook/event/{id}',
+        ]  // public paths
     ),
 
     /* ----------------------------------------------------------------- */
     /* Simple logging middleware                                          */
     /* ----------------------------------------------------------------- */
     LoggingMiddleware::class    => fn() => new LoggingMiddleware(
-    // you can inject LoggerInterface here if your middleware takes it
+        // you can inject LoggerInterface here if your middleware takes it
     ),
 
     PasswordHasher::class => fn() => new PasswordHasher(),
