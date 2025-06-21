@@ -5,6 +5,10 @@ namespace App\Entity;
 
 use MonkeysLegion\Entity\Attributes\Entity;
 use MonkeysLegion\Entity\Attributes\Field;
+use MonkeysLegion\Entity\Attributes\OneToOne;
+use MonkeysLegion\Entity\Attributes\OneToMany;
+use MonkeysLegion\Entity\Attributes\ManyToOne;
+use MonkeysLegion\Entity\Attributes\ManyToMany;
 
 #[Entity]
 class User
