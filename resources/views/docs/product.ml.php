@@ -1,75 +1,14 @@
 @extends('layouts.docs')
 
 @section('header')
-<h1>Product Documentation</h1>
-<p>Learn how to create and manage Stripe Products with the MonkeysLegion Stripe Package</p>
+<h1>Product Demo</h1>
+<p>Test Stripe Product creation, update and deletion</p>
 @endsection
 
 @section('content')
 <section class="docs-section">
-    <h2>Overview</h2>
-    <p>Products represent the goods or services you offer to your customers. Products can be used with Prices to define what and how much your customers pay.</p>
-</section>
-
-<section class="docs-section">
-    <h2>Create Product</h2>
-    <div class="method-signature">
-        <pre><code>public function createProduct(array $params): \Stripe\Product</code></pre>
-    </div>
-
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>$params['name']</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>The product's name</td>
-            </tr>
-            <tr>
-                <td><code>$params['description']</code></td>
-                <td>string</td>
-                <td>No</td>
-                <td>The product's description</td>
-            </tr>
-            <tr>
-                <td><code>$params['active']</code></td>
-                <td>boolean</td>
-                <td>No</td>
-                <td>Whether the product is active (default: true)</td>
-            </tr>
-            <tr>
-                <td><code>$params['images']</code></td>
-                <td>array</td>
-                <td>No</td>
-                <td>Array of image URLs for the product</td>
-            </tr>
-            <tr>
-                <td><code>$params['metadata']</code></td>
-                <td>array</td>
-                <td>No</td>
-                <td>Set of key-value pairs for custom data</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="code-example">
-        <h3>Example</h3>
-        <pre><code>$product = $productService->createProduct([
-    'name' => 'Premium T-shirt',
-    'description' => 'Soft cotton t-shirt',
-    'active' => true,
-    'images' => ['https://example.com/t-shirt.jpg'],
-    'metadata' => ['category' => 'clothing']
-]);</code></pre>
-    </div>
+    <h2>Create Product Demo</h2>
+    <p><strong>Note:</strong> Products represent goods/services. Required: name. Optional: description, active status, images, metadata</p>
 
     <div class="example-form">
         <h3>Interactive Test</h3>
@@ -119,17 +58,8 @@
 </section>
 
 <section class="docs-section">
-    <h2>Update Product</h2>
-    <div class="method-signature">
-        <pre><code>public function updateProduct(string $productId, array $params): \Stripe\Product</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$updated = $productService->updateProduct('prod_1234567890', [
-    'name' => 'Updated Product Name',
-    'metadata' => ['category' => 'new-category']
-]);</code></pre>
-    </div>
+    <h2>Update Product Demo</h2>
+    <p><strong>Note:</strong> Update existing product fields. Product ID required.</p>
 
     <div class="example-form">
         <h3>Interactive Test - Update Product</h3>
@@ -169,14 +99,8 @@
 </section>
 
 <section class="docs-section">
-    <h2>Delete Product</h2>
-    <div class="method-signature">
-        <pre><code>public function deleteProduct(string $productId, array $options = []): \Stripe\Product</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$deleted = $productService->deleteProduct('prod_1234567890');</code></pre>
-    </div>
+    <h2>Delete Product Demo</h2>
+    <p><strong>Note:</strong> Permanently delete a product. This action cannot be undone.</p>
 
     <div class="example-form">
         <h3>Interactive Test - Delete Product</h3>
@@ -188,10 +112,59 @@
             <button type="submit" class="btn btn-danger">Delete Product</button>
         </form>
     </div>
-
     <div id="delete-result-container" class="result-container" style="display: none;">
         <h3>Response</h3>
         <pre id="delete-result-output"><code></code></pre>
+    </div>
+</section>
+
+<section class="docs-section">
+    <h2>Retrieve Product Demo</h2>
+    <p><strong>Note:</strong> Get details of an existing product by ID.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Retrieve Product</h3>
+        <form id="retrieve-product-form">
+            <div class="form-group">
+                <label class="form-label" for="retrieve_product_id">Product ID</label>
+                <input type="text" id="retrieve_product_id" name="product_id" class="form-input" placeholder="prod_...">
+            </div>
+            <button type="submit" class="btn btn-info">Retrieve Product</button>
+        </form>
+    </div>
+
+    <div id="retrieve-product-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="retrieve-product-result-output"><code></code></pre>
+    </div>
+</section>
+
+<section class="docs-section">
+    <h2>List Products Demo</h2>
+    <p><strong>Note:</strong> List products with optional filters.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - List Products</h3>
+        <form id="list-products-form">
+            <div class="form-group">
+                <label class="form-label" for="products_limit">Limit (max results)</label>
+                <input type="number" id="products_limit" name="limit" class="form-input" value="10" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="active_filter">Active Status (optional)</label>
+                <select id="active_filter" name="active" class="form-input">
+                    <option value="">All products</option>
+                    <option value="true">Active only</option>
+                    <option value="false">Inactive only</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-info">List Products</button>
+        </form>
+    </div>
+
+    <div id="list-products-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="list-products-result-output"><code></code></pre>
     </div>
 </section>
 
@@ -281,6 +254,54 @@
 
         try {
             const response = await fetch('/stripe/product/delete', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Retrieve Product Handler
+    document.getElementById('retrieve-product-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('retrieve-product-result-container');
+        const resultOutput = document.getElementById('retrieve-product-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/product/retrieve', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // List Products Handler
+    document.getElementById('list-products-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('list-products-result-container');
+        const resultOutput = document.getElementById('list-products-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/product/list', {
                 method: 'POST',
                 body: formData
             });

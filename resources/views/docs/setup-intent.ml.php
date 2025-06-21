@@ -1,54 +1,14 @@
 @extends('layouts.docs')
 
 @section('header')
-<h1>SetupIntent Documentation</h1>
-<p>Learn how to create and manage SetupIntents for saving payment methods</p>
+<h1>SetupIntent Demo</h1>
+<p>Test SetupIntent creation - saves payment methods for future use</p>
 @endsection
 
 @section('content')
 <section class="docs-section">
-    <h2>Overview</h2>
-    <p>SetupIntents are used to set up payment methods for future payments. They're ideal for saving cards or other payment methods without charging immediately.</p>
-</section>
-
-<section class="docs-section">
-    <h2>Create SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function createSetupIntent(array $params): \Stripe\SetupIntent</code></pre>
-    </div>
-
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>$params['usage']</code></td>
-                <td>string</td>
-                <td>No</td>
-                <td>How the payment method will be used (default: 'off_session')</td>
-            </tr>
-            <tr>
-                <td><code>$params['payment_method_types']</code></td>
-                <td>array</td>
-                <td>No</td>
-                <td>Payment method types to allow (default: ['card'])</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="code-example">
-        <h3>Example</h3>
-        <pre><code>$setupIntent = $setupIntentService->createSetupIntent([
-    'usage' => 'off_session',
-    'payment_method_types' => ['card'] // Optional, defaults to ['card']
-]);</code></pre>
-    </div>
+    <h2>Create SetupIntent Demo</h2>
+    <p><strong>Note:</strong> SetupIntents save payment methods without charging. Used for storing cards for future payments.</p>
 
     <div class="example-form">
         <h3>Interactive Test</h3>
@@ -63,7 +23,6 @@
             <button type="submit" class="btn btn-primary">Create SetupIntent</button>
         </form>
     </div>
-
     <div id="setup-result-container" class="result-container" style="display: none;">
         <h3>Response</h3>
         <pre id="setup-result-output"><code></code></pre>
@@ -71,78 +30,94 @@
 </section>
 
 <section class="docs-section">
-    <h2>Retrieve SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function retrieveSetupIntent(string $setupIntentId): \Stripe\SetupIntent</code></pre>
+    <h2>Retrieve SetupIntent Demo</h2>
+    <p><strong>Note:</strong> Get details of an existing setup intent by ID.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Retrieve SetupIntent</h3>
+        <form id="retrieve-setup-form">
+            <div class="form-group">
+                <label class="form-label" for="setup_intent_id">SetupIntent ID</label>
+                <input type="text" id="setup_intent_id" name="setup_intent_id" class="form-input" placeholder="seti_...">
+            </div>
+            <button type="submit" class="btn btn-info">Retrieve SetupIntent</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$setupIntent = $setupIntentService->retrieveSetupIntent('seti_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Confirm SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function confirmSetupIntent(string $setupIntentId, array $params): \Stripe\SetupIntent</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$confirmed = $setupIntentService->confirmSetupIntent('seti_1234567890', [
-    'payment_method' => 'pm_card_visa'
-]);</code></pre>
+    <div id="retrieve-setup-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="retrieve-setup-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Cancel SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function cancelSetupIntent(string $setupIntentId): \Stripe\SetupIntent</code></pre>
+    <h2>Confirm SetupIntent Demo</h2>
+    <p><strong>Note:</strong> Confirm a setup intent with a payment method.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Confirm SetupIntent</h3>
+        <form id="confirm-setup-form">
+            <div class="form-group">
+                <label class="form-label" for="confirm_setup_id">SetupIntent ID</label>
+                <input type="text" id="confirm_setup_id" name="setup_intent_id" class="form-input" placeholder="seti_...">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="setup_payment_method">Payment Method ID</label>
+                <input type="text" id="setup_payment_method" name="payment_method" class="form-input" placeholder="pm_card_visa">
+            </div>
+            <button type="submit" class="btn btn-success">Confirm SetupIntent</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$cancelled = $setupIntentService->cancelSetupIntent('seti_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>List SetupIntents</h2>
-    <div class="method-signature">
-        <pre><code>public function listSetupIntents(array $params = []): \Stripe\Collection</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$setupIntents = $setupIntentService->listSetupIntents([
-    'customer' => 'cus_1234567890',
-    'limit' => 10
-]);</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Update SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function updateSetupIntent(string $setupIntentId, array $params): \Stripe\SetupIntent</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$updated = $setupIntentService->updateSetupIntent('seti_1234567890', [
-    'metadata' => ['order_id' => '12345']
-]);</code></pre>
+    <div id="confirm-setup-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="confirm-setup-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Validate SetupIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function isValidSetupIntent(string $setupIntentId): bool</code></pre>
+    <h2>Cancel SetupIntent Demo</h2>
+    <p><strong>Note:</strong> Cancel a setup intent before confirmation.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Cancel SetupIntent</h3>
+        <form id="cancel-setup-form">
+            <div class="form-group">
+                <label class="form-label" for="cancel_setup_id">SetupIntent ID</label>
+                <input type="text" id="cancel_setup_id" name="setup_intent_id" class="form-input" placeholder="seti_...">
+            </div>
+            <button type="submit" class="btn btn-warning">Cancel SetupIntent</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$isValid = $setupIntentService->isValidSetupIntent('seti_1234567890');
-if ($isValid) {
-    echo "SetupIntent is valid and succeeded";
-}</code></pre>
+    <div id="cancel-setup-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="cancel-setup-result-output"><code></code></pre>
+    </div>
+</section>
+
+<section class="docs-section">
+    <h2>List SetupIntents Demo</h2>
+    <p><strong>Note:</strong> List recent setup intents with optional filters.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - List SetupIntents</h3>
+        <form id="list-setup-form">
+            <div class="form-group">
+                <label class="form-label" for="setup_limit">Limit (max results)</label>
+                <input type="number" id="setup_limit" name="limit" class="form-input" value="10" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="setup_customer">Customer ID (optional)</label>
+                <input type="text" id="setup_customer" name="customer_id" class="form-input" placeholder="cus_...">
+            </div>
+            <button type="submit" class="btn btn-info">List SetupIntents</button>
+        </form>
+    </div>
+
+    <div id="list-setup-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="list-setup-result-output"><code></code></pre>
     </div>
 </section>
 
@@ -155,6 +130,102 @@ if ($isValid) {
 
         try {
             const response = await fetch('/stripe/setup-intent', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Retrieve SetupIntent Handler
+    document.getElementById('retrieve-setup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('retrieve-setup-result-container');
+        const resultOutput = document.getElementById('retrieve-setup-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/setup-intent/retrieve', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Confirm SetupIntent Handler
+    document.getElementById('confirm-setup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('confirm-setup-result-container');
+        const resultOutput = document.getElementById('confirm-setup-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/setup-intent/confirm', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Cancel SetupIntent Handler
+    document.getElementById('cancel-setup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('cancel-setup-result-container');
+        const resultOutput = document.getElementById('cancel-setup-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/setup-intent/cancel', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // List SetupIntents Handler
+    document.getElementById('list-setup-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('list-setup-result-container');
+        const resultOutput = document.getElementById('list-setup-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/setup-intent/list', {
                 method: 'POST',
                 body: formData
             });

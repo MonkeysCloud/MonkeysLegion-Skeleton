@@ -19,14 +19,14 @@
 
     <div class="docs-layout">
         <aside class="docs-sidebar">
-            <div class="sidebar-title">Stripe Documentation</div>
+            <div class="sidebar-title">Stripe Demo Forms</div>
             <nav>
                 <ul class="sidebar-nav">
-                    <li><a href="/docs/payment-intent">PaymentIntent</a></li>
-                    <li><a href="/docs/setup-intent">SetupIntent</a></li>
-                    <li><a href="/docs/checkout-session">Checkout Session</a></li>
-                    <li><a href="/docs/subscription">Subscription</a></li>
-                    <li><a href="/docs/product">Product</a></li>
+                    <li><a href="/docs/payment-intent">PaymentIntent Demo</a></li>
+                    <li><a href="/docs/setup-intent">SetupIntent Demo</a></li>
+                    <li><a href="/docs/checkout-session">Checkout Demo</a></li>
+                    <li><a href="/docs/subscription">Subscription Demo</a></li>
+                    <li><a href="/docs/product">Product Demo</a></li>
                 </ul>
             </nav>
         </aside>

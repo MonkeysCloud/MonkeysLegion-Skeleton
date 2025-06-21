@@ -39,6 +39,9 @@ return [
     // The maximum number of retries for failed webhook events.
     'webhook_retries' => (int)($_ENV['STRIPE_WEBHOOK_RETRIES'] ?? 3),
 
+    // Payload size limit for webhook events.
+    'max_payload_size' => (int)($_ENV['STRIPE_MAX_PAYLOAD_SIZE'] ?? 128 * 1024), // 128 KB
+
     // The URL for Stripe's API endpoint.
     'api_url' => $_ENV['STRIPE_API_URL'] ?? 'https://api.stripe.com',
 ];

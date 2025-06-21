@@ -1,68 +1,14 @@
 @extends('layouts.docs')
 
 @section('header')
-<h1>Subscription Documentation</h1>
-<p>Learn how to create and manage Stripe Subscriptions with the MonkeysLegion Stripe Package</p>
+<h1>Subscription Demo</h1>
+<p>Test Stripe Subscription creation and cancellation</p>
 @endsection
 
 @section('content')
 <section class="docs-section">
-    <h2>Overview</h2>
-    <p>Subscriptions allow you to charge customers on a recurring basis. This API lets you create, update, and manage subscriptions for your customers.</p>
-</section>
-
-<section class="docs-section">
-    <h2>Create Subscription</h2>
-    <div class="method-signature">
-        <pre><code>public function createSubscription(
-    string $customerId, 
-    string $priceId, 
-    array $options = []
-): \Stripe\Subscription</code></pre>
-    </div>
-
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>$customerId</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>ID of the customer to subscribe</td>
-            </tr>
-            <tr>
-                <td><code>$priceId</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>ID of the price to apply to the subscription</td>
-            </tr>
-            <tr>
-                <td><code>$options</code></td>
-                <td>array</td>
-                <td>No</td>
-                <td>Additional options for the subscription (trial_period_days, default_payment_method, etc.)</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="code-example">
-        <h3>Example</h3>
-        <pre><code>$subscription = $subscriptionService->createSubscription(
-    'cus_1234567890',
-    'price_1234567890',
-    [
-        'trial_period_days' => 14,
-        'default_payment_method' => 'pm_1234567890'
-    ]
-);</code></pre>
-    </div>
+    <h2>Create Subscription Demo</h2>
+    <p><strong>Note:</strong> Create recurring subscriptions. Requires Customer ID and Price ID.</p>
 
     <div class="example-form">
         <h3>Interactive Test</h3>
@@ -155,10 +101,65 @@ $cancelled = $subscriptionService->cancelSubscription('sub_1234567890', [
             <button type="submit" class="btn btn-danger">Cancel Subscription</button>
         </form>
     </div>
-
     <div id="cancel-result-container" class="result-container" style="display: none;">
         <h3>Response</h3>
         <pre id="cancel-result-output"><code></code></pre>
+    </div>
+</section>
+
+<section class="docs-section">
+    <h2>Retrieve Subscription Demo</h2>
+    <p><strong>Note:</strong> Get details of an existing subscription by ID.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Retrieve Subscription</h3>
+        <form id="retrieve-subscription-form">
+            <div class="form-group">
+                <label class="form-label" for="retrieve_subscription_id">Subscription ID</label>
+                <input type="text" id="retrieve_subscription_id" name="subscription_id" class="form-input" placeholder="sub_...">
+            </div>
+            <button type="submit" class="btn btn-info">Retrieve Subscription</button>
+        </form>
+    </div>
+
+    <div id="retrieve-subscription-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="retrieve-subscription-result-output"><code></code></pre>
+    </div>
+</section>
+
+<section class="docs-section">
+    <h2>List Customer Subscriptions Demo</h2>
+    <p><strong>Note:</strong> List all subscriptions for a specific customer.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - List Subscriptions</h3>
+        <form id="list-subscriptions-form">
+            <div class="form-group">
+                <label class="form-label" for="list_customer_id">Customer ID</label>
+                <input type="text" id="list_customer_id" name="customer_id" class="form-input" placeholder="cus_...">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="status_filter">Status Filter (optional)</label>
+                <select id="status_filter" name="status" class="form-input">
+                    <option value="">All statuses</option>
+                    <option value="active">Active</option>
+                    <option value="canceled">Canceled</option>
+                    <option value="incomplete">Incomplete</option>
+                    <option value="trialing">Trialing</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="subscriptions_limit">Limit (max results)</label>
+                <input type="number" id="subscriptions_limit" name="limit" class="form-input" value="10" min="1" max="100">
+            </div>
+            <button type="submit" class="btn btn-info">List Subscriptions</button>
+        </form>
+    </div>
+
+    <div id="list-subscriptions-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="list-subscriptions-result-output"><code></code></pre>
     </div>
 </section>
 
@@ -223,7 +224,6 @@ $cancelled = $subscriptionService->cancelSubscription('sub_1234567890', [
             resultContainer.style.display = 'block';
         }
     });
-
     document.getElementById('cancel-subscription-form').addEventListener('submit', async function(e) {
         e.preventDefault();
         const formData = new FormData(this);
@@ -232,6 +232,54 @@ $cancelled = $subscriptionService->cancelSubscription('sub_1234567890', [
 
         try {
             const response = await fetch('/stripe/subscription/cancel', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Retrieve Subscription Handler
+    document.getElementById('retrieve-subscription-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('retrieve-subscription-result-container');
+        const resultOutput = document.getElementById('retrieve-subscription-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/subscription/retrieve', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // List Subscriptions Handler
+    document.getElementById('list-subscriptions-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('list-subscriptions-result-container');
+        const resultOutput = document.getElementById('list-subscriptions-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/subscription/list', {
                 method: 'POST',
                 body: formData
             });

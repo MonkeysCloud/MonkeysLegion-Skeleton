@@ -1,62 +1,14 @@
 @extends('layouts.docs')
 
 @section('header')
-<h1>PaymentIntent Documentation</h1>
-<p>Learn how to create and manage PaymentIntents with the MonkeysLegion Stripe Package</p>
+<h1>PaymentIntent Demo</h1>
+<p>Test Stripe PaymentIntent creation - handles payment processing</p>
 @endsection
 
 @section('content')
 <section class="docs-section">
-    <h2>Overview</h2>
-    <p>PaymentIntents are used to handle the payment process from start to finish. They track the payment's lifecycle and handle authentication when required.</p>
-</section>
-
-<section class="docs-section">
-    <h2>Create PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function createPaymentIntent(
-    int $amount, 
-    string $currency = 'usd', 
-    bool $automatic_payment_methods = true
-): \Stripe\PaymentIntent</code></pre>
-    </div>
-
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>$amount</code></td>
-                <td>int</td>
-                <td>Yes</td>
-                <td>Amount in smallest currency unit</td>
-            </tr>
-            <tr>
-                <td><code>$currency</code></td>
-                <td>string</td>
-                <td>No</td>
-                <td>Three-letter ISO currency code (default: 'usd')</td>
-            </tr>
-            <tr>
-                <td><code>$automatic_payment_methods</code></td>
-                <td>bool</td>
-                <td>No</td>
-                <td>Enable automatic payment methods (default: true)</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="code-example">
-        <h3>Example</h3>
-        <pre><code>$paymentIntent = $stripeGateway->createPaymentIntent(1000, 'usd', true);
-echo $paymentIntent->client_secret;</code></pre>
-    </div>
+    <h2>Create PaymentIntent Demo</h2>
+    <p><strong>Note:</strong> Creates payment intent for card payments. Amount in cents (1000 = $10.00)</p>
 
     <div class="example-form">
         <h3>Interactive Test</h3>
@@ -76,7 +28,6 @@ echo $paymentIntent->client_secret;</code></pre>
             <button type="submit" class="btn btn-primary">Create PaymentIntent</button>
         </form>
     </div>
-
     <div id="result-container" class="result-container" style="display: none;">
         <h3>Response</h3>
         <pre id="result-output"><code></code></pre>
@@ -84,126 +35,94 @@ echo $paymentIntent->client_secret;</code></pre>
 </section>
 
 <section class="docs-section">
-    <h2>Retrieve PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function retrievePaymentIntent(string $paymentIntentId): \Stripe\PaymentIntent</code></pre>
+    <h2>Retrieve PaymentIntent Demo</h2>
+    <p><strong>Note:</strong> Get details of an existing payment intent by ID.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Retrieve Payment</h3>
+        <form id="retrieve-payment-form">
+            <div class="form-group">
+                <label class="form-label" for="payment_intent_id">PaymentIntent ID</label>
+                <input type="text" id="payment_intent_id" name="payment_intent_id" class="form-input" placeholder="pi_...">
+            </div>
+            <button type="submit" class="btn btn-info">Retrieve PaymentIntent</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$paymentIntent = $stripeGateway->retrievePaymentIntent('pi_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Confirm PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function confirmPaymentIntent(string $paymentIntentId, array $options = []): \Stripe\PaymentIntent</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$confirmed = $stripeGateway->confirmPaymentIntent('pi_1234567890', [
-    'payment_method' => 'pm_card_visa'
-]);</code></pre>
+    <div id="retrieve-payment-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="retrieve-payment-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Cancel PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function cancelPaymentIntent(string $paymentIntentId): \Stripe\PaymentIntent</code></pre>
+    <h2>Confirm PaymentIntent Demo</h2>
+    <p><strong>Note:</strong> Confirm a payment intent with a payment method.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Confirm Payment</h3>
+        <form id="confirm-payment-form">
+            <div class="form-group">
+                <label class="form-label" for="confirm_payment_id">PaymentIntent ID</label>
+                <input type="text" id="confirm_payment_id" name="payment_intent_id" class="form-input" placeholder="pi_...">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="payment_method">Payment Method ID</label>
+                <input type="text" id="payment_method" name="payment_method" class="form-input" placeholder="pm_card_visa">
+            </div>
+            <button type="submit" class="btn btn-success">Confirm Payment</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$cancelled = $stripeGateway->cancelPaymentIntent('pi_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Capture PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function capturePaymentIntent(string $paymentIntentId): \Stripe\PaymentIntent</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$captured = $stripeGateway->capturePaymentIntent('pi_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Refund PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function refundPaymentIntent(string $paymentIntentId, array $options = []): \Stripe\Refund</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$refund = $stripeGateway->refundPaymentIntent('pi_1234567890', [
-    'amount' => 500 // Partial refund of $5.00
-]);</code></pre>
+    <div id="confirm-payment-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="confirm-payment-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>List PaymentIntents</h2>
-    <div class="method-signature">
-        <pre><code>public function listPaymentIntent(array $params = []): \Stripe\Collection</code></pre>
+    <h2>Cancel PaymentIntent Demo</h2>
+    <p><strong>Note:</strong> Cancel a payment intent before confirmation.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Cancel Payment</h3>
+        <form id="cancel-payment-form">
+            <div class="form-group">
+                <label class="form-label" for="cancel_payment_id">PaymentIntent ID</label>
+                <input type="text" id="cancel_payment_id" name="payment_intent_id" class="form-input" placeholder="pi_...">
+            </div>
+            <button type="submit" class="btn btn-warning">Cancel Payment</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$paymentIntents = $stripeGateway->listPaymentIntent([
-    'limit' => 10,
-    'customer' => 'cus_1234567890'
-]);</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Update PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function updatePaymentIntent(string $paymentIntentId, array $params): \Stripe\PaymentIntent</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$updated = $stripeGateway->updatePaymentIntent('pi_1234567890', [
-    'metadata' => ['order_id' => '12345']
-]);</code></pre>
+    <div id="cancel-payment-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="cancel-payment-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Increment Authorization</h2>
-    <div class="method-signature">
-        <pre><code>public function incrementAuthorization(string $paymentIntentId, int $amount): \Stripe\PaymentIntent</code></pre>
+    <h2>List PaymentIntents Demo</h2>
+    <p><strong>Note:</strong> List recent payment intents with optional filters.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - List Payments</h3>
+        <form id="list-payments-form">
+            <div class="form-group">
+                <label class="form-label" for="payments_limit">Limit (max results)</label>
+                <input type="number" id="payments_limit" name="limit" class="form-input" value="10" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="customer_id">Customer ID (optional)</label>
+                <input type="text" id="customer_id" name="customer_id" class="form-input" placeholder="cus_...">
+            </div>
+            <button type="submit" class="btn btn-info">List PaymentIntents</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$incremented = $stripeGateway->incrementAuthorization('pi_1234567890', 500);</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Search PaymentIntents</h2>
-    <div class="method-signature">
-        <pre><code>public function searchPaymentIntent(array $params): \Stripe\SearchResult</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$results = $stripeGateway->searchPaymentIntent([
-    'query' => 'status:"succeeded" AND metadata["order_id"]:"12345"'
-]);</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>Validate PaymentIntent</h2>
-    <div class="method-signature">
-        <pre><code>public function isValidPaymentIntent(string $paymentIntentId): bool</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$isValid = $stripeGateway->isValidPaymentIntent('pi_1234567890');
-if ($isValid) {
-    echo "PaymentIntent is valid and succeeded";
-}</code></pre>
+    <div id="list-payments-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="list-payments-result-output"><code></code></pre>
     </div>
 </section>
 
@@ -216,6 +135,102 @@ if ($isValid) {
 
         try {
             const response = await fetch('/stripe/payment-intent', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Retrieve PaymentIntent Handler
+    document.getElementById('retrieve-payment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('retrieve-payment-result-container');
+        const resultOutput = document.getElementById('retrieve-payment-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/payment-intent/retrieve', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Confirm PaymentIntent Handler
+    document.getElementById('confirm-payment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('confirm-payment-result-container');
+        const resultOutput = document.getElementById('confirm-payment-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/payment-intent/confirm', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Cancel PaymentIntent Handler
+    document.getElementById('cancel-payment-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('cancel-payment-result-container');
+        const resultOutput = document.getElementById('cancel-payment-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/payment-intent/cancel', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // List PaymentIntents Handler
+    document.getElementById('list-payments-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('list-payments-result-container');
+        const resultOutput = document.getElementById('list-payments-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/payment-intent/list', {
                 method: 'POST',
                 body: formData
             });

@@ -150,4 +150,126 @@ final class SubscriptionController
             );
         }
     }
+
+    /**
+     * Retrieve a Stripe Subscription.
+     */
+    #[Route(
+        methods: 'POST',
+        path: '/stripe/subscription/retrieve',
+        name: 'stripe.subscription.retrieve',
+        summary: 'Retrieve Stripe Subscription',
+        tags: ['Subscription']
+    )]
+    public function retrieveSubscription(): Response
+    {
+        $headers = ['Content-Type' => 'application/json'];
+
+        try {
+            $subscriptionId = $_POST['subscription_id'] ?? '';
+
+            if (empty($subscriptionId)) {
+                throw new \InvalidArgumentException('Subscription ID is required');
+            }
+
+            $subscription = $this->SubscriptionService->retrieveSubscription($subscriptionId);
+
+            $responseData = [
+                'success' => true,
+                'subscription_id' => $subscription->id,
+                'customer' => $subscription->customer,
+                'status' => $subscription->status,
+                'current_period_start' => date('Y-m-d H:i:s', $subscription->current_period_start),
+                'current_period_end' => date('Y-m-d H:i:s', $subscription->current_period_end),
+                'trial_end' => $subscription->trial_end ? date('Y-m-d H:i:s', $subscription->trial_end) : null,
+                'created' => date('Y-m-d H:i:s', $subscription->created),
+                'items' => $subscription->items->data
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($responseData)),
+                200,
+                $headers
+            );
+        } catch (\Exception $e) {
+            $errorData = [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($errorData)),
+                400,
+                $headers
+            );
+        }
+    }
+
+    /**
+     * List Stripe Subscriptions.
+     */
+    #[Route(
+        methods: 'POST',
+        path: '/stripe/subscription/list',
+        name: 'stripe.subscription.list',
+        summary: 'List Stripe Subscriptions',
+        tags: ['Subscription']
+    )]
+    public function listSubscriptions(): Response
+    {
+        $headers = ['Content-Type' => 'application/json'];
+
+        try {
+            $customerId = $_POST['customer_id'] ?? '';
+
+            if (empty($customerId)) {
+                throw new \InvalidArgumentException('Customer ID is required');
+            }
+
+            $params = [];
+
+            if (!empty($_POST['limit']) && is_numeric($_POST['limit'])) {
+                $params['limit'] = (int)$_POST['limit'];
+            }
+
+            if (!empty($_POST['status'])) {
+                $params['status'] = $_POST['status'];
+            }
+
+            $subscriptions = $this->SubscriptionService->listSubscriptions($customerId, $params);
+
+            $responseData = [
+                'success' => true,
+                'customer_id' => $customerId,
+                'subscriptions' => array_map(function ($sub) {
+                    return [
+                        'id' => $sub->id,
+                        'status' => $sub->status,
+                        'current_period_start' => date('Y-m-d H:i:s', $sub->current_period_start),
+                        'current_period_end' => date('Y-m-d H:i:s', $sub->current_period_end),
+                        'trial_end' => $sub->trial_end ? date('Y-m-d H:i:s', $sub->trial_end) : null,
+                        'created' => date('Y-m-d H:i:s', $sub->created)
+                    ];
+                }, $subscriptions->data),
+                'has_more' => $subscriptions->has_more
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($responseData)),
+                200,
+                $headers
+            );
+        } catch (\Exception $e) {
+            $errorData = [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($errorData)),
+                400,
+                $headers
+            );
+        }
+    }
 }

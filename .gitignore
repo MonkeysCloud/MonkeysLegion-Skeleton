@@ -36,3 +36,7 @@ Thumbs.db
 
 # Keys Storage
 /.keys
+
+# logs
+var/log/stripe_webhooks.log
+var/log/app.log

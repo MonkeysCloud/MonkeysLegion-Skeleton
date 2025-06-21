@@ -1,79 +1,14 @@
 @extends('layouts.docs')
 
 @section('header')
-<h1>Checkout Session Documentation</h1>
-<p>Learn how to create and manage Stripe Checkout sessions for hosted payment pages</p>
+<h1>Checkout Session Demo</h1>
+<p>Test Stripe Checkout sessions for hosted payment pages</p>
 @endsection
 
 @section('content')
 <section class="docs-section">
-    <h2>Overview</h2>
-    <p>Checkout Sessions provide a secure, hosted payment page that handles the entire checkout flow. Perfect for e-commerce and subscription billing.</p>
-</section>
-
-<section class="docs-section">
-    <h2>Create Checkout Session</h2>
-    <div class="method-signature">
-        <pre><code>public function createCheckoutSession(array $params): \Stripe\Checkout\Session</code></pre>
-    </div>
-
-    <table class="params-table">
-        <thead>
-            <tr>
-                <th>Parameter</th>
-                <th>Type</th>
-                <th>Required</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td><code>$params['line_items']</code></td>
-                <td>array</td>
-                <td>Yes</td>
-                <td>Array of line items for the checkout</td>
-            </tr>
-            <tr>
-                <td><code>$params['mode']</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>The mode of the checkout ('payment', 'subscription', 'setup')</td>
-            </tr>
-            <tr>
-                <td><code>$params['success_url']</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>URL to redirect after successful payment</td>
-            </tr>
-            <tr>
-                <td><code>$params['cancel_url']</code></td>
-                <td>string</td>
-                <td>Yes</td>
-                <td>URL to redirect if user cancels</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <div class="code-example">
-        <h3>Basic Checkout Example</h3>
-        <pre><code>$session = $checkoutService->createCheckoutSession([
-    'line_items' => [
-        [
-            'price_data' => [
-                'currency' => 'usd',
-                'product_data' => [
-                    'name' => 'T-shirt',
-                ],
-                'unit_amount' => 2000,
-            ],
-            'quantity' => 1,
-        ],
-    ],
-    'mode' => 'payment',
-    'success_url' => 'https://yoursite.com/success',
-    'cancel_url' => 'https://yoursite.com/cancel',
-]);</code></pre>
-    </div>
+    <h2>Create Checkout Session Demo</h2>
+    <p><strong>Note:</strong> Creates hosted checkout page. Redirects users to Stripe-hosted payment form.</p>
 
     <div class="example-form">
         <h3>Interactive Test - Create Session</h3>
@@ -114,33 +49,7 @@
 
 <section class="docs-section">
     <h2>Get Checkout URL Helper</h2>
-    <div class="method-signature">
-        <pre><code>public function getCheckoutUrl(array $params): string</code></pre>
-    </div>
-
-    <p>This helper method creates a checkout session and returns the URL directly for immediate redirection.</p>
-
-    <div class="code-example">
-        <pre><code>$checkoutUrl = $checkoutService->getCheckoutUrl([
-    'line_items' => [
-        [
-            'price_data' => [
-                'currency' => 'usd',
-                'product_data' => ['name' => 'T-shirt'],
-                'unit_amount' => 2000,
-            ],
-            'quantity' => 1,
-        ],
-    ],
-    'mode' => 'payment',
-    'success_url' => 'https://yoursite.com/success',
-    'cancel_url' => 'https://yoursite.com/cancel',
-]);
-
-// Redirect user to Stripe Checkout
-header('Location: ' . $checkoutUrl);
-exit;</code></pre>
-    </div>
+    <p><strong>Note:</strong> Creates session and returns URL directly for immediate redirection.</p>
 
     <div class="example-form">
         <h3>Interactive Test - Direct Redirect</h3>
@@ -152,79 +61,96 @@ exit;</code></pre>
             <div class="form-group">
                 <label class="form-label" for="url_amount">Amount (cents)</label>
                 <input type="number" id="url_amount" name="amount" class="form-input" value="1500" min="50">
-            </div>
-            <button type="submit" class="btn btn-secondary">Go to Checkout (Redirect)</button>
+            </div> <button type="submit" class="btn btn-secondary">Go to Checkout (Redirect)</button>
         </form>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Retrieve Checkout Session</h2>
-    <div class="method-signature">
-        <pre><code>public function retrieveCheckoutSession(string $sessionId): \Stripe\Checkout\Session</code></pre>
+    <h2>Retrieve Checkout Session Demo</h2>
+    <p><strong>Note:</strong> Get details of an existing checkout session by ID.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Retrieve Session</h3>
+        <form id="retrieve-session-form">
+            <div class="form-group">
+                <label class="form-label" for="session_id">Session ID</label>
+                <input type="text" id="session_id" name="session_id" class="form-input" placeholder="cs_...">
+            </div>
+            <button type="submit" class="btn btn-info">Retrieve Session</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$session = $checkoutService->retrieveCheckoutSession('cs_1234567890');</code></pre>
-    </div>
-</section>
-
-<section class="docs-section">
-    <h2>List Checkout Sessions</h2>
-    <div class="method-signature">
-        <pre><code>public function listCheckoutSessions(array $params = []): \Stripe\Collection</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$sessions = $checkoutService->listCheckoutSessions([
-    'limit' => 10,
-    'created' => [
-        'gte' => strtotime('2023-01-01'),
-    ],
-]);</code></pre>
+    <div id="retrieve-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="retrieve-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Expire Checkout Session</h2>
-    <div class="method-signature">
-        <pre><code>public function expireCheckoutSession(string $sessionId): \Stripe\Checkout\Session</code></pre>
+    <h2>List Checkout Sessions Demo</h2>
+    <p><strong>Note:</strong> List recent checkout sessions with optional filters.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - List Sessions</h3>
+        <form id="list-sessions-form">
+            <div class="form-group">
+                <label class="form-label" for="limit">Limit (max results)</label>
+                <input type="number" id="limit" name="limit" class="form-input" value="10" min="1" max="100">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="created_gte">Created After (optional)</label>
+                <input type="datetime-local" id="created_gte" name="created_gte" class="form-input">
+            </div>
+            <button type="submit" class="btn btn-info">List Sessions</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$expired = $checkoutService->expireCheckoutSession('cs_1234567890');</code></pre>
+    <div id="list-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="list-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>List Line Items</h2>
-    <div class="method-signature">
-        <pre><code>public function listLineItems(string $sessionId, array $params = []): \Stripe\Collection</code></pre>
+    <h2>Expire Checkout Session Demo</h2>
+    <p><strong>Note:</strong> Manually expire an active checkout session to prevent further use.</p>
+
+    <div class="example-form">
+        <h3>Interactive Test - Expire Session</h3>
+        <form id="expire-session-form">
+            <div class="form-group">
+                <label class="form-label" for="expire_session_id">Session ID</label>
+                <input type="text" id="expire_session_id" name="session_id" class="form-input" placeholder="cs_...">
+            </div>
+            <button type="submit" class="btn btn-warning">Expire Session</button>
+        </form>
     </div>
 
-    <div class="code-example">
-        <pre><code>$lineItems = $checkoutService->listLineItems('cs_1234567890');</code></pre>
+    <div id="expire-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="expire-result-output"><code></code></pre>
     </div>
 </section>
 
 <section class="docs-section">
-    <h2>Validation Methods</h2>
+    <h2>List Line Items Demo</h2>
+    <p><strong>Note:</strong> Get line items from a completed checkout session.</p>
 
-    <div class="method-signature">
-        <pre><code>public function isValidCheckoutSession(string $sessionId): bool</code></pre>
+    <div class="example-form">
+        <h3>Interactive Test - List Line Items</h3>
+        <form id="line-items-form">
+            <div class="form-group">
+                <label class="form-label" for="line_items_session_id">Session ID</label>
+                <input type="text" id="line_items_session_id" name="session_id" class="form-input" placeholder="cs_...">
+            </div>
+            <button type="submit" class="btn btn-info">Get Line Items</button>
+        </form>
     </div>
 
-    <div class="method-signature">
-        <pre><code>public function isExpiredCheckoutSession(string $sessionId): bool</code></pre>
-    </div>
-
-    <div class="code-example">
-        <pre><code>$isValid = $checkoutService->isValidCheckoutSession('cs_1234567890');
-$isExpired = $checkoutService->isExpiredCheckoutSession('cs_1234567890');
-
-if ($isValid && !$isExpired) {
-    echo "Session is active and valid";
-}</code></pre>
+    <div id="line-items-result-container" class="result-container" style="display: none;">
+        <h3>Response</h3>
+        <pre id="line-items-result-output"><code></code></pre>
     </div>
 </section>
 
@@ -237,6 +163,102 @@ if ($isValid && !$isExpired) {
 
         try {
             const response = await fetch('/stripe/checkout-session', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Retrieve Session Handler
+    document.getElementById('retrieve-session-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('retrieve-result-container');
+        const resultOutput = document.getElementById('retrieve-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/checkout-session/retrieve', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // List Sessions Handler
+    document.getElementById('list-sessions-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('list-result-container');
+        const resultOutput = document.getElementById('list-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/checkout-session/list', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Expire Session Handler
+    document.getElementById('expire-session-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('expire-result-container');
+        const resultOutput = document.getElementById('expire-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/checkout-session/expire', {
+                method: 'POST',
+                body: formData
+            });
+            const responseText = await response.text();
+            const data = JSON.parse(responseText);
+            resultOutput.textContent = JSON.stringify(data, null, 2);
+            resultContainer.style.display = 'block';
+        } catch (error) {
+            resultOutput.textContent = JSON.stringify({
+                error: error.message
+            }, null, 2);
+            resultContainer.style.display = 'block';
+        }
+    });
+
+    // Line Items Handler
+    document.getElementById('line-items-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const resultContainer = document.getElementById('line-items-result-container');
+        const resultOutput = document.getElementById('line-items-result-output').querySelector('code');
+
+        try {
+            const response = await fetch('/stripe/checkout-session/line-items', {
                 method: 'POST',
                 body: formData
             });

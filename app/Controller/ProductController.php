@@ -223,4 +223,120 @@ final class ProductController
             );
         }
     }
+
+    /**
+     * Retrieve a Stripe Product.
+     */
+    #[Route(
+        methods: 'POST',
+        path: '/stripe/product/retrieve',
+        name: 'stripe.product.retrieve',
+        summary: 'Retrieve Stripe Product',
+        tags: ['Product']
+    )]
+    public function retrieveProduct(): Response
+    {
+        $headers = ['Content-Type' => 'application/json'];
+
+        try {
+            $productId = $_POST['product_id'] ?? '';
+
+            if (empty($productId)) {
+                throw new \InvalidArgumentException('Product ID is required');
+            }
+
+            $product = $this->ProductService->retrieveProduct($productId);
+
+            $responseData = [
+                'success' => true,
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'description' => $product->description,
+                'active' => $product->active,
+                'images' => $product->images,
+                'metadata' => $product->metadata,
+                'created' => date('Y-m-d H:i:s', $product->created),
+                'updated' => date('Y-m-d H:i:s', $product->updated)
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($responseData)),
+                200,
+                $headers
+            );
+        } catch (\Exception $e) {
+            $errorData = [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($errorData)),
+                400,
+                $headers
+            );
+        }
+    }
+
+    /**
+     * List Stripe Products.
+     */
+    #[Route(
+        methods: 'POST',
+        path: '/stripe/product/list',
+        name: 'stripe.product.list',
+        summary: 'List Stripe Products',
+        tags: ['Product']
+    )]
+    public function listProducts(): Response
+    {
+        $headers = ['Content-Type' => 'application/json'];
+
+        try {
+            $params = [];
+
+            if (!empty($_POST['limit']) && is_numeric($_POST['limit'])) {
+                $params['limit'] = (int)$_POST['limit'];
+            }
+
+            if (isset($_POST['active']) && $_POST['active'] !== '') {
+                $params['active'] = $_POST['active'] === 'true';
+            }
+
+            $products = $this->ProductService->listProducts($params);
+
+            $responseData = [
+                'success' => true,
+                'products' => array_map(function ($product) {
+                    return [
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'description' => $product->description,
+                        'active' => $product->active,
+                        'images' => $product->images,
+                        'created' => date('Y-m-d H:i:s', $product->created),
+                        'updated' => date('Y-m-d H:i:s', $product->updated)
+                    ];
+                }, $products->data),
+                'has_more' => $products->has_more
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($responseData)),
+                200,
+                $headers
+            );
+        } catch (\Exception $e) {
+            $errorData = [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+
+            return new Response(
+                Stream::createFromString(json_encode($errorData)),
+                400,
+                $headers
+            );
+        }
+    }
 }
