@@ -14,4 +14,4 @@ auth:
 
     # → this is where we declare *all* our “public paths”
     public_paths:
-    - /
+      - /
