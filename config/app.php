@@ -284,11 +284,19 @@ return [
     /* ----------------------------------------------------------------- */
     /* Authentication middleware                                          */
     /* ----------------------------------------------------------------- */
-    AuthMiddleware::class       => fn($c) => new AuthMiddleware(
+    AuthMiddleware::class => fn($c) => new AuthMiddleware(
+        // 1) Response factory
         $c->get(ResponseFactoryInterface::class),
+
+        // 2) Realm name (stays the same)
         'Protected',
+
+        // 3) Your token from app.mlc
         (string) $c->get(MlcConfig::class)->get('auth.token'),
-        ['/']  // public paths
+
+        // 4) *All* public paths from app.mlc (fallback to ['/'] if key missing)
+        $c->get(MlcConfig::class)
+            ->get('auth.public_paths', ['/']),
     ),
 
     /* ----------------------------------------------------------------- */
