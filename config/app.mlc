@@ -8,10 +8,10 @@ database {
     pass   "secret"
 }
 
-auth:
+auth {
     # your JWT / HMAC token key (already in use)
     token      "YOUR_AUTH_TOKEN"
 
     # → this is where we declare *all* our “public paths”
     public_paths = ["/"]
-
+}
