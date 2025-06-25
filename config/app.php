@@ -277,7 +277,7 @@ return [
         fn($c) => new RateLimitMiddleware(
             $c->get(ResponseFactoryInterface::class),
             $c->get(CacheInterface::class),
-            200,   // limit
+            5000,   // limit
             60     // window (seconds)
         ),
 
