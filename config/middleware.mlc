@@ -2,7 +2,7 @@
 middleware {
     global = [
         "\\MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
-        "\\MonkeysLegion\\Core\\Middleware\\RateLimitMiddleware",
+        "\\MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\AuthMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\LoggingMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",

@@ -1,4 +1,5 @@
-token "changeme-super-secret"   # bearer-token used by AuthMiddleware
-
-# optional extra keys you may want later
-allow_origin  "*"               # reuse in CorsMiddleware if desired
+auth {
+    token       = "changeme-super-secret"
+    jwt_secret  = "changeme-even-more-secret"
+    jwt_ttl     = 3600
+}
