@@ -290,5 +290,19 @@ final class HomeControllerTest extends IntegrationTestCase
 Happy hacking with **MonkeysLegion**! 🎉
 
 ## Contributors
-- [Jorge Peraza](https://github.com/yorchperaza)
-- [Amanar Marouane](https://github.com/Amanar-Marouane)
+<table>
+  <tr>
+    <td>
+      <a href="https://github.com/yorchperaza">
+        <img src="https://github.com/yorchperaza.png" width="100px;" alt="Jorge Peraza"/><br />
+        <sub><b>Jorge Peraza</b></sub>
+      </a>
+    </td>
+    <td>
+      <a href="https://github.com/Amanar-Marouane">
+        <img src="https://github.com/Amanar-Marouane.png" width="100px;" alt="Amanar Marouane"/><br />
+        <sub><b>Amanar Marouane</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
