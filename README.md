@@ -290,5 +290,5 @@ final class HomeControllerTest extends IntegrationTestCase
 Happy hacking with **MonkeysLegion**! 🎉
 
 ## Contributors
-
+- [Jorge Peraza](https://github.com/yorchperaza)
 - [Amanar Marouane](https://github.com/Amanar-Marouane)
