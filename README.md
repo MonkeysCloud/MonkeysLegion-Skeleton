@@ -1,4 +1,6 @@
 # MonkeysLegion Skeleton
+[![PHP Version](https://img.shields.io/badge/php-8.4%2B-blue.svg)](https://php.net)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 **A production-ready starter for building web apps & APIs with the MonkeysLegion framework.**
 
