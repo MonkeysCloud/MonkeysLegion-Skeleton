@@ -1,17 +1,3 @@
 # top‑level keys
 app_name    "MyApp"
 debug       true
-
-database {
-    dsn    "mysql:host=127.0.0.1;port=3306;dbname=myapp;charset=utf8mb4"
-    user   "root"
-    pass   "secret"
-}
-
-auth {
-    # your JWT / HMAC token key (already in use)
-    token      "YOUR_AUTH_TOKEN"
-
-    # → this is where we declare *all* our “public paths”
-    public_paths = ["/"]
-}

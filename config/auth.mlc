@@ -1,5 +1,33 @@
+# 🔑 Configuration: auth.public_paths
+#
+# Defines which request paths bypass all authentication and authorization checks.
+# Patterns support:
+#   "*"          – global wildcard; matches every path (useful for fully open APIs or dev mode)
+#   "/auth/*"    – prefix wildcard; matches any route beginning with "/auth/", e.g.:
+#                    /auth/register
+#                    /auth/login
+#                    /auth/forgot-password
+#   "/"          – exact match; only the home page
+#   "/docs*"     – fnmatch-style wildcard; matches "/docs", "/docs/index.html", etc.
+#
+# Combine multiple patterns to open exactly the endpoints you need:
+#   public_paths = [
+#     "/",         # home
+#     "/auth/*",   # all auth flows
+#     "/assets/*", # static files
+#     "/health"    # health checks
+#   ]
+#
+# To disable all checks (everything public), just use ["*"].
+
 auth {
     token       = "changeme-super-secret"
     jwt_secret  = "changeme-even-more-secret"
     jwt_ttl     = 3600
+
+    # → declare all of our “public” routes here:
+    # match-all for dev or fully open API
+    public_paths = [
+        "*"
+    ]
 }
