@@ -8,6 +8,6 @@ use MonkeysLegion\Repository\EntityRepository;
 
 class UserRepository extends EntityRepository
 {
-    protected string $table       = 'users';
+    protected string $table       = 'user';
     protected string $entityClass = User::class;
 }
