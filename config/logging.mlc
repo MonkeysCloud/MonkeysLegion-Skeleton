@@ -1,0 +1,24 @@
+# Master switch for all logging
+logging {
+    enabled = true
+
+    # Send Monolog to stdout?
+    stdout {
+        enabled = true
+        level   = debug
+    }
+
+    # Also write to a file?
+    file {
+        enabled = true
+        level   = info
+        path    = var/log/app.log
+    }
+
+    # PHP runtime errors
+    php_errors {
+        enabled = true
+        display = stderr
+        file    = var/log/php-errors.log
+    }
+}
