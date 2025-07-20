@@ -10,6 +10,7 @@ middleware {
         "\\MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
         "\\MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware",
         "\\MonkeysLegion\\Auth\\Middleware\\JwtAuthMiddleware",
+        "\\MonkeysLegion\\Auth\\Middleware\\JwtUserMiddleware",
         "\\MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware"
     ]
 }
