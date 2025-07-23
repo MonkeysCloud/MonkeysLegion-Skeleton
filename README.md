@@ -24,8 +24,7 @@ Includes:
 ## 🚀 Quick-start
 
 ```bash
-composer create-project --stability=dev \
-    monkeyscloud/monkeyslegion-skeleton my-app "dev-main"
+composer create-project monkeyscloud/monkeyslegion-skeleton my-app
 cd my-app
 
 cp .env.example .env       # configure DB, secrets
