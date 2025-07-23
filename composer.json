@@ -7,7 +7,7 @@
   "prefer-stable": true,
   "require": {
     "php": "^8.4",
-    "monkeyscloud/monkeyslegion": "^1.0@dev",
+    "monkeyscloud/monkeyslegion": "^1.0",
     "laminas/laminas-diactoros": "^3.6",
     "monolog/monolog": "^3.9"
   },
@@ -47,7 +47,7 @@
   ],
   "extra": {
     "branch-alias": {
-      "dev-main": "1.0-dev"
+      "dev-main": "1.0.x-dev"
     }
   }
 }
