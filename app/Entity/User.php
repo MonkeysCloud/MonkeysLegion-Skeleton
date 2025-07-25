@@ -9,6 +9,7 @@ use MonkeysLegion\Entity\Attributes\OneToOne;
 use MonkeysLegion\Entity\Attributes\OneToMany;
 use MonkeysLegion\Entity\Attributes\ManyToOne;
 use MonkeysLegion\Entity\Attributes\ManyToMany;
+use MonkeysLegion\Entity\Attributes\JoinTable;
 
 #[Entity]
 class User
