@@ -1,0 +1,30 @@
+# Top-level settings for the “files” config
+default_disk = "local"
+max_bytes    = 20971520
+mime_allow   = ["image/jpeg","image/png","image/webp","application/pdf"]
+
+# All disks grouped under one “disks” object
+disks {
+    # Local filesystem
+    local {
+        root             = "storage/app"
+        public_base_url  = "files"
+    }
+
+    # Uncomment & fill out to enable S3
+    # s3 {
+    #   bucket           = "my-s3-bucket"
+    #   region           = "us-east-1"
+    #   prefix           = "uploads/"
+    #   public_base_url  = "https://my-cloudfront/"
+    # }
+
+    # Uncomment & fill out to enable GCS
+    # gcs {
+    #   project_id       = "my-gcp-project"
+    #   key_file_path    = "/path/to/key.json"
+    #   bucket           = "my-gcs-bucket"
+    #   prefix           = "uploads/"
+    #   public_base_url  = "https://cdn.example.com"
+    # }
+}
