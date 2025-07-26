@@ -8,7 +8,7 @@ files {
     disks {
         # Local filesystem
         local {
-            root             = "storage/app"
+            root             = "public/files"
             public_base_url  = "files"
         }
 
