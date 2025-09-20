@@ -29,7 +29,7 @@ cd my-app
 
 cp .env.example .env       # configure DB, secrets
 composer install
-php vendor/bin/ml key:generate
+php ml key:generate
 
 composer serve             # or php vendor/bin/dev-server
 open http://127.0.0.1:8000 # your first MonkeysLegion page
@@ -179,9 +179,9 @@ class User
 ```
 
 ```bash
-php vendor/bin/ml make:migration   # diff → var/migrations/
-php vendor/bin/ml migrate          # apply migrations
-php vendor/bin/ml rollback         # revert last migration
+php ml make:migration   # diff → var/migrations/
+php ml migrate          # apply migrations
+php ml rollback         # revert last migration
 ```
 
 ---
@@ -189,9 +189,9 @@ php vendor/bin/ml rollback         # revert last migration
 ## 🌱 Fixtures & Seeds
 
 ```bash
-php vendor/bin/ml make:seeder UsersTable  # create App/Database/Seeders/UsersTableSeeder.php
-php vendor/bin/ml db:seed                 # run all seeders
-php vendor/bin/ml db:seed UsersTable      # run only UsersTableSeeder
+php ml make:seeder UsersTable  # create App/Database/Seeders/UsersTableSeeder.php
+php ml db:seed                 # run all seeders
+php ml db:seed UsersTable      # run only UsersTableSeeder
 ```
 
 ---
@@ -199,22 +199,29 @@ php vendor/bin/ml db:seed UsersTable      # run only UsersTableSeeder
 ## 🛠 CLI Cheatsheet
 
 ```bash
-php vendor/bin/ml key:generate
-php vendor/bin/ml db:create
-php vendor/bin/ml cache:clear
-php vendor/bin/ml make:entity User
-php vendor/bin/ml make:controller User
-php vendor/bin/ml make:middleware Auth
-php vendor/bin/ml make:policy User
-php vendor/bin/ml make:migration
-php vendor/bin/ml migrate
-php vendor/bin/ml rollback
-php vendor/bin/ml route:list
-php vendor/bin/ml openapi:export
-php vendor/bin/ml schema:update --dump
-php vendor/bin/ml schema:update --force
-php vendor/bin/ml make:seeder UsersTable
-php vendor/bin/ml db:seed
+php ml make:dkim-pkey                 # Generate DKIM private and public key files
+php ml mail:install                   # Publish Mail scaffolding into your project
+php ml make:dkim-pkey                 # Generate DKIM private and public key files
+php ml key:generate                   # Generate a new APP_KEY in your .env file
+php ml db:create                      # Create the schema using .env credentials
+php ml cache:clear                    # Clear the compiled view cache (var/cache/views)
+php ml make:mail Mail                 # Generate a new Mailable class
+php ml make:entity User               # Generate or update an Entity class with fields & relationships
+php ml make:controller User           # Generate a new Controller class stub
+php ml make:middleware Auth           # Generate a new Middleware class stub
+php ml make:policy User               # Generate a new Policy class stub
+php ml make:migration                 # Generate SQL diff from entities to MySQL schema
+php ml migrate                        # Run outstanding migrations
+php ml rollback                       # Undo the last batch of migrations
+php ml route:list                     # Display all registered routes.
+php ml openapi:export                 # Dump OpenAPI spec to stdout or a file.
+php ml schema:update                  # Compare entities → database and apply missing tables/columns (use --dump or --force)
+php ml make:seeder UsersTable         # Generate a new database seeder class stub
+php ml db:seed                        # Run database seeders (optionally specify one)
+php ml tinker                         # Interactive REPL (Tinker) with Container bootstrapped
+
+# if monkeyscloud/monkeyslegion-stripe installed
+php ml stripe:install                 #Publish Stripe scaffolding into your project
 ```
 
 ---
