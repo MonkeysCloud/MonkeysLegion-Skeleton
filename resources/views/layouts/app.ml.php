@@ -297,7 +297,49 @@
 {{ $scripts ?? '' }}
 
 @env('development')
-{{-- Development tools --}}
+{{-- 🔁 Dev auto-reload script --}}
+<script>
+    (function () {
+        let lastVersion = null;
+        const endpoint = '/_dev/reload.json';
+
+        async function checkReload() {
+            try {
+                const res = await fetch(endpoint + '?t=' + Date.now(), {
+                    cache: 'no-store'
+                });
+
+                if (!res.ok) {
+                    return;
+                }
+
+                const data = await res.json();
+                if (!data || typeof data.version === 'undefined') {
+                    return;
+                }
+
+                if (lastVersion === null) {
+                    // First hit: just store current version
+                    lastVersion = data.version;
+                    return;
+                }
+
+                if (data.version !== lastVersion) {
+                    console.log('[MonkeysLegion DevServer] Change detected, reloading page…');
+                    window.location.reload();
+                }
+            } catch (e) {
+                // Ignore errors in dev
+                // console.warn('[Dev reload] error:', e);
+            }
+        }
+
+        // Poll every 1s
+        setInterval(checkReload, 1000);
+    })();
+</script>
+
+{{-- Development tools badge --}}
 <div style="position:fixed;bottom:10px;right:80px;background:#000;color:#0f0;padding:8px 12px;font-size:11px;border-radius:6px;z-index:9999;font-family:monospace;box-shadow:0 2px 10px rgba(0,0,0,0.3);">
     🔧 DEV MODE
 </div>
