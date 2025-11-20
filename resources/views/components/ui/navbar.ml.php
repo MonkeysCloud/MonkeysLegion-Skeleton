@@ -75,7 +75,7 @@ $attrs = $attrs->merge([
                 </svg>
                 GitHub
             </a>
-            <a href="/get-started" class="btn btn-primary">Get Started</a>
+            <a href="https://monkeyslegion.com/docs/starter" target="_blank" class="btn btn-primary">Get Started</a>
             @endguest
         </div>
 
