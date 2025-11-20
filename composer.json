@@ -36,8 +36,12 @@
     "post-install-cmd": [
       "@php vendor/bin/ml key:generate --if-missing"
     ],
-    "serve": "php vendor/bin/dev-server",
-    "server:stop": "php vendor/bin/dev-server stop",
+    "serve": "@php vendor/bin/dev-server",
+    "server:start": "@php vendor/bin/dev-server",
+    "server:start:public": "@php vendor/bin/dev-server 0.0.0.0 8000",
+    "server:stop": "@php vendor/bin/dev-server stop",
+    "server:restart": "@php vendor/bin/dev-server restart",
+    "server:status": "@php vendor/bin/dev-server status",
     "test": "phpunit"
   },
   "bin": [
