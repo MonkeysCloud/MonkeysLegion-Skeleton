@@ -2,7 +2,7 @@
     'title' => 'Ship Production-Ready PHP in Record Time',
     'subtitle' => 'The lightweight, modular framework that lets modern teams move from commit to cloud without the boilerplate.',
     'primaryButton' => 'Get Started',
-    'primaryLink' => '/get-started',
+    'primaryLink' => 'https://monkeyslegion.com/docs/starter',
     'secondaryButton' => 'View Docs',
     'secondaryLink' => 'https://monkeyslegion.com/docs',
     'gradient' => true,
@@ -32,7 +32,7 @@
                 @if($slots->has('actions'))
                 {{ $slots->actions }}
                 @else
-                <a href="{{ $primaryLink }}" class="btn btn-primary btn-lg hero-btn-primary">
+                <a href="{{ $primaryLink }}" target="_blank" class="btn btn-primary btn-lg hero-btn-primary">
                     {{ $primaryButton }}
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M5 12h14M12 5l7 7-7 7"/>

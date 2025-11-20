@@ -21,9 +21,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     {{-- Additional head content --}}
-    @if($slots->has('head'))
-    {{ $slots->head }}
-    @endif
+    {{ $head ?? '' }}
 
     <style>
         *, *::before, *::after {
@@ -185,11 +183,7 @@
 <x-ui.navbar />
 
 {{-- Page Header (if provided) --}}
-@if($slots->has('header'))
-<header class="page-header">
-    {{ $slots->header }}
-</header>
-@endif
+{{ $header ?? '' }}
 
 {{-- Main Content --}}
 <main class="main-content" id="main-content">
@@ -300,9 +294,7 @@
     });
 </script>
 
-@if($slots->has('scripts'))
-{{ $slots->scripts }}
-@endif
+{{ $scripts ?? '' }}
 
 @env('development')
 {{-- Development tools --}}

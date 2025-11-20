@@ -4,8 +4,7 @@
 ])
 
 @php
-    // If no year was passed from the parent, default to current year
-    if ($year === null || $year === '') {
+if ($year === null || $year === '') {
     $year = date('Y');
 }
 @endphp
@@ -20,9 +19,66 @@
                     The lightweight, modular framework that lets modern teams move from commit to cloud without the boilerplate.
                 </p>
                 <div class="footer-social">
-                    <a href="https://github.com/MonkeysLegion-Skeleton" target="_blank" rel="noopener noreferrer" class="footer-social-link" aria-label="GitHub">
+                    {{-- GitHub --}}
+                    <a href="https://github.com/MonkeysCloud/MonkeysLegion-Skeleton"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="footer-social-link"
+                       aria-label="GitHub">
                         <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                                     0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+                                     -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52
+                                     .28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+                                     -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27
+                                     1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15
+                                     0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+                                     0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8
+                                     c0-4.42-3.58-8-8-8z"/>
+                        </svg>
+                    </a>
+
+                    {{-- X / Twitter (MonkeysCloud org) --}}
+                    <a href="https://twitter.com/MonkeysCloud"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="footer-social-link"
+                       aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775
+                                     4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184
+                                     a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162
+                                     a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096
+                                     a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827
+                                     4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417
+                                     9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067
+                                     a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496
+                                     13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                    </a>
+
+                    {{-- Slack workspace --}}
+                    <a href="https://monkeyslegion.slack.com"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="footer-social-link"
+                       aria-label="Slack">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037
+                                     c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0
+                                     12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037
+                                     A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027
+                                     C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057
+                                     19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028
+                                     c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106
+                                     13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128
+                                     10.2 10.2 0 00.372-.292.074.074 0 01.077-.01
+                                     c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01
+                                     c.12.098.246.198.373.292a.077.077 0 01-.006.127
+                                     12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107
+                                     c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028
+                                     19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054
+                                     c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03z"/>
                         </svg>
                     </a>
                 </div>
@@ -33,10 +89,10 @@
                 <h3 class="footer-title">Framework</h3>
                 <ul class="footer-links">
                     <li><a href="https://monkeyslegion.com/docs" target="_blank" rel="noopener noreferrer">Documentation</a></li>
-                    <li><a href="https://monkeyslegion.com/docs/getting-started" target="_blank" rel="noopener noreferrer">Getting Started</a></li>
-                    <li><a href="https://monkeyslegion.com/docs/routing" target="_blank" rel="noopener noreferrer">Routing</a></li>
-                    <li><a href="https://monkeyslegion.com/docs/di-container" target="_blank" rel="noopener noreferrer">DI Container</a></li>
-                    <li><a href="https://monkeyslegion.com/docs/cli" target="_blank" rel="noopener noreferrer">CLI Tools</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/starter" target="_blank" rel="noopener noreferrer">Getting Started</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/packages/router" target="_blank" rel="noopener noreferrer">Routing</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/packages/template" target="_blank" rel="noopener noreferrer">Template Engine</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/package/cli" target="_blank" rel="noopener noreferrer">CLI Tools</a></li>
                 </ul>
             </div>
 
@@ -45,10 +101,10 @@
                 <h3 class="footer-title">Resources</h3>
                 <ul class="footer-links">
                     <li><a href="https://monkeyslegion.com/articles" target="_blank" rel="noopener noreferrer">Articles</a></li>
-                    <li><a href="https://monkeyslegion.com/examples" target="_blank" rel="noopener noreferrer">Examples</a></li>
-                    <li><a href="https://monkeyslegion.com/api" target="_blank" rel="noopener noreferrer">API Reference</a></li>
-                    <li><a href="https://monkeyslegion.com/roadmap" target="_blank" rel="noopener noreferrer">Roadmap</a></li>
-                    <li><a href="https://monkeyslegion.com/changelog" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/starter/first-project" target="_blank" rel="noopener noreferrer">First Project Tutorial</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/packages" target="_blank" rel="noopener noreferrer">Package Map</a></li>
+                    <li><a href="https://monkeyslegion.com/docs/deployment" target="_blank" rel="noopener noreferrer">Deployment Guide</a></li>
+                    <li><a href="https://monkeyslegion.com/community" target="_blank" rel="noopener noreferrer">Community Overview</a></li>
                 </ul>
             </div>
 
@@ -56,7 +112,9 @@
             <div class="footer-column">
                 <h3 class="footer-title">Community</h3>
                 <ul class="footer-links">
-                    <li><a href="https://github.com/monkeyscloud/MonkeysLegion-Skeleton" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    <li><a href="https://github.com/MonkeysCloud/MonkeysLegion-Skeleton" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                    <li><a href="https://monkeyslegion.slack.com" target="_blank" rel="noopener noreferrer">Slack</a></li>
+                    <li><a href="mailto:info@monkeyslegion.com">Contact</a></li>
                 </ul>
             </div>
         </div>
@@ -67,9 +125,13 @@
                 &copy; {{ $year }} MonkeysLegion. Built with ❤️ by the community.
             </p>
             <div class="footer-legal">
-                <a href="https://monkeyslegion.com/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                <a href="https://monkeyslegion.com/terms" target="_blank" rel="noopener noreferrer">Terms of Service</a>
-                <a href="https://github.com/monkeyscloud/MonkeysLegion-Skeleton/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a>
+                <a href="https://monkeyslegion.com/docs" target="_blank" rel="noopener noreferrer">Docs</a>
+                <a href="https://monkeyslegion.com/community" target="_blank" rel="noopener noreferrer">Community</a>
+                <a href="https://github.com/MonkeysCloud/MonkeysLegion-Skeleton/blob/main/LICENSE"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    MIT License
+                </a>
             </div>
         </div>
     </div>
