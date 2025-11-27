@@ -5,18 +5,27 @@ namespace App\Entity;
 
 use MonkeysLegion\Entity\Attributes\Entity;
 use MonkeysLegion\Entity\Attributes\Field;
-use MonkeysLegion\Entity\Attributes\OneToOne;
-use MonkeysLegion\Entity\Attributes\OneToMany;
-use MonkeysLegion\Entity\Attributes\ManyToOne;
-use MonkeysLegion\Entity\Attributes\ManyToMany;
-use MonkeysLegion\Entity\Attributes\JoinTable;
+
+use MonkeysLegion\Auth\Contract\AuthenticatableInterface;
+use MonkeysLegion\Auth\Contract\HasRolesInterface;
+use MonkeysLegion\Auth\Contract\HasPermissionsInterface;
+use MonkeysLegion\Auth\Trait\AuthenticatableTrait;
+use MonkeysLegion\Auth\Trait\HasRolesTrait;
+use MonkeysLegion\Auth\Trait\HasPermissionsTrait;
 
 /**
  * User entity representing a user in the system.
  */
 #[Entity(table: 'users')]
-class User
+class User implements
+    AuthenticatableInterface,
+    HasRolesInterface,
+    HasPermissionsInterface
 {
+    use AuthenticatableTrait;
+    use HasRolesTrait;
+    use HasPermissionsTrait;
+
     #[Field(type: 'integer')]
     public int $id;
 
@@ -44,12 +53,16 @@ class User
     #[Field(type: 'datetime')]
     public \DateTimeImmutable $updated_at;
 
-    public function __construct()
-    {
-        // you can prefill defaults if you want:
-        // $this->created_at = new \DateTimeImmutable();
-        // $this->updated_at = new \DateTimeImmutable();
-    }
+    /**
+     * RBAC (not database columns)
+     * Provided by HasRolesTrait and HasPermissionsTrait
+     */
+    public array $roles = [];
+    public array $permissions = [];
+
+    // ----------------------------------------------------------
+    // Accessors / helpers
+    // ----------------------------------------------------------
 
     public function getId(): int
     {
@@ -125,5 +138,19 @@ class User
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updated_at;
+    }
+
+    // ----------------------------------------------------------
+    // Required by AuthenticatableInterface
+    // ----------------------------------------------------------
+
+    public function getAuthIdentifier(): int|string
+    {
+        return $this->id;
+    }
+
+    public function getAuthPassword(): string
+    {
+        return $this->password_hash;
     }
 }
