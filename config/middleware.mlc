@@ -2,6 +2,8 @@
 middleware {
     global = [
         "\\MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
+        "\\MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware",
+        "\\MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\ErrorHandlerMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\AuthMiddleware",
@@ -9,8 +11,5 @@ middleware {
         "\\MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",
         "\\MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
         "\\MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware",
-        "\\MonkeysLegion\\Auth\\Middleware\\JwtAuthMiddleware",
-        "\\MonkeysLegion\\Auth\\Middleware\\JwtUserMiddleware",
-        "\\MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware"
     ]
 }
