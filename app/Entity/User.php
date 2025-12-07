@@ -5,6 +5,8 @@ namespace App\Entity;
 
 use MonkeysLegion\Entity\Attributes\Entity;
 use MonkeysLegion\Entity\Attributes\Field;
+use MonkeysLegion\Entity\Attributes\ManyToMany;
+use MonkeysLegion\Entity\Attributes\JoinTable;
 
 use MonkeysLegion\Auth\Contract\AuthenticatableInterface;
 use MonkeysLegion\Auth\Contract\HasRolesInterface;
@@ -54,10 +56,21 @@ class User implements
     public \DateTimeImmutable $updated_at;
 
     /**
-     * RBAC (not database columns)
-     * Provided by HasRolesTrait and HasPermissionsTrait
+     * Roles assigned to the user (Many-to-Many via user_roles).
+     * HasRolesTrait will work on top of this relation.
      */
+    #[ManyToMany(target: Role::class, inversedBy: 'users')]
+    #[JoinTable(
+        name: 'user_roles',
+        joinColumn: 'user_id',
+        inverseJoinColumn: 'role_id'
+    )]
     public array $roles = [];
+
+    /**
+     * Permissions are usually resolved from roles.
+     * If later you want a direct ManyToMany(User <-> Permission), you can map it here.
+     */
     public array $permissions = [];
 
     // ----------------------------------------------------------
