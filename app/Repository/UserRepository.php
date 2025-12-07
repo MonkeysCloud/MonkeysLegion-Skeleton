@@ -8,6 +8,13 @@ use MonkeysLegion\Repository\EntityRepository;
 
 class UserRepository extends EntityRepository
 {
-    protected string $table       = 'user';
+    /**
+     * DB table for this repository.
+     */
+    protected string $table = 'users';
+
+    /**
+     * Entity class this repository hydrates.
+     */
     protected string $entityClass = User::class;
 }
