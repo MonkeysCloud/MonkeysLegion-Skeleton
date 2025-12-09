@@ -11,6 +11,6 @@ middleware {
         "\\MonkeysLegion\\Http\\Middleware\\LoggingMiddleware",
         "\\MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",
         "\\MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
-        "\\MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware",
+        "\\MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware"
     ]
 }
