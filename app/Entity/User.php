@@ -162,8 +162,18 @@ class User implements
         return $this->id;
     }
 
+    public function getAuthIdentifierName(): string
+    {
+        return 'id';
+    }
+
     public function getAuthPassword(): string
     {
         return $this->password_hash;
+    }
+
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_secret !== null;
     }
 }
