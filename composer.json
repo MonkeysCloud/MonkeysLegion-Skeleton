@@ -3,6 +3,31 @@
   "description": "Starter project for the MonkeysLegion framework",
   "type": "project",
   "license": "MIT",
+  "keywords": [
+    "framework",
+    "monkeyslegion",
+    "php",
+    "skeleton",
+    "boilerplate",
+    "starter",
+    "mvc",
+    "api",
+    "psr-7",
+    "psr-15"
+  ],
+  "authors": [
+    {
+      "name": "MonkeysCloud Team",
+      "email": "jorge@monkeys.cloud",
+      "homepage": "https://monkeyslegion.com",
+      "role": "Developer"
+    }
+  ],
+  "homepage": "https://github.com/monkeyscloud/monkeyslegion-skeleton",
+  "support": {
+    "issues": "https://github.com/monkeyscloud/monkeyslegion-skeleton/issues",
+    "source": "https://github.com/monkeyscloud/monkeyslegion-skeleton"
+  },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
