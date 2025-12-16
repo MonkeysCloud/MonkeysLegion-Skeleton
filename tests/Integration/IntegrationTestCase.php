@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests;
+namespace Tests\Integration;
 
 use MonkeysLegion\DI\ContainerBuilder;
 use PHPUnit\Framework\TestCase;
@@ -25,9 +25,19 @@ abstract class IntegrationTestCase extends TestCase
 
     protected function setUp(): void
     {
+        if (!defined('ML_BASE_PATH')) {
+            define('ML_BASE_PATH', realpath(__DIR__ . '/../../'));
+        }
+
         // Build PHP-DI container using app config
         $builder = new ContainerBuilder();
-        $builder->addDefinitions(require __DIR__ . '/../config/app.php');
+        
+        // Add framework defaults
+        $builder->addDefinitions((new \MonkeysLegion\Config\AppConfig())());
+        
+        // Add application overrides
+        $builder->addDefinitions(require __DIR__ . '/../../config/app.php');
+        
         $this->container = $builder->build();
 
         // Get the HTTP pipeline
@@ -36,13 +46,15 @@ abstract class IntegrationTestCase extends TestCase
 
     /**
      * Create a ServerRequest for testing.
+     *
+     * @param array<string, string|string[]> $headers
      */
     protected function createRequest(
         string $method,
         string $uri,
         array $headers = [],
         string|null $body = null
-    ) {
+    ): \Psr\Http\Message\ServerRequestInterface {
         $requestFactory = new ServerRequestFactory();
         $uriFactory     = new UriFactory();
 
@@ -63,11 +75,9 @@ abstract class IntegrationTestCase extends TestCase
     /**
      * Dispatch the request through your PSR-15 pipeline and return the response.
      */
-    protected function dispatch($request)
+    protected function dispatch(\Psr\Http\Message\ServerRequestInterface $request): ResponseInterface
     {
-        // CoreRequestHandler is the final handler in the pipeline
-        $coreHandler = $this->container->get(CoreRequestHandler::class);
-        return $this->dispatcher->process($request, $coreHandler);
+        return $this->dispatcher->handle($request);
     }
 
     /**
@@ -86,6 +96,8 @@ abstract class IntegrationTestCase extends TestCase
 
     /**
      * Assert the response JSON matches the given array.
+     *
+     * @param array<mixed> $expected
      */
     protected function assertJsonResponse(
         ResponseInterface $response,

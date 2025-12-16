@@ -1,0 +1,11 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - app
+        - tests
+    excludePaths:
+        - vendor
+    bootstrapFiles:
+        - tests/phpstan-bootstrap.php
+    tmpDir: var/cache/phpstan

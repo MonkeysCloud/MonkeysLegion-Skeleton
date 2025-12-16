@@ -26,7 +26,7 @@ if (! function_exists('asset')) {
             $manifestPath = base_path('public/assets/manifest.json');
             if (is_file($manifestPath)) {
                 $content = file_get_contents($manifestPath);
-                $manifest = json_decode($content, true) ?: [];
+                $manifest = $content !== false ? (json_decode($content, true) ?: []) : [];
             } else {
                 $manifest = [];
             }
@@ -54,6 +54,9 @@ if (! function_exists('asset')) {
 }
 
 if (!function_exists('trans')) {
+    /**
+     * @param array<string, string> $replace
+     */
     function trans(string $key, array $replace = []): string {
         /** @var Translator $t */
         $t = ML_CONTAINER->get(Translator::class);

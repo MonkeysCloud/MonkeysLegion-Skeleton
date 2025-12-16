@@ -38,7 +38,9 @@
   },
   "require-dev": {
     "phpunit/phpunit": "^11.0",
-    "http-interop/http-factory-tests": "^2.2"
+    "http-interop/http-factory-tests": "^2.2",
+    "phpstan/phpstan": "^2.1",
+    "squizlabs/php_codesniffer": "^4.0"
   },
   "autoload": {
     "psr-4": {
@@ -70,7 +72,18 @@
     "server:stop": "php vendor/bin/dev-server stop",
     "server:restart": "php vendor/bin/dev-server restart",
     "server:status": "php vendor/bin/dev-server status",
-    "test": "phpunit"
+    "test": "phpunit",
+    "test:unit": "phpunit --testsuite=Unit",
+    "test:integration": "phpunit --testsuite=Integration",
+    "test:coverage": "phpunit --coverage-html coverage",
+    "phpstan": "phpstan analyse src tests --level=8",
+    "cs": "phpcs --standard=PSR12 src tests",
+    "cs-fix": "phpcbf --standard=PSR12 src tests",
+    "check": [
+      "@cs",
+      "@phpstan",
+      "@test"
+    ]
   },
   "bin": [
     "bin/ml",
