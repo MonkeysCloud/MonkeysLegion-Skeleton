@@ -59,7 +59,7 @@ class User implements
      * Roles assigned to the user (Many-to-Many via user_roles).
      * HasRolesTrait will work on top of this relation.
      */
-    #[ManyToMany(target: Role::class, inversedBy: 'users')]
+    #[ManyToMany(targetEntity: Role::class, inversedBy: 'users')]
     #[JoinTable(
         name: 'user_roles',
         joinColumn: 'user_id',

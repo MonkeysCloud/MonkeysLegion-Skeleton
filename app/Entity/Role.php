@@ -36,7 +36,7 @@ class Role
     /**
      * Inverse side of the many-to-many with User.
      */
-    #[ManyToMany(target: User::class, mappedBy: 'roles')]
+    #[ManyToMany(targetEntity: User::class, mappedBy: 'roles')]
     public array $users = [];
 
     // ----------------------------------------------------------
