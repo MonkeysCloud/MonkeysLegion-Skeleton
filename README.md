@@ -724,6 +724,7 @@ Entity-schema diff engine and SQL migration runner.
 php ml make:migration   # Generate migration from entity differences
 php ml migrate          # Run pending migrations
 php ml rollback         # Revert last migration
+php ml schema:update    # Compare entities → database and apply missing tables/columns (use --dump or --force)
 ```
 
 ---
