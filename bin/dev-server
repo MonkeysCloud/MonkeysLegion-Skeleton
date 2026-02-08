@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * MonkeysLegion Dev Server – bin wrapper.
+ *
+ * Delegates to the vendor monkeyslegion-dev-server package.
+ * This allows `composer serve` / `php bin/dev-server` to work
+ * regardless of whether the package is installed as a dependency.
+ */
+
+// Locate the vendor dev-server binary
+$projectRoot = dirname(__DIR__);
+$vendorBin   = $projectRoot . '/vendor/monkeyscloud/monkeyslegion-dev-server/bin/dev-server';
+
+if (! is_file($vendorBin)) {
+    fwrite(STDERR, "Error: monkeyscloud/monkeyslegion-dev-server not installed. Run: composer install\n");
+    exit(1);
+}
+
+// Forward all arguments
+$args = array_slice($argv, 1);
+$cmd  = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg($vendorBin);
+foreach ($args as $arg) {
+    $cmd .= ' ' . escapeshellarg($arg);
+}
+
+$exitCode = 0;
+passthru($cmd, $exitCode);
+exit($exitCode);
