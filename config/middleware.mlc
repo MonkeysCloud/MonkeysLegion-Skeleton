@@ -4,6 +4,8 @@ middleware {
         "MonkeysLegion\\Http\\Middleware\\ErrorHandlerMiddleware",
         "MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
         "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware",
+        "MonkeysLegion\\Session\\Middleware\\SessionMiddleware",
+        "MonkeysLegion\\Session\\Middleware\\VerifyCsrfToken",
         "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware",
         "MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware",
         "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware",
