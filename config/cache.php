@@ -5,11 +5,12 @@ return [
     'default' => $_ENV['CACHE_DRIVER'] ?? 'file',
 
     // Available cache drivers. Keys must match the CacheType enum values.
-    'drivers' => [
+    'stores' => [
         // File-based cache configuration
         'file' => [
+            'driver' => 'file',
             // Directory for cache files (optional, defaults to system temp)
-            'directory' => $_ENV['CACHE_FILE_DIRECTORY'] ?? '/path/to/cache',
+            'directory' => $_ENV['CACHE_FILE_DIRECTORY'] ?? '/storage/cache',
             // Optional: auto-cleanup settings, lock expiration, etc.
             // 'auto_cleanup' => [
             //     'enabled' => $_ENV['CACHE_FILE_AUTO_CLEANUP_ENABLED'] ?? true,
@@ -21,6 +22,7 @@ return [
 
         // Redis cache configuration
         'redis' => [
+            'driver' => 'redis',
             'host' => $_ENV['CACHE_REDIS_HOST'] ?? '127.0.0.1',
             'port' => $_ENV['CACHE_REDIS_PORT'] ?? 6379,
             // 'auth' => $_ENV['CACHE_REDIS_AUTH'] ?? 'your_password', // optional
@@ -31,6 +33,7 @@ return [
 
         // In-memory array cache (no config needed)
         'memcached' => [
+            'driver' => 'memcached',
             // No options required
         ],
     ],
