@@ -1,10 +1,30 @@
 <?php
 $env = $_ENV + $_SERVER;
 
-$dbHost     = $env['DB_HOST'];
-$dbPort     = $env['DB_PORT'];
-$dbName     = $env['DB_DATABASE'];
-$dbCharset  = $env['DB_CHARSET'];
+/*
+|--------------------------------------------------------------------------
+| If no DB_HOST is defined the skeleton falls back to an SQLite in-memory
+| database so that it boots without any external database.
+|--------------------------------------------------------------------------
+*/
+
+$dbHost = $env['DB_HOST'] ?? null;
+
+if ($dbHost === null || $dbHost === '') {
+    return [
+        'default' => 'sqlite',
+        'connections' => [
+            'sqlite' => [
+                'driver'   => 'sqlite',
+                'database' => ':memory:',
+            ],
+        ],
+    ];
+}
+
+$dbPort     = $env['DB_PORT'] ?? '3306';
+$dbName     = $env['DB_DATABASE'] ?? 'app';
+$dbCharset  = $env['DB_CHARSET'] ?? 'utf8mb4';
 
 /* recognise BOTH DB_USER and DB_USERNAME, ditto for password */
 $dbUser     = $env['DB_USERNAME']
