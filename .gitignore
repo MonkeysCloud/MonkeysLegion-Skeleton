@@ -12,6 +12,8 @@
 /cache/
 /tmp/
 /coverage/
+/var/sessions/*
+!/var/sessions/.gitkeep
 
 # IDE / editor settings
 /.idea/
