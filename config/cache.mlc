@@ -1,6 +1,36 @@
-# Cache settings (MonkeysLegion template engine)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Cache Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Application-wide cache and template cache settings.
+
 cache {
-    # true = write compiled templates to disk under var/cache/views
-    # false = always compile in-memory (no disk I/O)
-    enabled false
+    default = ${CACHE_DRIVER:file}
+
+    stores {
+        file {
+            driver    = "file"
+            directory = "storage/cache"
+        }
+
+        redis {
+            driver = "redis"
+            host   = ${REDIS_HOST:127.0.0.1}
+            port   = ${REDIS_PORT:6379}
+            # auth     = ${REDIS_PASSWORD:}
+            # database = ${REDIS_DATABASE:0}
+            # prefix   = ${CACHE_PREFIX:ml:}
+        }
+
+        memcached {
+            driver = "memcached"
+        }
+    }
+
+    # ─── Template Cache ───────────────────────────────────────────────────────
+    # Compiled template caching (MLView engine)
+    views {
+        enabled = ${CACHE_VIEWS:false}
+        path    = "var/cache/views"
+    }
 }

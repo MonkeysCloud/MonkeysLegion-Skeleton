@@ -3,25 +3,24 @@ declare(strict_types=1);
 
 namespace Tests\Integration;
 
-use MonkeysLegion\DI\ContainerBuilder;
+use MonkeysLegion\DI\Container;
+use MonkeysLegion\Framework\Application;
+use MonkeysLegion\Http\Message\Response;
+use MonkeysLegion\Http\Message\Stream;
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
-use MonkeysLegion\Http\MiddlewareDispatcher;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\UriFactory;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamFactoryInterface;
-use MonkeysLegion\Http\CoreRequestHandler;
 
 /**
- * Base class for HTTP integration tests.
+ * Base class for integration tests.
  *
- * Sets up the DI container and HTTP middleware pipeline.
+ * Boots the v2 Application container and provides HTTP request helpers.
  */
 abstract class IntegrationTestCase extends TestCase
 {
-    protected ContainerInterface $container;
-    protected MiddlewareDispatcher $dispatcher;
+    protected Container $container;
 
     protected function setUp(): void
     {
@@ -29,91 +28,121 @@ abstract class IntegrationTestCase extends TestCase
             define('ML_BASE_PATH', realpath(__DIR__ . '/../../'));
         }
 
-        // Build PHP-DI container using app config
-        $builder = new ContainerBuilder();
-        
-        // Add framework defaults
-        $builder->addDefinitions((new \MonkeysLegion\Config\AppConfig())());
-        
-        // Add application overrides
-        $builder->addDefinitions(require __DIR__ . '/../../config/app.php');
-        
-        $this->container = $builder->build();
-
-        // Get the HTTP pipeline
-        $this->dispatcher = $this->container->get(MiddlewareDispatcher::class);
+        $this->container = Application::create(basePath: ML_BASE_PATH)->boot();
     }
 
+    // ── Request Factories ──────────────────────────────────────
+
     /**
-     * Create a ServerRequest for testing.
-     *
      * @param array<string, string|string[]> $headers
      */
     protected function createRequest(
         string $method,
         string $uri,
         array $headers = [],
-        string|null $body = null
-    ): \Psr\Http\Message\ServerRequestInterface {
-        $requestFactory = new ServerRequestFactory();
-        $uriFactory     = new UriFactory();
+        ?string $body = null,
+    ): ServerRequestInterface {
+        $request = (new ServerRequestFactory())
+            ->createServerRequest($method, (new UriFactory())->createUri($uri));
 
-        $request = $requestFactory->createServerRequest($method, $uriFactory->createUri($uri));
         foreach ($headers as $name => $value) {
             $request = $request->withHeader($name, $value);
         }
 
         if ($body !== null) {
-            $streamFactory = $this->container->get(StreamFactoryInterface::class);
-            $stream        = $streamFactory->createStream($body);
-            $request       = $request->withBody($stream);
+            $request = $request->withBody(Stream::createFromString($body));
         }
 
         return $request;
     }
 
     /**
-     * Dispatch the request through your PSR-15 pipeline and return the response.
+     * @param array<string, mixed> $data
+     * @param array<string, string> $headers
      */
-    protected function dispatch(\Psr\Http\Message\ServerRequestInterface $request): ResponseInterface
+    protected function json(
+        string $method,
+        string $uri,
+        array $data = [],
+        array $headers = [],
+    ): ServerRequestInterface {
+        $headers['Content-Type'] = 'application/json';
+        $headers['Accept'] = 'application/json';
+
+        return $this->createRequest(
+            $method,
+            $uri,
+            $headers,
+            json_encode($data, JSON_THROW_ON_ERROR),
+        );
+    }
+
+    // ── Shorthand Methods ──────────────────────────────────────
+
+    /**
+     * @param array<string, string> $headers
+     */
+    protected function get(string $uri, array $headers = []): ServerRequestInterface
     {
-        return $this->dispatcher->handle($request);
+        return $this->createRequest('GET', $uri, $headers);
     }
 
     /**
-     * Assert the response has the expected HTTP status.
+     * @param array<string, mixed> $data
+     * @param array<string, string> $headers
      */
-    protected function assertStatus(
-        ResponseInterface $response,
-        int $expected
-    ): void {
+    protected function post(string $uri, array $data = [], array $headers = []): ServerRequestInterface
+    {
+        return $this->json('POST', $uri, $data, $headers);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @param array<string, string> $headers
+     */
+    protected function put(string $uri, array $data = [], array $headers = []): ServerRequestInterface
+    {
+        return $this->json('PUT', $uri, $data, $headers);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     */
+    protected function delete(string $uri, array $headers = []): ServerRequestInterface
+    {
+        return $this->createRequest('DELETE', $uri, $headers);
+    }
+
+    // ── Assertions ─────────────────────────────────────────────
+
+    protected function assertStatus(ResponseInterface $response, int $expected): void
+    {
         $this->assertSame(
             $expected,
             $response->getStatusCode(),
-            'Unexpected status code'
+            sprintf(
+                'Expected status %d, got %d. Body: %s',
+                $expected,
+                $response->getStatusCode(),
+                mb_substr((string) $response->getBody(), 0, 500),
+            ),
         );
     }
 
     /**
-     * Assert the response JSON matches the given array.
-     *
      * @param array<mixed> $expected
      */
-    protected function assertJsonResponse(
-        ResponseInterface $response,
-        array $expected
-    ): void {
-        // Check Content-Type header contains “application/json”
+    protected function assertJsonResponse(ResponseInterface $response, array $expected): void
+    {
         $this->assertStringContainsString(
             'application/json',
             $response->getHeaderLine('Content-Type'),
-            'Response is not JSON'
         );
 
         $body = (string) $response->getBody();
-        $this->assertJson($body, 'Response body is not valid JSON');
+        $this->assertJson($body);
 
-        $actual = json_decode($body, true);
+        $actual = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals($expected, $actual);
     }
 }

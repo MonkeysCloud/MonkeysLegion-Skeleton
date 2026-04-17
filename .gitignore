@@ -8,12 +8,19 @@
 /*.phar
 
 # Logs and runtime cache
-/logs/
-/cache/
-/tmp/
-/coverage/
+/var/cache/*
+!/var/cache/.gitkeep
+/var/log/*
+!/var/log/.gitkeep
 /var/sessions/*
 !/var/sessions/.gitkeep
+/var/migrations/*
+!/var/migrations/.gitkeep
+/storage/logs/*
+!/storage/logs/.gitkeep
+/storage/cache/*
+!/storage/cache/.gitkeep
+/coverage/
 
 # IDE / editor settings
 /.idea/
@@ -29,8 +36,11 @@
 .env.testing
 
 # PHPUnit and test artifacts
-/phpunit.xml
+/.phpunit.cache/
 /phpunit.result.cache
+
+# PHPStan cache
+/var/cache/phpstan/
 
 # OS-specific files
 .DS_Store

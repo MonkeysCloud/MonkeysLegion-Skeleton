@@ -1,41 +1,27 @@
 #!/usr/bin/env php
 <?php
-
 declare(strict_types=1);
-
-use MonkeysLegion\Cli\CliKernel;
-use MonkeysLegion\Framework\HttpBootstrap;
 
 /**
  * MonkeysLegion CLI entry point (php bin/ml).
+ *
+ * Boots the v2 Application and delegates to the CLI kernel automatically
+ * when running under PHP_SAPI === 'cli'.
  */
 
-// 1) Check for vendor/autoload.php
-$dir = __DIR__ . '/..';
-$candidate = $dir . '/vendor/autoload.php';
-$found = false;
+use MonkeysLegion\Framework\Application;
 
-if (file_exists($candidate)) {
-    require_once $candidate;
-    define('ML_BASE_PATH', realpath($dir));
-    $found = true;
-}
+// 1) Locate autoloader
+$dir = dirname(__DIR__);
+$autoload = $dir . '/vendor/autoload.php';
 
-if (! $found) {
-    fwrite(STDERR, "Error: could not find vendor/autoload.php above " . __DIR__ . "\n");
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "Error: could not find vendor/autoload.php in {$dir}\n");
     exit(1);
 }
 
-// 2) Load your DI definitions from the project config
-$configFile = ML_BASE_PATH . '/config/app.php';
-if (! file_exists($configFile)) {
-    fwrite(STDERR, "Error: missing config/app.php at {$configFile}\n");
-    exit(1);
-}
+require_once $autoload;
+define('ML_BASE_PATH', realpath($dir));
 
-// 3) Bootstrap and run the CLI kernel
-$container = HttpBootstrap::buildContainer(base_path());
-
-/** @var CliKernel $kernel */
-$kernel = $container->get(CliKernel::class);
-exit($kernel->run($argv));
+// 2) Boot and run — Application detects CLI SAPI and runs CliKernel
+Application::create(basePath: ML_BASE_PATH)->run();

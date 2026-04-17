@@ -4,65 +4,93 @@ declare(strict_types=1);
 namespace Tests\Unit\Entity;
 
 use App\Entity\User;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class UserTest extends TestCase
+/**
+ * Unit tests for the User entity — v2 property hooks and computed properties.
+ */
+#[CoversClass(User::class)]
+final class UserTest extends TestCase
 {
-    public function testInitialState(): void
+    #[Test]
+    public function emailIsLowercasedAndTrimmed(): void
     {
         $user = new User();
-        $this->assertSame(1, $user->getTokenVersion());
-        $this->assertNull($user->getTwoFactorSecret());
-        $this->assertFalse($user->hasTwoFactorEnabled());
-        $this->assertNull($user->email_verified_at);
+        $user->email = '  Test@Example.COM  ';
+
+        $this->assertSame('test@example.com', $user->email);
     }
 
-    public function testSettersAndGetters(): void
+    #[Test]
+    public function nameCannotBeEmpty(): void
     {
-        $user = new User();
-        
-        $user->setEmail('test@example.com');
-        $this->assertSame('test@example.com', $user->getEmail());
-        $this->assertSame('test@example.com', $user->getAuthIdentifierName() === 'email' ? $user->getAuthIdentifier() : 'test@example.com'); // Auth identifier might be ID not email, checked below
+        $this->expectException(\InvalidArgumentException::class);
 
-        $user->setPasswordHash('hashed_password');
-        $this->assertSame('hashed_password', $user->getPasswordHash());
-        $this->assertSame('hashed_password', $user->getAuthPassword());
+        $user = new User();
+        $user->name = '';
     }
 
-    public function testTokenVersionManagement(): void
+    #[Test]
+    public function tokenVersionStartsAtOneAndIncrements(): void
     {
         $user = new User();
-        $initial = $user->getTokenVersion();
-        
+
+        $this->assertSame(1, $user->token_version);
+
         $user->bumpTokenVersion();
-        $this->assertSame($initial + 1, $user->getTokenVersion());
+
+        $this->assertSame(2, $user->token_version);
     }
 
-    public function testTwoFactorStatus(): void
+    #[Test]
+    public function emailVerification(): void
     {
         $user = new User();
-        $this->assertFalse($user->hasTwoFactorEnabled());
 
-        $user->setTwoFactorSecret('secret');
-        $this->assertTrue($user->hasTwoFactorEnabled());
-        $this->assertSame('secret', $user->getTwoFactorSecret());
-
-        $user->setTwoFactorSecret(null);
-        $this->assertFalse($user->hasTwoFactorEnabled());
-    }
-
-    public function testEmailVerification(): void
-    {
-        $user = new User();
+        $this->assertFalse($user->isVerified);
         $this->assertNull($user->email_verified_at);
 
-        $now = new \DateTimeImmutable();
-        $user->markEmailVerified($now);
-        $this->assertSame($now, $user->email_verified_at);
-        
         $user->markEmailVerified();
+
+        $this->assertTrue($user->isVerified);
         $this->assertInstanceOf(\DateTimeImmutable::class, $user->email_verified_at);
-        $this->assertNotSame($now, $user->email_verified_at);
+    }
+
+    #[Test]
+    public function twoFactorComputedProperty(): void
+    {
+        $user = new User();
+
+        $this->assertFalse($user->hasTwoFactor);
+
+        $user->two_factor_secret = 'secret123';
+
+        $this->assertTrue($user->hasTwoFactor);
+
+        $user->two_factor_secret = null;
+
+        $this->assertFalse($user->hasTwoFactor);
+    }
+
+    #[Test]
+    public function displayNameCombinesNameAndEmail(): void
+    {
+        $user = new User();
+        $user->name = 'Jorge';
+        $user->email = 'jorge@example.com';
+
+        $this->assertSame('Jorge <jorge@example.com>', $user->displayName);
+    }
+
+    #[Test]
+    public function authInterfaceMethods(): void
+    {
+        $user = new User();
+        $user->password_hash = 'hashed_password';
+
+        $this->assertSame('id', $user->getAuthIdentifierName());
+        $this->assertSame('hashed_password', $user->getAuthPassword());
     }
 }

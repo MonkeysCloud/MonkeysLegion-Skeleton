@@ -32,9 +32,9 @@
   "prefer-stable": true,
   "require": {
     "php": "^8.4",
-    "monkeyscloud/monkeyslegion": "^1.0",
-    "laminas/laminas-diactoros": "^3.6",
-    "monolog/monolog": "^3.9"
+    "monkeyscloud/monkeyslegion": "^2.0",
+    "laminas/laminas-diactoros": "^3.8",
+    "monolog/monolog": "^3.10"
   },
   "require-dev": {
     "phpunit/phpunit": "^11.0",
@@ -47,7 +47,7 @@
       "App\\": "app/"
     },
     "files": [
-      "src/Template/helpers.php"
+      "src/helpers.php"
     ]
   },
   "autoload-dev": {
@@ -78,9 +78,9 @@
     "test:unit": "phpunit --testsuite=Unit",
     "test:integration": "phpunit --testsuite=Integration",
     "test:coverage": "phpunit --coverage-html coverage",
-    "phpstan": "phpstan analyse src tests --level=8",
-    "cs": "phpcs --standard=PSR12 src tests",
-    "cs-fix": "phpcbf --standard=PSR12 src tests",
+    "phpstan": "phpstan analyse app src tests --level=9",
+    "cs": "phpcs --standard=PSR12 app src tests",
+    "cs-fix": "phpcbf --standard=PSR12 app src tests",
     "check": [
       "@cs",
       "@phpstan",
@@ -94,7 +94,7 @@
   ],
   "extra": {
     "branch-alias": {
-      "dev-main": "1.0.x-dev"
+      "dev-main": "2.0.x-dev"
     }
   }
 }

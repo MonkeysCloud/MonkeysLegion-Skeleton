@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Queue Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Central queue routing and connection config.
+# Matches Laravel 13's Queue::route() competitive feature via #[QueueRoute].
+
+queue {
+    default = ${QUEUE_CONNECTION:sync}
+
+    connections {
+        sync {
+            driver = "sync"
+        }
+
+        database {
+            driver      = "database"
+            table       = "jobs"
+            retry_after = 90
+        }
+
+        redis {
+            driver     = "redis"
+            connection = "default"
+            queue      = "default"
+        }
+    }
+
+    # ─── Central Route Rules ──────────────────────────────────────────────────
+    # Map job classes to specific queues/connections.
+    # This complements the #[OnQueue] attribute on job classes.
+
+    # routing {
+    #     "App\\Job\\SendWelcomeEmailJob" = { queue = "emails" }
+    #     "App\\Job\\ProcessPayment"      = { queue = "payments", connection = "redis" }
+    # }
+
+    # ─── Failed Jobs ─────────────────────────────────────────────────────────
+    failed {
+        driver = "database"
+        table  = "failed_jobs"
+    }
+}

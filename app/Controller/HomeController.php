@@ -5,43 +5,30 @@ namespace App\Controller;
 
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Http\Message\Response;
-use MonkeysLegion\Http\Message\Stream;
 use MonkeysLegion\Template\Renderer;
 
 /**
- * HomeController is responsible for rendering the home page.
+ * Renders public web pages.
  */
 final class HomeController
 {
-    public function __construct(private Renderer $renderer) {}
+    public function __construct(
+        private readonly Renderer $renderer,
+    ) {}
 
-    /**
-     * Render the home page.
-     *
-     * @return Response
-     */
     #[Route(
         methods: 'GET',
-        path:    '/',
-        name:    'home',
+        path: '/',
+        name: 'home',
         summary: 'Render home page',
-        tags:    ['Page']
+        tags: ['Page'],
     )]
     public function index(): Response
     {
-        // 1) Render template
         $html = $this->renderer->render('home', [
             'title' => 'Home',
         ]);
 
-        // 2) Build a Stream from the HTML
-        $body = Stream::createFromString($html);
-
-        // 3) Return the MonkeysLegion PSR-7 Response
-        return new Response(
-            $body,
-            200,
-            ['Content-Type' => 'text/html']
-        );
+        return Response::html($html);
     }
 }

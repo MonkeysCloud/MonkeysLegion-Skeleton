@@ -1,0 +1,34 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Mail Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Configure mail transport and default sender.
+
+mail {
+    default = ${MAIL_DRIVER:log}
+
+    from {
+        address = ${MAIL_FROM_ADDRESS:noreply@example.com}
+        name    = ${MAIL_FROM_NAME:"MonkeysLegion App"}
+    }
+
+    transports {
+        smtp {
+            driver     = "smtp"
+            host       = ${MAIL_HOST:smtp.example.com}
+            port       = ${MAIL_PORT:587}
+            username   = ${MAIL_USERNAME:}
+            password   = ${MAIL_PASSWORD:}
+            encryption = ${MAIL_ENCRYPTION:tls}
+        }
+
+        log {
+            driver  = "log"
+            channel = "mail"
+        }
+
+        null {
+            driver = "null"
+        }
+    }
+}

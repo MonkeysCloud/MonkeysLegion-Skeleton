@@ -1,24 +1,59 @@
-# Master switch for all logging
+# ═══════════════════════════════════════════════════════════════════════════════
+# Logging Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Structured logging with multiple channels.
+# Follows PSR-3 log levels: debug, info, notice, warning, error, critical, alert, emergency.
+
 logging {
     enabled = true
+    default = ${LOG_CHANNEL:stack}
 
-    # Send Monolog to stdout?
-    stdout {
-        enabled = true
-        level   = debug
+    channels {
+        stack {
+            driver   = "stack"
+            channels = ["daily", "console"]
+        }
+
+        daily {
+            driver      = "file"
+            path        = "var/log/app.log"
+            daily       = true
+            date_format = "Y-m-d"
+            level       = ${LOG_LEVEL:debug}
+            format      = "[{timestamp}] [{env}] {level}: {message} {context}"
+        }
+
+        single {
+            driver = "file"
+            path   = "var/log/app.log"
+            level  = ${LOG_LEVEL:debug}
+            format = "[{timestamp}] [{env}] {level}: {message} {context}"
+        }
+
+        console {
+            driver   = "console"
+            level    = ${LOG_LEVEL:debug}
+            colorize = true
+            format   = "[{env}] {level}: {message} {context}"
+        }
+
+        emergency {
+            driver = "file"
+            path   = "var/log/emergency.log"
+            level  = "emergency"
+            format = "[{timestamp}] [{env}] EMERGENCY: {message} {context}"
+        }
+
+        null {
+            driver = "null"
+        }
     }
 
-    # Also write to a file?
-    file {
-        enabled = true
-        level   = info
-        path    = var/log/app.log
-    }
-
-    # PHP runtime errors
+    # ─── PHP Runtime Errors ───────────────────────────────────────────────────
     php_errors {
         enabled = true
-        display = stderr
-        file    = var/log/php-errors.log
+        display = "stderr"
+        file    = "var/log/php-errors.log"
     }
 }
