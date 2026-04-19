@@ -34,7 +34,8 @@
     "php": "^8.4",
     "monkeyscloud/monkeyslegion": "^2.0",
     "laminas/laminas-diactoros": "^3.8",
-    "monolog/monolog": "^3.10"
+    "monolog/monolog": "^3.10",
+    "monkeyscloud/monkeyslegion-cli": "^2.0.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^11.0",
