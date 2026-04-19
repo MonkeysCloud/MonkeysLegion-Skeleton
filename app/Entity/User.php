@@ -100,7 +100,7 @@ class User implements
     #[JoinTable(
         name: 'user_roles',
         joinColumn: 'user_id',
-        inverseJoinColumn: 'role_id',
+        inverseColumn: 'role_id',
     )]
     public array $roleEntities = [];
 
