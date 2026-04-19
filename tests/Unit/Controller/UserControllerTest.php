@@ -91,10 +91,16 @@ final class UserControllerTest extends TestCase
     #[Test]
     public function createCallsServiceAndReturns201(): void
     {
-        $user = $this->makeUser(99);
-
         $repo = $this->createMock(UserRepository::class);
-        $repo->method('persist');
+        $repo->method('persist')->willReturnCallback(function (User $user): void {
+            // Simulate DB persist: set ID and timestamps via reflection
+            $ref = new \ReflectionProperty($user, 'id');
+            $ref->setValue($user, 99);
+            $ref = new \ReflectionProperty($user, 'created_at');
+            $ref->setValue($user, new \DateTimeImmutable());
+            $ref = new \ReflectionProperty($user, 'updated_at');
+            $ref->setValue($user, new \DateTimeImmutable());
+        });
 
         $service = new UserService(
             $repo,
@@ -102,22 +108,13 @@ final class UserControllerTest extends TestCase
             $this->createMock(LoggerInterface::class),
         );
 
-        // Create a wrapper that sets ID post-creation
         $dto = new CreateUserRequest('new@test.com', 'New User', 'password1');
+        $controller = $this->makeController(repo: $repo, service: $service);
+        $response = $controller->create($dto);
 
-        // Since createUser returns entity without ID (persist is mocked),
-        // test the service method directly and the controller's attribute routing
-        $createdUser = $service->createUser($dto);
-        // Manually set ID as DB would
-        $ref = new \ReflectionProperty($createdUser, 'id');
-        $ref->setValue($createdUser, 99);
-        $ref = new \ReflectionProperty($createdUser, 'created_at');
-        $ref->setValue($createdUser, new \DateTimeImmutable());
-        $ref = new \ReflectionProperty($createdUser, 'updated_at');
-        $ref->setValue($createdUser, new \DateTimeImmutable());
-
-        $response = \App\Resource\UserResource::make($createdUser, 201);
         $this->assertSame(201, $response->getStatusCode());
+        $body = json_decode((string) $response->getBody(), true);
+        $this->assertSame(99, $body['data']['id']);
     }
 
     #[Test]

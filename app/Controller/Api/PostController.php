@@ -54,11 +54,8 @@ final class PostController
         CreatePostRequest $dto,
         ServerRequestInterface $request,
     ): Response {
-        $userId = $request->getAttribute('userId');
-        $author = $this->service->findPost($userId); // Will be resolved via DI
-
-        // For now, create with the authenticated user context
-        $post = $this->service->createPost($dto, $request->getAttribute('user'));
+        $author = $request->getAttribute('user');
+        $post = $this->service->createPost($dto, $author);
 
         return PostResource::make($post, 201);
     }

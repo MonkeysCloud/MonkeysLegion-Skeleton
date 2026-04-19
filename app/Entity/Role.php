@@ -50,6 +50,6 @@ class Role
     /**
      * @var list<User>
      */
-    #[ManyToMany(targetEntity: User::class, mappedBy: 'roles')]
+    #[ManyToMany(targetEntity: User::class, mappedBy: 'roleEntities')]
     public array $users = [];
 }

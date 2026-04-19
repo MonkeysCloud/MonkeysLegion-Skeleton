@@ -14,7 +14,7 @@ use MonkeysLegion\Entity\Attributes\OneToMany;
 use MonkeysLegion\Entity\Attributes\SoftDeletes;
 use MonkeysLegion\Entity\Attributes\Timestamps;
 
-use App\Enum\OrderStatus;
+
 
 /**
  * Blog post entity demonstrating full v2 entity capabilities.
@@ -76,7 +76,7 @@ class Post
 
     // ── Relationships ──────────────────────────────────────────
 
-    #[ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ManyToOne(targetEntity: User::class)]
     #[Fillable]
     public User $author;
 
