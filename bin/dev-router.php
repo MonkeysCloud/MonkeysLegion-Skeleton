@@ -4,21 +4,62 @@
 declare(strict_types=1);
 
 /**
- * PHP built-in server router – bin wrapper.
+ * PHP built-in server router – project override.
  *
- * Delegates to the vendor monkeyslegion-dev-server router script.
- * The dev-server binary already looks for bin/dev-router.php first,
- * then falls back to the vendor copy. This file ensures the
- * composer bin reference is valid and can serve as a project-level
- * override point.
+ * Serves static files from public/ explicitly (with correct MIME types)
+ * and routes all other requests to public/index.php.
  */
 
-$projectRoot  = dirname(__DIR__);
-$vendorRouter = $projectRoot . '/vendor/monkeyscloud/monkeyslegion-dev-server/bin/dev-router.php';
+$projectRoot = dirname(__DIR__);
+$uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/';
 
-if (! is_file($vendorRouter)) {
-    fwrite(STDERR, "Error: vendor router not found. Run: composer install\n");
-    exit(1);
+// ── Dev Hot Reload Endpoint ──────────────────────────────────
+if ($uri === '/_dev/reload.json') {
+    $marker = $projectRoot . '/var/cache/dev-reload.json';
+
+    header('Content-Type: application/json');
+    header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+    header('Pragma: no-cache');
+
+    if (!is_file($marker)) {
+        echo json_encode(['version' => 0, 'status' => 'no_marker']);
+        return true;
+    }
+
+    $content = @file_get_contents($marker);
+    echo ($content !== false) ? $content : json_encode(['version' => 0, 'status' => 'read_error']);
+    return true;
 }
 
-require $vendorRouter;
+// ── Static Files ─────────────────────────────────────────────
+$file = $projectRoot . '/public' . $uri;
+
+if ($uri !== '/' && is_file($file)) {
+    $mimeTypes = [
+        'css'   => 'text/css',
+        'js'    => 'application/javascript',
+        'json'  => 'application/json',
+        'svg'   => 'image/svg+xml',
+        'png'   => 'image/png',
+        'jpg'   => 'image/jpeg',
+        'jpeg'  => 'image/jpeg',
+        'gif'   => 'image/gif',
+        'webp'  => 'image/webp',
+        'ico'   => 'image/x-icon',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf'   => 'font/ttf',
+        'map'   => 'application/json',
+    ];
+
+    $ext  = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+    $mime = $mimeTypes[$ext] ?? mime_content_type($file) ?: 'application/octet-stream';
+
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . filesize($file));
+    readfile($file);
+    return;
+}
+
+// ── Front Controller ─────────────────────────────────────────
+require $projectRoot . '/public/index.php';

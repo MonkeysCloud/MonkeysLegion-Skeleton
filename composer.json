@@ -68,6 +68,7 @@
     "post-install-cmd": [
       "@php vendor/bin/ml key:generate --if-missing"
     ],
+    "dev": "php -S localhost:8080 server.php",
     "serve": "php vendor/bin/dev-server",
     "server:start": "php vendor/bin/dev-server",
     "server:start:public": "php vendor/bin/dev-server 0.0.0.0 8000",
@@ -77,6 +78,8 @@
     "test": "phpunit",
     "test:unit": "phpunit --testsuite=Unit",
     "test:integration": "phpunit --testsuite=Integration",
+    "test:feature": "phpunit --testsuite=Feature",
+    "test:performance": "phpunit --testsuite=Performance",
     "test:coverage": "phpunit --coverage-html coverage",
     "phpstan": "phpstan analyse app src tests --level=9",
     "cs": "phpcs --standard=PSR12 app src tests",
