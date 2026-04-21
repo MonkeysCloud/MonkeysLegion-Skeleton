@@ -101,7 +101,7 @@ if (!function_exists('trans')) {
     function trans(string $key, array $replace = []): string
     {
         /** @var Translator $t */
-        $t = ML_CONTAINER->get(Translator::class);
+        $t = \MonkeysLegion\DI\Container::instance()->get(Translator::class);
 
         return $t->trans($key, $replace);
     }
@@ -109,25 +109,20 @@ if (!function_exists('trans')) {
 
 // ── CSRF Helpers ───────────────────────────────────────────────
 
-if (!function_exists('csrf_token')) {
+if (! function_exists('csrf_token')) {
     function csrf_token(): string
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
-        if (empty($_SESSION['csrf_token'])) {
-            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        }
+        /** @var \MonkeysLegion\Session\Contracts\SessionInterface|null $session */
+        $session = \MonkeysLegion\DI\Container::instance()->get(SessionManager::class);
 
-        return $_SESSION['csrf_token'];
+        return $session !== null ? $session->token() : '';
     }
 }
 
-if (!function_exists('csrf_field')) {
+if (! function_exists('csrf_field')) {
     function csrf_field(): string
     {
         $token = htmlspecialchars(csrf_token(), ENT_QUOTES, 'UTF-8');
-
         return '<input type="hidden" name="_csrf" value="' . $token . '" />';
     }
 }
@@ -138,7 +133,7 @@ if (!function_exists('auth_user_id')) {
     function auth_user_id(): ?int
     {
         /** @var ServerRequestInterface $req */
-        $req = ML_CONTAINER->get(ServerRequestInterface::class);
+        $req = \MonkeysLegion\DI\Container::instance()->get(ServerRequestInterface::class);
 
         return $req->getAttribute('userId');
     }
