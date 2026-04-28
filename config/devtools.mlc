@@ -1,0 +1,94 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# DevTools Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Enterprise debugging, profiling, and diagnostics for
+# MonkeysLegion applications. Zero overhead when disabled.
+
+devtools {
+    enabled     = ${DEVTOOLS_ENABLED:true}
+    environment = ${APP_ENV:local}
+    sample_rate = ${DEVTOOLS_SAMPLE_RATE:1.0}
+
+    # ── Toolbar ─────────────────────────────────────────────
+    toolbar {
+        enabled        = ${APP_DEBUG:false}
+        inject_html    = true
+        api_header     = "X-MonkeysLegion-Profile"
+        max_payload_kb = 256
+    }
+
+    # ── Storage ─────────────────────────────────────────────
+    storage {
+        driver         = ${DEVTOOLS_STORAGE:file}
+        path           = "var/devtools/profiles"
+        retention_days = 7
+        max_profiles   = 1000
+    }
+
+    # ── Collectors ──────────────────────────────────────────
+    collectors {
+        request    = true
+        route      = true
+        middleware = true
+        query      = true
+        cache      = true
+        event      = true
+        container  = true
+        entity     = true
+        config     = true
+        auth       = true
+        session    = true
+        validation = true
+        openapi    = true
+        exception  = true
+        telemetry  = true
+    }
+
+    # ── Redaction ───────────────────────────────────────────
+    redaction {
+        enabled = true
+        keys    = [
+            "authorization",
+            "cookie",
+            "set-cookie",
+            "password",
+            "password_hash",
+            "token",
+            "secret",
+            "api_key",
+            "private_key",
+            "database_url",
+            "dsn",
+            "credential",
+            "access_token",
+            "refresh_token",
+            "client_secret",
+            "webhook_secret"
+        ]
+    }
+
+    # ── Performance Thresholds ──────────────────────────────
+    thresholds {
+        slow_request_ms  = 200
+        slow_query_ms    = 100
+        n_plus_one_count = 5
+        high_memory_mb   = 64
+    }
+
+    # ── Production Safety ───────────────────────────────────
+    production {
+        enabled               = false
+        sample_rate           = 0.01
+        toolbar               = false
+        require_signed_access = true
+        export_sanitized_only = true
+    }
+
+    # ── Security ────────────────────────────────────────────
+    security {
+        allowed_ips  = ["127.0.0.1", "::1"]
+        require_auth = true
+        role         = "developer"
+    }
+}

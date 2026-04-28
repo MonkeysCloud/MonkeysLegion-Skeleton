@@ -7,6 +7,7 @@
 
 middleware {
     global = [
+        "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware",
         "MonkeysLegion\\Http\\Middleware\\ErrorHandlerMiddleware",
         "MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
         "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware",
@@ -29,5 +30,6 @@ middleware {
         csrf     = "MonkeysLegion\\Session\\Middleware\\VerifyCsrfToken"
         throttle = "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware"
         locale   = "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware"
+        devtools = "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware"
     }
 }
