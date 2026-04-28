@@ -1,0 +1,43 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Database Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Supports MySQL 8.4+, PostgreSQL 16+, and SQLite.
+# If no DB_HOST is set the skeleton falls back to SQLite in-memory.
+
+database {
+    default = ${DB_CONNECTION:mysql}
+
+    connections {
+        mysql {
+            driver   = "mysql"
+            host     = ${DB_HOST:127.0.0.1}
+            port     = ${DB_PORT:3306}
+            database = ${DB_DATABASE:ml_skeleton}
+            username = ${DB_USERNAME:root}
+            password = ${DB_PASSWORD:}
+            charset  = ${DB_CHARSET:utf8mb4}
+
+            options {
+                errmode            = "exception"
+                default_fetch_mode = "assoc"
+            }
+        }
+
+        pgsql {
+            driver   = "pgsql"
+            host     = ${DB_HOST:127.0.0.1}
+            port     = ${DB_PORT:5432}
+            database = ${DB_DATABASE:ml_skeleton}
+            username = ${DB_USERNAME:postgres}
+            password = ${DB_PASSWORD:}
+            charset  = ${DB_CHARSET:utf8}
+            schema   = "public"
+        }
+
+        sqlite {
+            driver   = "sqlite"
+            database = ${DB_DATABASE::memory:}
+        }
+    }
+}

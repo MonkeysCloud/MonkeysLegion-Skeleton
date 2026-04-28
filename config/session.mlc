@@ -1,0 +1,41 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Session Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Encrypted by default in v2 when APP_KEY is set.
+#
+# Key paths must match SessionProvider expectations:
+#   session.driver, session.lifetime,
+#   session.file.path, session.database.table, session.redis.prefix,
+#   session.cookie.*
+
+session {
+    driver   = ${SESSION_DRIVER:file}
+    lifetime = ${SESSION_LIFETIME:7200}
+    encrypt  = ${SESSION_ENCRYPT:false}
+
+    # ─── Driver-specific settings ────────────────────────────────────────────
+    file {
+        path = "var/sessions"
+    }
+
+    database {
+        table = "sessions"
+    }
+
+    redis {
+        connection = ${REDIS_SESSION_CONNECTION:default}
+        prefix     = "session:"
+    }
+
+    # ─── Cookie Settings ─────────────────────────────────────────────────────
+    cookie {
+        name      = ${SESSION_COOKIE_NAME:ml_session}
+        lifetime  = ${SESSION_COOKIE_LIFETIME:7200}
+        path      = "/"
+        domain    = ${SESSION_COOKIE_DOMAIN:}
+        secure    = ${SESSION_COOKIE_SECURE:true}
+        httponly   = ${SESSION_COOKIE_HTTPONLY:true}
+        same_site = ${SESSION_COOKIE_SAMESITE:Lax}
+    }
+}

@@ -5,79 +5,51 @@ namespace App\Entity;
 
 use MonkeysLegion\Entity\Attributes\Entity;
 use MonkeysLegion\Entity\Attributes\Field;
+use MonkeysLegion\Entity\Attributes\Id;
+use MonkeysLegion\Entity\Attributes\Fillable;
 use MonkeysLegion\Entity\Attributes\ManyToMany;
+use MonkeysLegion\Entity\Attributes\Timestamps;
 
 /**
  * Role entity representing an RBAC role.
  */
 #[Entity(table: 'roles')]
+#[Timestamps]
 class Role
 {
-    #[Field(type: 'integer')]
-    public int $id;
+    // ── Fields ──────────────────────────────────────────────────
 
-    // Machine name / slug, used internally by HasRolesTrait (e.g. "admin", "editor").
+    #[Id]
+    #[Field(type: 'unsignedBigInt', autoIncrement: true)]
+    public private(set) int $id;
+
     #[Field(type: 'string', length: 100)]
-    public string $slug;
+    #[Fillable]
+    public string $slug {
+        set(string $value) {
+            $this->slug = strtolower(trim($value));
+        }
+    }
 
-    // Human readable name.
     #[Field(type: 'string', length: 255)]
+    #[Fillable]
     public string $name;
 
     #[Field(type: 'string', length: 255, nullable: true)]
+    #[Fillable]
     public ?string $description = null;
 
     #[Field(type: 'datetime')]
-    public \DateTimeImmutable $created_at;
+    public private(set) \DateTimeImmutable $created_at;
 
     #[Field(type: 'datetime')]
-    public \DateTimeImmutable $updated_at;
+    public private(set) \DateTimeImmutable $updated_at;
+
+    // ── Relationships ──────────────────────────────────────────
 
     /**
-     * Inverse side of the many-to-many with User.
+     * @var list<User>
      */
-    #[ManyToMany(targetEntity: User::class, mappedBy: 'roles')]
+    #[ManyToMany(targetEntity: User::class, mappedBy: 'roleEntities')]
     public array $users = [];
-
-    // ----------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
-    public function setSlug(string $slug): self
-    {
-        $this->slug = $slug;
-        return $this;
-    }
-
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): self
-    {
-        $this->name = $name;
-        return $this;
-    }
-
-    public function getDescription(): ?string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(?string $description): self
-    {
-        $this->description = $description;
-        return $this;
-    }
 }

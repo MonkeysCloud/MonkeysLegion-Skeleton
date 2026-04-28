@@ -1,5 +1,14 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# CORS Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Cross-Origin Resource Sharing settings for the HTTP pipeline.
+
 cors {
-    allow_origin  ["*"]
-    allow_methods ["GET","POST","OPTIONS","DELETE","PATCH"]
-    allow_headers ["Content-Type","Authorization"]
+    allow_origin      = ["*"]
+    allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+    allow_headers     = ["Content-Type", "Authorization", "X-Requested-With"]
+    expose_headers    = ["X-Request-Id", "X-RateLimit-Remaining"]
+    max_age           = 3600
+    supports_credentials = false
 }

@@ -1,6 +1,13 @@
-# Global PSR-15 middleware pipeline – order matters (first runs first)
+# ═══════════════════════════════════════════════════════════════════════════════
+# Middleware Pipeline — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Global PSR-15 middleware pipeline — order matters (first runs first).
+# All classes MUST implement Psr\Http\Server\MiddlewareInterface.
+
 middleware {
     global = [
+        "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware",
         "MonkeysLegion\\Http\\Middleware\\ErrorHandlerMiddleware",
         "MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
         "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware",
@@ -9,10 +16,20 @@ middleware {
         "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware",
         "MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware",
         "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware",
-        "MonkeysLegion\\Http\\Middleware\\AuthMiddleware",
         "MonkeysLegion\\Http\\Middleware\\LoggingMiddleware",
         "MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",
         "MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
         "MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware"
     ]
+
+    # ─── Route-level Middleware Aliases ────────────────────────────────────────
+    # Shorthand aliases usable in #[Middleware(['auth', 'throttle:60,1'])]
+    aliases {
+        auth     = "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware"
+        cors     = "MonkeysLegion\\Core\\Middleware\\CorsMiddleware"
+        csrf     = "MonkeysLegion\\Session\\Middleware\\VerifyCsrfToken"
+        throttle = "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware"
+        locale   = "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware"
+        devtools = "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware"
+    }
 }

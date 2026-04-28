@@ -1,3 +1,15 @@
-# top‑level keys
-app_name    "MyApp"
-debug       true
+# ═══════════════════════════════════════════════════════════════════════════════
+# Application Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Core application settings. All values support env variable interpolation
+# via the ${VAR_NAME:default_value} syntax.
+
+app {
+    name     = ${APP_NAME:"MonkeysLegion App"}
+    env      = ${APP_ENV:production}
+    debug    = ${APP_DEBUG:false}
+    url      = ${APP_URL:http://localhost:8000}
+    key      = ${APP_KEY}
+    timezone = "UTC"
+}

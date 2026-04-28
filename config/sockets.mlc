@@ -1,0 +1,99 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# WebSocket Configuration — MonkeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Configuration for the monkeyslegion-sockets package.
+# WebSocket server supports multiple transport drivers, registries,
+# and broadcast strategies for real-time communication.
+
+sockets {
+    #
+    #--------------------------------------------------------------------------
+    # WebSocket Driver
+    #--------------------------------------------------------------------------
+    #
+    # This setting determines which transport driver will be used for the
+    # WebSocket server. Supported: "stream", "swoole", "react".
+    #
+    driver = ${WS_DRIVER:stream}
+
+    #
+    #--------------------------------------------------------------------------
+    # Connection Registry
+    #--------------------------------------------------------------------------
+    #
+    # Controls how active connections and room tags are tracked.
+    # Supported: "local" (Single-node), "redis" (Distributed cluster).
+    #
+    registry = ${WS_REGISTRY:local}
+
+    #
+    #--------------------------------------------------------------------------
+    # Broadcast Strategy
+    #--------------------------------------------------------------------------
+    #
+    # Controls how messages are signaled from the app to the WebSocket workers.
+    # Supported: "unix" (Single-server IPC), "redis" (Distributed Pub/Sub).
+    #
+    broadcast = ${WS_BROADCAST:unix}
+
+    #
+    #--------------------------------------------------------------------------
+    # Protocol Formatter
+    #--------------------------------------------------------------------------
+    #
+    # Defines the serialization format for WebSocket messages.
+    # Supported: "json" (Human-readable), "msgpack" (Compact binary).
+    #
+    formatter = ${WS_FORMATTER:json}
+
+    #
+    #--------------------------------------------------------------------------
+    # Server Configuration
+    #--------------------------------------------------------------------------
+    #
+    # Listening address and port for the WebSocket server.
+    #
+    host = ${WS_HOST:0.0.0.0}
+    port = ${WS_PORT:8080}
+
+    #
+    #--------------------------------------------------------------------------
+    # Unix Socket Configuration
+    #--------------------------------------------------------------------------
+    #
+    # Required when using "unix" broadcaster.
+    #
+    unix {
+        path = ${WS_UNIX_PATH:/tmp/ml_sockets.sock}
+    }
+
+    #
+    #--------------------------------------------------------------------------
+    # Driver Options
+    #--------------------------------------------------------------------------
+    #
+    # Specific options for transport drivers.
+    #
+    options {
+        max_message_size   = ${WS_MAX_MESSAGE_SIZE:10485760}
+        write_buffer_size  = ${WS_WRITE_BUFFER_SIZE:5242880}
+        heartbeat_interval = ${WS_HEARTBEAT_INTERVAL:60}
+        idle_timeout       = ${WS_IDLE_TIMEOUT:120}
+        ping_interval      = ${WS_PING_INTERVAL:30}
+    }
+
+    #
+    #--------------------------------------------------------------------------
+    # Security Configuration
+    #--------------------------------------------------------------------------
+    #
+    security {
+        # List of allowed domains for WebSocket handshakes (CSWH Protection)
+        allowed_origins = [
+            "http://localhost:3000",
+            "http://localhost:8000",
+            "http://localhost:8080"
+        ]
+    }
+}

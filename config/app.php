@@ -2,26 +2,24 @@
 declare(strict_types=1);
 
 /**
- * Project-specific overrides for MonkeysLegion DI definitions.
+ * MonkeysLegion v2 — DI Container Overrides.
  *
- * Any definitions here will override the framework defaults provided by
- * MonkeysLegion\Config\AppConfig. Add only what you need to customize.
+ * This file is for interface-to-concrete bindings and complex
+ * factory definitions ONLY. All typed configuration belongs
+ * in the .mlc config files.
+ *
+ * @see https://monkeyslegion.com/docs/di
  */
 return [
-    // Example: swap out the default metrics implementation:
-    // MonkeysLegion\Telemetry\MetricsInterface::class
-    //     => fn() => new MonkeysLegion\Telemetry\StatsDMetrics('127.0.0.1', 8125),
-
-    // Example: override the rate-limit cache path:
+    // Example: bind a cache interface to Redis implementation
     // Psr\SimpleCache\CacheInterface::class
-    //     => fn() => new MonkeysLegion\Http\SimpleFileCache(
-    //         base_path('var/custom_cache/rate_limit')
-    //     ),
+    //     => fn($c) => $c->get(MonkeysLegion\Cache\Stores\RedisStore::class),
 
-    // Example: bind a custom repository:
-    // App\Repository\UserRepository::class
-    //     => fn($c) => new App\Repository\UserRepository(
-    //         $c->get(MonkeysLegion\Database\MySQL\Connection::class)
+    // Example: bind a custom queue connection
+    // MonkeysLegion\Queue\Contracts\QueueInterface::class
+    //     => fn($c) => new MonkeysLegion\Queue\Driver\DatabaseQueue(
+    //         $c->get(MonkeysLegion\Database\MySQL\Connection::class),
+    //         'jobs',
     //     ),
 
     // Add your overrides below:

@@ -3,29 +3,59 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use MonkeysLegion\DI\Container;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class HelperTest extends TestCase
+/**
+ * Unit tests for global helper functions.
+ */
+final class HelperTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
-        // Helpers are loaded in bootstrap/autoload but we can ensure they are available
-        require_once __DIR__ . '/../../src/Template/helpers.php';
+        require_once __DIR__ . '/../../src/helpers.php';
     }
 
-    public function testCsrfTokenGeneratesString(): void
+    #[Test]
+    public function basepathReturnsProjectRoot(): void
     {
-        // Mock session if needed, or rely on PHP's behavior (may fail in CLI if headers sent)
-        // For basic CLI test, we might suppress warnings or use @
-        
-        $token = @csrf_token();
-        $this->assertNotEmpty($token);
+        if (!defined('ML_BASE_PATH')) {
+            define('ML_BASE_PATH', realpath(__DIR__ . '/../../'));
+        }
+
+        $this->assertSame(ML_BASE_PATH, base_path());
+        $this->assertStringEndsWith('/config', base_path('config'));
     }
 
-    public function testCsrfFieldContainsToken(): void
+    #[Test]
+    public function appPathReturnsAppDir(): void
     {
-        $field = @csrf_field();
-        $this->assertStringContainsString('<input type="hidden" name="_csrf"', $field);
+        $this->assertStringEndsWith('/app', app_path());
+        $this->assertStringEndsWith('/app/Entity', app_path('Entity'));
+    }
+
+    #[Test]
+    public function csrfTokenRequiresContainer(): void
+    {
+        // Reset container instance to ensure clean state
+        Container::resetInstance();
+
+        $this->expectException(\MonkeysLegion\DI\Exceptions\ServiceResolveException::class);
+        $this->expectExceptionMessage('Container instance not set');
+
+        csrf_token();
+    }
+
+    #[Test]
+    public function csrfFieldRequiresContainer(): void
+    {
+        Container::resetInstance();
+
+        $this->expectException(\MonkeysLegion\DI\Exceptions\ServiceResolveException::class);
+        $this->expectExceptionMessage('Container instance not set');
+
+        csrf_field();
     }
 }

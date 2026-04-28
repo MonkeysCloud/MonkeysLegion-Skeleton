@@ -5,58 +5,49 @@ namespace Tests\Unit\Controller;
 
 use App\Controller\HomeController;
 use MonkeysLegion\Template\Renderer;
+use MonkeysLegion\Template\Compiler;
+use MonkeysLegion\Template\Loader;
+use MonkeysLegion\Template\Parser;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-class HomeControllerTest extends TestCase
+#[CoversClass(HomeController::class)]
+final class HomeControllerTest extends TestCase
 {
-    public function testIndexRendersHomeTemplate(): void
+    #[Test]
+    public function indexReturns200WithHtml(): void
     {
-        // 1. Setup temporary template file
-        $tempDir = sys_get_temp_dir() . '/ml_test_views';
-        if (!is_dir($tempDir)) {
-            mkdir($tempDir);
-        }
+        // Renderer is final — create a real instance with a mock Loader
+        $tempDir = sys_get_temp_dir() . '/ml_test_' . uniqid();
+        mkdir($tempDir, 0755, true);
         $templatePath = $tempDir . '/home.ml.php';
-        file_put_contents($templatePath, '<html>Home</html>');
+        file_put_contents($templatePath, '<html><body>Home Page</body></html>');
 
-        // 2. Mock Loader to return the temp file path
-        $loader = $this->createMock(\MonkeysLegion\Template\Loader::class);
-        $loader->method('getSourcePath')
-            ->with('home')
-            ->willReturn($templatePath);
-        
-        // Mock getCompiledPath to avoid cache issues or use a temp cache dir
-        $loader->method('getCompiledPath')
-            ->willReturn($tempDir . '/home.php');
+        $loader = $this->createMock(Loader::class);
+        $loader->method('getSourcePath')->with('home')->willReturn($templatePath);
+        $loader->method('getCompiledPath')->willReturn($tempDir . '/home.compiled.php');
 
-        // 3. Create real Parser and Compiler (lightweight)
-        $parser = new \MonkeysLegion\Template\Parser();
-        $compiler = new \MonkeysLegion\Template\Compiler($parser);
+        $parser = new Parser();
+        $compiler = new Compiler($parser);
+        $renderer = new Renderer($parser, $compiler, $loader, false, $tempDir);
 
-        // 4. Instantiate real Renderer with mocked Loader
-        // We use a temp cache dir for the renderer
-        $renderer = new Renderer(
-            $parser,
-            $compiler,
-            $loader,
-            false, // cache enabled (false for testing to avoid complexity?) 
-                   // actually if false, it still writes to compiled path? 
-                   // Let's use false and ensure we have write permissions
-            $tempDir
-        );
-
-        // 5. Inject into Controller
         $controller = new HomeController($renderer);
         $response = $controller->index();
 
-        // 6. Assertions
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertSame('text/html', $response->getHeaderLine('Content-Type'));
-        $this->assertStringContainsString('<html>Home</html>', (string) $response->getBody());
-        
+        $this->assertStringContainsString(
+            'text/html',
+            $response->getHeaderLine('Content-Type'),
+        );
+        $this->assertStringContainsString(
+            'Home Page',
+            (string) $response->getBody(),
+        );
+
         // Cleanup
         @unlink($templatePath);
-        @unlink($tempDir . '/home.php');
+        @unlink($tempDir . '/home.compiled.php');
         @rmdir($tempDir);
     }
 }
