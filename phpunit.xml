@@ -34,5 +34,6 @@
         <env name="APP_ENV" value="testing"/>
         <env name="APP_DEBUG" value="true"/>
         <env name="ML_BASE_PATH" value="."/>
+        <env name="QUEUE_DEFAULT" value="null"/>
     </php>
 </phpunit>

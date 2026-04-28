@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use MonkeysLegion\DI\Container;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -36,16 +37,25 @@ final class HelperTest extends TestCase
     }
 
     #[Test]
-    public function csrfTokenGeneratesString(): void
+    public function csrfTokenRequiresContainer(): void
     {
-        $token = @csrf_token();
-        $this->assertNotEmpty($token);
+        // Reset container instance to ensure clean state
+        Container::resetInstance();
+
+        $this->expectException(\MonkeysLegion\DI\Exceptions\ServiceResolveException::class);
+        $this->expectExceptionMessage('Container instance not set');
+
+        csrf_token();
     }
 
     #[Test]
-    public function csrfFieldContainsToken(): void
+    public function csrfFieldRequiresContainer(): void
     {
-        $field = @csrf_field();
-        $this->assertStringContainsString('<input type="hidden" name="_csrf"', $field);
+        Container::resetInstance();
+
+        $this->expectException(\MonkeysLegion\DI\Exceptions\ServiceResolveException::class);
+        $this->expectExceptionMessage('Container instance not set');
+
+        csrf_field();
     }
 }

@@ -12,12 +12,12 @@ use PHPUnit\Framework\TestCase;
 final class AppProviderTest extends TestCase
 {
     #[Test]
-    public function registerDoesNotThrow(): void
+    public function getDefinitionsReturnsArray(): void
     {
         $provider = new AppProvider();
-        $provider->register();
+        $definitions = $provider->getDefinitions();
 
-        $this->assertTrue(true); // No exception
+        $this->assertIsArray($definitions);
     }
 
     #[Test]

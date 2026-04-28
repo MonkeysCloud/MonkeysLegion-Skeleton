@@ -7,7 +7,7 @@
 
 queue {
     # The default store to use (redis, database, null)
-    default = ${QUEUE_DEFAULT:null}
+    default = ${QUEUE_DEFAULT:"null"}
 
     # ─── Core queue behavior ─────────────────────────────────────────────────
     settings {
