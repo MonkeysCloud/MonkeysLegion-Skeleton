@@ -2,31 +2,44 @@
 # Queue Configuration — MonkeysLegion v2
 # ═══════════════════════════════════════════════════════════════════════════════
 #
-# Central queue routing and connection config.
-# Matches Laravel 13's Queue::route() competitive feature via #[QueueRoute].
+# Central queue routing and driver config.
+# See: monkeyscloud/monkeyslegion-queue 2.0
 
 queue {
-    default = ${QUEUE_CONNECTION:sync}
+    # The default store to use (redis, database, null)
+    default = ${QUEUE_DEFAULT:null}
 
-    connections {
-        sync {
-            driver = "sync"
+    # ─── Core queue behavior ─────────────────────────────────────────────────
+    settings {
+        default_queue      = ${QUEUE_DEFAULT_QUEUE:default}
+        failed_queue       = ${QUEUE_FAILED_QUEUE:failed}
+        queue_prefix       = ${QUEUE_PREFIX:ml_queue}
+        retry_after        = ${QUEUE_RETRY_AFTER:90}
+        visibility_timeout = ${QUEUE_VISIBILITY_TIMEOUT:300}
+        max_attempts       = ${QUEUE_MAX_ATTEMPTS:3}
+        path               = ${QUEUE_VIEW_PATH:ml-queue}
+    }
+
+    # ─── Queue Drivers (stores) ──────────────────────────────────────────────
+    stores {
+        redis {
+            host     = ${REDIS_HOST:127.0.0.1}
+            port     = ${REDIS_PORT:6379}
+            username = ${REDIS_USERNAME:null}
+            password = ${REDIS_PASSWORD:null}
+            database = ${REDIS_DATABASE:0}
+            timeout  = ${REDIS_TIMEOUT:2.0}
         }
 
         database {
-            driver      = "database"
-            table       = "jobs"
-            retry_after = 90
+            table        = ${QUEUE_DATABASE_TABLE:jobs}
+            failed_table = ${QUEUE_DATABASE_FAILED_TABLE:failed_jobs}
         }
 
-        redis {
-            driver     = "redis"
-            connection = "default"
-            queue      = "default"
-        }
+        null {}
     }
 
-    # ─── Central Route Rules ──────────────────────────────────────────────────
+    # ─── Central Route Rules ─────────────────────────────────────────────────
     # Map job classes to specific queues/connections.
     # This complements the #[OnQueue] attribute on job classes.
 
@@ -34,10 +47,4 @@ queue {
     #     "App\\Job\\SendWelcomeEmailJob" = { queue = "emails" }
     #     "App\\Job\\ProcessPayment"      = { queue = "payments", connection = "redis" }
     # }
-
-    # ─── Failed Jobs ─────────────────────────────────────────────────────────
-    failed {
-        driver = "database"
-        table  = "failed_jobs"
-    }
 }
