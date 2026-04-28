@@ -2,33 +2,50 @@
 # Mail Configuration — MonkeysLegion v2
 # ═══════════════════════════════════════════════════════════════════════════════
 #
-# Configure mail transport and default sender.
+# Configure mail transport, rate limiter, and default sender.
+# Drivers: smtp, sendmail, mailgun, monkeys_mail, null
 
 mail {
-    default = ${MAIL_DRIVER:log}
+    driver = ${MAIL_DRIVER:null}
 
     from {
         address = ${MAIL_FROM_ADDRESS:noreply@example.com}
         name    = ${MAIL_FROM_NAME:"MonkeysLegion App"}
     }
 
-    transports {
+    # ─── Transport Drivers ───────────────────────────────────────────────────
+    drivers {
         smtp {
-            driver     = "smtp"
-            host       = ${MAIL_HOST:smtp.example.com}
+            host       = ${MAIL_HOST:smtp.mailtrap.io}
             port       = ${MAIL_PORT:587}
             username   = ${MAIL_USERNAME:}
             password   = ${MAIL_PASSWORD:}
             encryption = ${MAIL_ENCRYPTION:tls}
         }
 
-        log {
-            driver  = "log"
-            channel = "mail"
+        sendmail {
+            path = ${MAIL_SENDMAIL_PATH:/usr/sbin/sendmail}
         }
 
-        null {
-            driver = "null"
+        mailgun {
+            domain  = ${MAILGUN_DOMAIN:}
+            secret  = ${MAILGUN_SECRET:}
+            region  = ${MAILGUN_REGION:us}
         }
+
+        monkeys_mail {
+            api_key = ${MONKEYS_MAIL_API_KEY:}
+            domain  = ${MONKEYS_MAIL_DOMAIN:monkeys.cloud}
+        }
+
+        null {}
+    }
+
+    # ─── Rate Limiter ────────────────────────────────────────────────────────
+    rate_limiter {
+        key          = ${MAIL_RATE_KEY:ml_mail}
+        limit        = ${MAIL_RATE_LIMIT:100}
+        seconds      = ${MAIL_RATE_SECONDS:60}
+        storage_path = ${MAIL_RATE_STORAGE:/tmp}
     }
 }
