@@ -1,0 +1,146 @@
+# MonkeysLegion Apex — AI Configuration
+# Resolved by Apex ConfigResolver (MLC priority over ai.php)
+
+ai {
+    # Default AI provider: anthropic | openai | google | deepseek | groq | mistral | xai | cohere | ollama
+    default_provider = ${AI_PROVIDER:-anthropic}
+
+    # ── Providers ────────────────────────────────────────────────────
+
+    providers {
+        anthropic {
+            api_key  = ${ANTHROPIC_API_KEY:-}
+            model    = ${ANTHROPIC_MODEL:-claude-sonnet-4}
+            base_url = ${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
+            timeout  = 30
+        }
+
+        openai {
+            api_key  = ${OPENAI_API_KEY:-}
+            model    = ${OPENAI_MODEL:-gpt-4.1}
+            base_url = ${OPENAI_BASE_URL:-https://api.openai.com}
+            timeout  = 30
+        }
+
+        google {
+            api_key  = ${GOOGLE_API_KEY:-}
+            model    = ${GOOGLE_MODEL:-gemini-2.5-flash}
+            base_url = ${GOOGLE_BASE_URL:-https://generativelanguage.googleapis.com}
+            timeout  = 30
+        }
+
+        vertex {
+            api_key  = ${VERTEX_API_KEY:-}
+            model    = ${VERTEX_MODEL:-gemini-2.5-flash}
+            project  = ${VERTEX_PROJECT:-}
+            location = ${VERTEX_LOCATION:-us-central1}
+            timeout  = 30
+        }
+
+        ollama {
+            model    = ${OLLAMA_MODEL:-llama3}
+            base_url = ${OLLAMA_BASE_URL:-http://localhost:11434}
+            timeout  = 60
+        }
+
+        # deepseek {
+        #     api_key  = ${DEEPSEEK_API_KEY:-}
+        #     model    = ${DEEPSEEK_MODEL:-deepseek-chat}
+        #     base_url = ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+        #     timeout  = 30
+        # }
+
+        # groq {
+        #     api_key  = ${GROQ_API_KEY:-}
+        #     model    = ${GROQ_MODEL:-llama-3.3-70b-versatile}
+        #     base_url = ${GROQ_BASE_URL:-https://api.groq.com}
+        #     timeout  = 30
+        # }
+
+        # mistral {
+        #     api_key  = ${MISTRAL_API_KEY:-}
+        #     model    = ${MISTRAL_MODEL:-mistral-large-latest}
+        #     base_url = ${MISTRAL_BASE_URL:-https://api.mistral.ai}
+        #     timeout  = 30
+        # }
+
+        # xai {
+        #     api_key  = ${XAI_API_KEY:-}
+        #     model    = ${XAI_MODEL:-grok-3}
+        #     base_url = ${XAI_BASE_URL:-https://api.x.ai}
+        #     timeout  = 30
+        # }
+
+        # cohere {
+        #     api_key  = ${COHERE_API_KEY:-}
+        #     model    = ${COHERE_MODEL:-command-r-plus}
+        #     base_url = ${COHERE_BASE_URL:-https://api.cohere.com}
+        #     timeout  = 30
+        # }
+    }
+
+    # ── Cost & Budget ────────────────────────────────────────────────
+
+    cost {
+        tracking_enabled = true
+        max_budget       = ${AI_MAX_BUDGET:-100.0}
+    }
+
+    # ── Rate Limiting ────────────────────────────────────────────────
+
+    rate_limit {
+        enabled        = true
+        max_requests   = ${AI_RATE_LIMIT:-60}
+        window_seconds = 60
+    }
+
+    # ── Guards ───────────────────────────────────────────────────────
+
+    guards {
+        input {
+            pii_detection       = true
+            injection_detection = true
+            toxicity_detection  = true
+        }
+
+        output {
+            pii_detection = true
+        }
+    }
+
+    # ── Cache ────────────────────────────────────────────────────────
+
+    cache {
+        enabled = ${AI_CACHE_ENABLED:-false}
+        ttl     = ${AI_CACHE_TTL:-3600}
+        prefix  = "apex_cache:"
+    }
+
+    # ── Retry ────────────────────────────────────────────────────────
+
+    retry {
+        max_retries = 3
+        base_delay  = 1.0
+        max_delay   = 8.0
+    }
+
+    # ── Router ───────────────────────────────────────────────────────
+
+    router {
+        strategy = ${AI_ROUTER_STRATEGY:-cost_optimized}
+
+        tiers {
+            fast     = ["claude-haiku-4", "gpt-4.1-nano"]
+            balanced = ["claude-sonnet-4", "gpt-4.1"]
+            power    = ["claude-opus-4", "o3"]
+        }
+    }
+
+    # ── Memory ───────────────────────────────────────────────────────
+
+    memory {
+        default      = "sliding_window"
+        max_tokens   = 4096
+        max_messages = 50
+    }
+}

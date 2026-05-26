@@ -1,0 +1,46 @@
+# HTTP Client Configuration
+# MonkeysLegion Framework — HTTP Client Package
+#
+# This file configures the default outbound HTTP client behavior.
+# Required by monkeyslegion-apex >= 1.1.0
+
+http_client {
+    # Request timeouts (seconds)
+    timeout         = ${HTTP_CLIENT_TIMEOUT:-30}
+    connect_timeout = ${HTTP_CLIENT_CONNECT_TIMEOUT:-5}
+
+    # SSL verification
+    verify_ssl = ${HTTP_CLIENT_VERIFY_SSL:-true}
+
+    # Redirect following
+    max_redirects = ${HTTP_CLIENT_MAX_REDIRECTS:-5}
+
+    # User-Agent string
+    user_agent = ${HTTP_CLIENT_USER_AGENT:-MonkeysLegion/2.0}
+
+    # Connection pool size (reused cURL handles)
+    pool_size = ${HTTP_CLIENT_POOL_SIZE:-10}
+
+    # Throw RequestException on 4xx/5xx responses
+    throw_on_error = ${HTTP_CLIENT_THROW_ON_ERROR:-false}
+
+    # Retry configuration
+    retry {
+        max_attempts = ${HTTP_CLIENT_RETRY_MAX:-3}
+        backoff      = ${HTTP_CLIENT_RETRY_BACKOFF:-exponential_jitter}
+        base_delay   = ${HTTP_CLIENT_RETRY_DELAY:-100}
+        max_delay    = ${HTTP_CLIENT_RETRY_MAX_DELAY:-5000}
+    }
+
+    # Logging configuration
+    logging {
+        enabled    = ${HTTP_CLIENT_LOG_ENABLED:-true}
+        level      = ${HTTP_CLIENT_LOG_LEVEL:-debug}
+        body_limit = ${HTTP_CLIENT_LOG_BODY_LIMIT:-1024}
+    }
+
+    # Rate limiting (requests per second per domain)
+    rate_limit {
+        max_per_second = ${HTTP_CLIENT_RATE_LIMIT:-10}
+    }
+}
