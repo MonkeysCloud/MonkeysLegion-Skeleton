@@ -113,7 +113,7 @@ if (! function_exists('csrf_token')) {
     function csrf_token(): string
     {
         /** @var \MonkeysLegion\Session\Contracts\SessionInterface|null $session */
-        $session = \MonkeysLegion\DI\Container::instance()->get(SessionManager::class);
+        $session = \MonkeysLegion\DI\Container::instance()->get(\MonkeysLegion\Session\SessionManager::class);
 
         return $session !== null ? $session->token() : '';
     }
