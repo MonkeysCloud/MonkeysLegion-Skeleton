@@ -4,20 +4,25 @@
 # This file configures the MCP server and client behavior.
 # Required by monkeyslegion-apex >= 1.1.0
 
-mcp:
-  server:
-    name: "MonkeysLegion-MCP"
-    version: "1.0.0"
+mcp {
+  server {
+    name "MonkeysLegion-MCP"
+    version "1.0.0"
+  }
 
-  transport: "stdio"          # stdio | streamable-http
-  endpoint: "/mcp"            # HTTP endpoint path (streamable-http only)
-  protocol_version: "2025-03-26"
+  transport "stdio"          # stdio | streamable-http
+  endpoint "/mcp"            # HTTP endpoint path (streamable-http only)
+  protocol_version "2025-03-26"
 
-  scan:
-    directories:
-      - path: "app/Mcp"
-        namespace: "App\\Mcp"
+  scan {
+    directories {
+        path "app/Mcp"
+        namespace "App\\Mcp"
+    }
+  }
 
-  logging:
-    enabled: true
-    level: "debug"            # debug | info | warning | error
+  logging {
+    enabled true
+    level "debug"            # debug | info | warning | error
+  }
+}
