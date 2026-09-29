@@ -7,6 +7,7 @@
 
 # Vite build output
 /public/build/
+/public/assets/build/
 /public/hot
 
 # TypeScript build info
