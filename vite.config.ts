@@ -20,7 +20,7 @@ export default defineConfig({
     },
     publicDir: false,
     build: {
-        outDir: 'public/assets/build',
+        outDir: 'public/build',
         manifest: 'manifest.json',
         rollupOptions: {
             input: 'resources/js/app.tsx',
