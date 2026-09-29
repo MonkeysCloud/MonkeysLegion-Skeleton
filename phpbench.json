@@ -1,0 +1,30 @@
+{
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "tests/Performance/Benchmarks",
+    "runner.retry_threshold": 5,
+    "runner.revs": {
+        "default": 100
+    },
+    "runner.iterations": {
+        "default": 10
+    },
+    "runner.warmup": {
+        "default": 2
+    },
+    "report.generators": {
+        "default": {
+            "generator": "table",
+            "cols": ["benchmark", "subject", "params", "mem_peak", "time_avg", "time_stdev", "rstdev"]
+        },
+        "aggregate": {
+            "generator": "table",
+            "cols": ["benchmark", "subject", "params", "mem_peak", "time_avg", "rstdev"],
+            "aggregate": "mean"
+        }
+    },
+    "report.outputs": {
+        "default": {
+            "renderer": "console"
+        }
+    }
+}

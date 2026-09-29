@@ -1,0 +1,10 @@
+# Vite Configuration
+#
+# In development, assets are served from the Vite dev server (HMR).
+# In production, assets are resolved from the built manifest.json.
+
+vite {
+    dev_server = "http://localhost:5173"
+    build_path = "public/build"
+    manifest   = "manifest.json"
+}

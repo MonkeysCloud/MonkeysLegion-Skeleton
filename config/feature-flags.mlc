@@ -1,0 +1,16 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Feature Flags Configuration — MonKeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+
+feature_flags {
+    # Driver: memory | database | redis
+    driver = ${FEATURE_FLAGS_DRIVER:memory}
+
+    # Database driver settings
+    table = "feature_flags"
+
+    # Redis driver settings
+    redis {
+        prefix = "ml:feature_flags:"
+    }
+}

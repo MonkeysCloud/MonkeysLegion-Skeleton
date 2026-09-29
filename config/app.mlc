@@ -1,15 +1,42 @@
 # ═══════════════════════════════════════════════════════════════════════════════
-# Application Configuration — MonkeysLegion v2
+# Application Configuration — MonKeysLegion v2.1
 # ═══════════════════════════════════════════════════════════════════════════════
 #
 # Core application settings. All values support env variable interpolation
 # via the ${VAR_NAME:default_value} syntax.
 
 app {
-    name     = ${APP_NAME:"MonkeysLegion App"}
+    name     = ${APP_NAME:"MonKeysLegion App"}
     env      = ${APP_ENV:production}
     debug    = ${APP_DEBUG:false}
     url      = ${APP_URL:http://localhost:8000}
     key      = ${APP_KEY}
     timezone = "UTC"
+}
+
+# ── Performance ─────────────────────────────────────────────────────────────
+
+performance {
+    # Compile DI container in production (eliminates runtime reflection)
+    compile_container = ${COMPILE_CONTAINER:false}
+
+    # OPcache preload script (run `ml preload:generate` to create)
+    preload = ${OPCACHE_PRELOAD:false}
+}
+
+# ── HTTP Optimizations ──────────────────────────────────────────────────────
+
+compression {
+    enabled  = ${COMPRESSION_ENABLED:true}
+    min_size = 1024          # Don't compress responses smaller than 1 KB
+    level    = 6             # gzip compression level (1-9)
+}
+
+etag {
+    enabled = ${ETAG_ENABLED:true}
+    weak    = true           # Use weak ETags (W/"...")
+}
+
+conditional {
+    enabled = ${CONDITIONAL_ENABLED:true}   # Last-Modified / If-Modified-Since
 }

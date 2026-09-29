@@ -1,31 +1,39 @@
-# MonkeysLegion Skeleton v2
+# MonKeysLegion Skeleton v2.1
 
 [![PHP Version](https://img.shields.io/badge/php-8.4%2B-8892BF.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tests-139%20passed-brightgreen.svg)](#-testing)
 [![Packagist](https://img.shields.io/packagist/v/monkeyscloud/monkeyslegion-skeleton.svg)](https://packagist.org/packages/monkeyscloud/monkeyslegion-skeleton)
 
-**Production-ready PHP 8.4 skeleton for building web apps & APIs with the MonkeysLegion framework v2.**
+**Production-ready PHP 8.4 skeleton for building web apps & APIs with the MonKeysLegion framework v2.1.**
 
-Built on attribute-first routing, property hooks, asymmetric visibility, and a zero-magic PSR-15 pipeline.
+Built on attribute-first routing, property hooks, asymmetric visibility, and a zero-magic PSR-15 pipeline. Now with Inertia.js SSR, Vite asset pipeline, feature flags, webhooks, Markdown rendering, search indexing, and multi-channel notifications.
 
 ---
 
-## ✨ What's New in v2
+## ✨ What's New in v2.1
 
-| Feature | v1 | v2 |
-|---------|----|----|
-| **Entry point** | `HttpBootstrap::run()` | `Application::create()->run()` |
-| **Entity properties** | Getters/setters | PHP 8.4 property hooks |
-| **Visibility** | Public/private | `public private(set)` asymmetric |
-| **Configuration** | `.php` arrays | `.mlc` typed config |
-| **Routing** | Manual registration | `#[Route]` attributes |
-| **Auth** | Manual middleware | `#[Authenticated]`, `#[RequiresRole]` |
-| **Rate limiting** | Custom | `#[Throttle(max: 60, per: 1)]` |
-| **Events** | Manual dispatch | `#[Listener]` auto-discovery |
-| **DI** | Config-first | `#[Singleton]`, `#[Provider]` |
-| **PHPStan** | Level 8 | Level 9 |
-| **Tests** | 12 tests | 139 tests, 289 assertions |
+| Feature | v2.0 | v2.1 |
+|---------|------|------|
+| **Inertia.js** | — | Full adapter with SSR support |
+| **Vite** | — | Asset pipeline with HMR + manifest |
+| **Feature Flags** | — | Memory/Database/Redis drivers |
+| **Webhooks** | — | Signing, delivery, retry, multi-driver |
+| **Markdown** | — | Pure PHP renderer with extensions |
+| **Search** | — | Null/Database/Meilisearch engines |
+| **Notifications** | Mail only | + Slack, Teams, Webhook channels |
+| **OAuth** | — | Google, GitHub, GitLab, Facebook, X, Microsoft |
+| **HTTP Middleware** | 6 | 12+ (CSP, Compression, Conditional, Correlation, Signed URLs, Deprecation) |
+| **Entity Casts** | — | JSON, Boolean, DateTime, Decimal, Enum, Array |
+| **Query Builder** | Basic | + `whereHas`, `whereDoesntHave`, `has`, `doesntHave`, `load()` |
+| **Database** | — | Model factories, nested transactions |
+| **Schedule** | Basic | + Health monitor (degraded/unhealthy detection) |
+| **Core** | — | GDPR module, health checks, OPcache preload |
+| **Telemetry** | Basic | + Prometheus exporter, OTLP/HTTP tracing |
+| **CLI** | 15 commands | 35+ commands, React/Vue presets, TypeScript generator |
+| **Validation** | 7 rules | + `#[NotPwned]` (HIBP API check) |
+| **Router** | — | + `#[ApiVersion]`, `#[Deprecated]` attributes |
+| **DevTools** | 4 panels | + Request, Routes, Session, Timeline panels |
 
 ---
 
@@ -36,18 +44,27 @@ Built on attribute-first routing, property hooks, asymmetric visibility, and a z
 | **HTTP Stack**           | PSR-7/15 compliant, middleware pipeline, SAPI emitter    |
 | **Routing**              | Attribute-based v2, auto-discovery, constraints, caching |
 | **Dependency Injection** | PSR-11 container with `#[Singleton]`, `#[Provider]`      |
-| **Database**             | Native PDO MySQL 8.4, Query Builder, Micro-ORM           |
-| **Authentication**       | JWT, RBAC, 2FA, OAuth, API keys                          |
+| **Database**             | Native PDO MySQL 8.4, Query Builder, Micro-ORM, Factories |
+| **Authentication**       | JWT, RBAC, 2FA, OAuth (6 providers), API keys            |
 | **API Documentation**    | Live OpenAPI 3.1 & Swagger UI                            |
 | **Validation**           | DTO binding with attribute constraints                   |
 | **Rate Limiting**        | `#[Throttle]` attribute, sliding-window (IP + User)      |
 | **Templating**           | MLView with components, slots, caching                   |
-| **CLI**                  | Migrations, cache, key-gen, scaffolding, Tinker REPL     |
+| **CLI**                  | 35+ commands, React/Vue presets, TypeScript generator    |
 | **Files**                | Multi-driver storage, image processing, chunked uploads  |
 | **I18n**                 | Full internationalization & localization support         |
-| **Telemetry**            | Prometheus metrics, distributed tracing, PSR-3 logging   |
+| **Telemetry**            | Prometheus metrics, OTLP tracing, PSR-3 logging          |
 | **Mail**                 | SMTP, Markdown templates, DKIM support                   |
 | **Caching**              | Multiple drivers (File, Redis, Memcached)                |
+| **Feature Flags**        | Memory, Database, Redis drivers                          |
+| **Webhooks**             | HMAC signing, retry, delivery tracking                   |
+| **Search**               | Database full-text, Meilisearch integration              |
+| **Notifications**        | Mail, Slack, Teams, Webhook channels                     |
+| **Markdown**             | Pure PHP renderer with extensions                        |
+| **Inertia.js**           | SSR + CSR fallback, lazy props, flash bridge             |
+| **Vite**                 | Asset pipeline, HMR, manifest, route exporter            |
+| **Security**             | CSP, GDPR, audit log, signed URLs, SQL guard             |
+| **Health Checks**        | Database, cache, disk space monitoring                   |
 
 ---
 
@@ -64,6 +81,17 @@ composer serve
 # → http://127.0.0.1:8000
 ```
 
+### Frontend Setup (Inertia.js + Vite)
+
+```bash
+php ml frontend:install --preset=react
+# or
+php ml frontend:install --preset=vue
+
+npm run dev    # Start Vite dev server (HMR)
+npm run build  # Production build
+```
+
 ---
 
 ## 📁 Project Structure
@@ -74,7 +102,7 @@ my-app/
 │  ├─ Controller/          # Attribute-routed controllers
 │  │  └─ Api/              # API controllers (UserController, PostController, AuthController)
 │  ├─ Dto/                 # Request DTOs with validation attributes
-│  ├─ Entity/              # Entities with PHP 8.4 property hooks
+│  ├─ Entity/              # Entities with PHP 8.4 property hooks + casts
 │  ├─ Enum/                # Backed enums with business logic
 │  ├─ Event/               # Domain events (final readonly)
 │  ├─ Job/                 # Queue jobs (ShouldQueue)
@@ -88,15 +116,25 @@ my-app/
 ├─ config/
 │  ├─ app.php              # DI container bindings (only PHP config file)
 │  ├─ app.mlc              # Application settings
-│  ├─ database.mlc         # Database connection
-│  ├─ auth.mlc             # JWT, guards, 2FA
+│  ├─ auth.mlc             # JWT, guards, 2FA, OAuth
 │  ├─ cache.mlc            # Cache drivers
+│  ├─ compression.mlc      # HTTP compression
 │  ├─ cors.mlc             # CORS policy
+│  ├─ database.mlc         # Database connection
+│  ├─ feature-flags.mlc    # Feature flag drivers
+│  ├─ inertia.mlc          # Inertia.js SSR config
 │  ├─ logging.mlc          # Log channels
 │  ├─ mail.mlc             # SMTP/mailer
-│  ├─ middleware.mlc        # Middleware pipeline
+│  ├─ markdown.mlc         # Markdown renderer
+│  ├─ middleware.mlc        # Middleware pipeline + aliases
+│  ├─ notifications.mlc    # Notification channels
 │  ├─ queue.mlc            # Queue drivers
-│  └─ session.mlc          # Session config
+│  ├─ search.mlc           # Search engine config
+│  ├─ security.mlc         # CSP, CSRF, GDPR, audit, signed URLs
+│  ├─ session.mlc          # Session config
+│  ├─ telemetry.mlc        # Metrics, tracing, logging
+│  ├─ vite.mlc             # Vite asset pipeline
+│  └─ webhooks.mlc         # Webhook signing + delivery
 ├─ public/index.php        # Application::create()->run()
 ├─ bootstrap.php           # Application::create()->boot()
 ├─ ml                      # CLI entry point
@@ -134,34 +172,29 @@ MonkeysLegion\Framework\Application::create(
 )->run();
 ```
 
-### Entities (PHP 8.4 Property Hooks + Asymmetric Visibility)
+### Entities (PHP 8.4 Property Hooks + Asymmetric Visibility + Casts)
 
 ```php
 use MonkeysLegion\Entity\Attributes\Entity;
 use MonkeysLegion\Entity\Attributes\Field;
 use MonkeysLegion\Entity\Attributes\Id;
 use MonkeysLegion\Entity\Attributes\Timestamps;
+use MonkeysLegion\Entity\Casts\CastManager;
 use MonkeysLegion\Auth\Contract\AuthenticatableInterface;
-use MonkeysLegion\Auth\Contract\HasRolesInterface;
 
 #[Entity(table: 'users')]
 #[Timestamps]
-final class User implements AuthenticatableInterface, HasRolesInterface
+final class User implements AuthenticatableInterface
 {
-    // Auto-increment ID — readable by all, writable only by the ORM
     #[Id]
     #[Field(type: 'unsignedBigInt', autoIncrement: true)]
     public private(set) int $id;
 
-    // Property hook: auto-lowercase and trim on set
     #[Field(type: 'string', length: 255, unique: true)]
     public string $email {
-        set(string $value) {
-            $this->email = strtolower(trim($value));
-        }
+        set(string $value) { $this->email = strtolower(trim($value)); }
     }
 
-    // Property hook: validation on set
     #[Field(type: 'string', length: 100)]
     public string $name {
         set(string $value) {
@@ -189,36 +222,26 @@ final class User implements AuthenticatableInterface, HasRolesInterface
     public bool $isVerified {
         get => $this->email_verified_at !== null;
     }
-
-    // RBAC interface implementation
-    /** @var list<string> */
-    protected array $roles = [];
-
-    /** @var list<string> */
-    protected array $permissions = [];
-
-    public function getRoles(): array { return $this->roles; }
-    public function hasRole(string $role): bool { return in_array($role, $this->roles, true); }
-    public function hasPermission(string $permission): bool
-    {
-        foreach ($this->permissions as $p) {
-            if ($p === '*' || $p === $permission) return true;
-            if (str_ends_with($p, '.*') && str_starts_with($permission, rtrim($p, '.*'))) return true;
-        }
-        return false;
-    }
-
-    // Auth interface
-    public function getAuthIdentifier(): int|string { return $this->id; }
-    public function getAuthPassword(): string { return $this->password_hash; }
-    public function bumpTokenVersion(): void { $this->token_version++; }
-
-    // Lifecycle helpers
-    public function markEmailVerified(): void
-    {
-        $this->email_verified_at = new \DateTimeImmutable();
-    }
 }
+```
+
+**Entity Casts (v2.1):**
+
+```php
+use MonkeysLegion\Entity\Casts\{JsonCast, BooleanCast, DatetimeCast, EnumCast};
+
+// In your entity:
+#[Field(type: 'json')]
+#[Cast(JsonCast::class)]
+public array $metadata = [];
+
+#[Field(type: 'boolean')]
+#[Cast(BooleanCast::class)]
+public bool $active = true;
+
+#[Field(type: 'string')]
+#[Cast(EnumCast::class, enum: UserRole::class)]
+public UserRole $role = UserRole::User;
 ```
 
 ### Services (`#[Singleton]` + PSR-14 Events)
@@ -251,17 +274,6 @@ final class UserService
 
         return $user;
     }
-
-    public function findUser(int $id): ?User
-    {
-        return $this->users->find($id);
-    }
-
-    public function deleteUser(int $id): void
-    {
-        $this->users->delete($id);
-        $this->logger->info('User deleted', ['id' => $id]);
-    }
 }
 ```
 
@@ -271,34 +283,25 @@ final class UserService
 use MonkeysLegion\Router\Attributes\Route;
 use MonkeysLegion\Router\Attributes\RoutePrefix;
 use MonkeysLegion\Router\Attributes\Middleware;
+use MonkeysLegion\Router\Attributes\ApiVersion;
+use MonkeysLegion\Router\Attributes\Deprecated;
 use MonkeysLegion\Auth\Attribute\Authenticated;
 use MonkeysLegion\Auth\Attribute\RequiresRole;
 use MonkeysLegion\Http\Message\Response;
 
 #[RoutePrefix('/api/v2/users')]
 #[Middleware(['cors', 'throttle:60,1'])]
-#[Authenticated]
+#[ApiVersion('2')]
 final class UserController
 {
-    public function __construct(
-        private readonly UserService $service,
-        private readonly UserRepository $users,
-    ) {}
-
     #[Route('GET', '/', name: 'users.index', summary: 'List users', tags: ['Users'])]
     public function index(ServerRequestInterface $request): Response
     {
         return UserResource::collection($this->users->findActiveUsers());
     }
 
-    #[Route('GET', '/{id:\d+}', name: 'users.show', summary: 'Get user by ID')]
-    public function show(ServerRequestInterface $request, string $id): Response
-    {
-        $user = $this->users->findOrFail((int) $id);
-        return UserResource::make($user);
-    }
-
     #[Route('POST', '/', name: 'users.create')]
+    #[Authenticated]
     #[RequiresRole('admin')]
     public function create(CreateUserRequest $dto): Response
     {
@@ -306,16 +309,10 @@ final class UserController
         return UserResource::make($user, 201);
     }
 
-    #[Route('PUT', '/{id:\d+}', name: 'users.update')]
-    #[RequiresRole('admin')]
-    public function update(UpdateUserRequest $dto, string $id): Response
-    {
-        $user = $this->service->updateUser((int) $id, $dto);
-        return UserResource::make($user);
-    }
-
     #[Route('DELETE', '/{id:\d+}', name: 'users.destroy')]
+    #[Authenticated]
     #[RequiresRole('admin')]
+    #[Deprecated(sunset: '2026-12-31', link: '/docs/api/v3')]
     public function destroy(string $id): Response
     {
         $this->service->deleteUser((int) $id);
@@ -324,318 +321,107 @@ final class UserController
 }
 ```
 
-### DTOs (Validation Attributes)
+### OAuth Social Login (v2.1)
 
 ```php
-use MonkeysLegion\Validation\Attributes\NotBlank;
-use MonkeysLegion\Validation\Attributes\Email;
-use MonkeysLegion\Validation\Attributes\Length;
+use MonkeysLegion\Auth\OAuth\OAuthManager;
 
-final readonly class CreateUserRequest
+#[Route('GET', '/oauth/{provider}', name: 'oauth.redirect')]
+public function redirect(string $provider, OAuthManager $oauth): Response
 {
-    public function __construct(
-        #[NotBlank] #[Email]
-        public string $email,
-
-        #[NotBlank] #[Length(min: 2, max: 100)]
-        public string $name,
-
-        #[NotBlank] #[Length(min: 8, max: 64)]
-        public string $password,
-    ) {}
+    return $oauth->provider($provider)->redirect();
 }
 
-// Partial update DTO — all nullable
-final readonly class UpdateUserRequest
+#[Route('GET', '/oauth/{provider}/callback', name: 'oauth.callback')]
+public function callback(string $provider, OAuthManager $oauth): Response
 {
-    public function __construct(
-        #[Email]
-        public ?string $email = null,
-
-        #[Length(min: 2, max: 100)]
-        public ?string $name = null,
-
-        #[Length(min: 8, max: 64)]
-        public ?string $password = null,
-    ) {}
+    $user = $oauth->provider($provider)->user();
+    $localUser = $this->userProvider->findOrCreateFromOAuth($provider, $user);
+    // Generate JWT or session...
+    return Response::redirect('/dashboard');
 }
 ```
 
-**Available Validation Constraints:**
+**Supported providers:** Google, GitHub, GitLab, Facebook, X (Twitter), Microsoft
 
-- `#[NotBlank]` – Value cannot be empty
-- `#[Email]` – Valid email format
-- `#[Length(min, max)]` – String length range
-- `#[Range(min, max)]` – Numeric range
-- `#[Pattern(regex)]` – Regex pattern match
-- `#[Url]` – Valid URL format
-- `#[UuidV4]` – Valid UUIDv4 format
-
-**Validation Error Response (400):**
-
-```json
-{
-  "errors": [
-    { "field": "email", "message": "Value must be a valid e-mail." },
-    { "field": "password", "message": "Length constraint violated." }
-  ]
-}
-```
-
-### JSON:API Resources
+### Inertia.js + Vite (v2.1)
 
 ```php
-final class UserResource
-{
-    public static function toArray(User $user): array
-    {
-        return [
-            'id'         => $user->id,
-            'type'       => 'users',
-            'attributes' => [
-                'email'       => $user->email,
-                'name'        => $user->name,
-                'is_verified' => $user->isVerified,
-                'created_at'  => $user->created_at->format('c'),
-                'updated_at'  => $user->updated_at->format('c'),
-            ],
-        ];
-    }
+use MonkeysLegion\Inertia\Inertia;
 
-    public static function make(User $user, int $status = 200): Response
-    {
-        return Response::json(['data' => self::toArray($user)], $status);
-    }
+// In a controller — returns an Inertia response
+return Inertia::render('Users/Index', [
+    'users' => $users,
+    'filters' => $request->getQueryParams(),
+]);
 
-    public static function collection(array $users): Response
-    {
-        return Response::json([
-            'data' => array_map(self::toArray(...), $users),
-            'meta' => ['total' => count($users)],
-        ]);
-    }
-}
+// Lazy props (only loaded when needed)
+return Inertia::render('Dashboard', [
+    'stats' => Inertia::lazy(fn() => $this->stats->compute()),
+]);
+
+// SSR is automatic when enabled in config/inertia.mlc
 ```
 
-### Events & Listeners
-
 ```php
-// Domain event — final readonly, automatically timestamped
-final readonly class UserCreated
-{
-    public function __construct(
-        public User $user,
-        public \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
-    ) {}
-}
-
-// Listener — auto-discovered via #[Listener] attribute
-use MonkeysLegion\Events\Attribute\Listener;
-
-#[Listener(UserCreated::class)]
-final class SendWelcomeEmail
-{
-    public function __construct(private readonly LoggerInterface $logger) {}
-
-    public function __invoke(UserCreated $event): void
-    {
-        $this->logger->info('Queuing welcome email', [
-            'user_id' => $event->user->id,
-            'email'   => $event->user->email,
-        ]);
-        // Dispatch SendWelcomeEmailJob to queue...
-    }
-}
+{{-- In templates --}}
+@vite(['resources/css/app.css', 'resources/js/app.tsx'])
 ```
 
-### Queue Jobs
+### Feature Flags (v2.1)
 
 ```php
-use MonkeysLegion\Queue\Contracts\ShouldQueue;
+use MonkeysLegion\FeatureFlags\FeatureManager;
 
-final class SendWelcomeEmailJob implements ShouldQueue
-{
-    public function __construct(
-        private readonly int $userId,
-    ) {}
-
-    public function handle(UserRepository $users, LoggerInterface $logger): void
-    {
-        $user = $users->find($this->userId);
-
-        if ($user === null) {
-            $logger->warning('SendWelcomeEmail: user not found', ['user_id' => $this->userId]);
-            return;
-        }
-
-        // Send the actual email via Mailer...
-        $logger->info('Welcome email sent', ['user_id' => $this->userId, 'email' => $user->email]);
-    }
-
-    public function failed(\Throwable $e): void
-    {
-        // Handle failure (retry, DLQ, notify, etc.)
-    }
+if ($flags->isEnabled('new_checkout_flow')) {
+    return $this->renderer->render('checkout.v2');
 }
+return $this->renderer->render('checkout.v1');
+
+// Route-level middleware
+#[Route('GET', '/beta', name: 'beta')]
+#[Middleware(['feature:new_checkout_flow'])]
+public function beta(): Response { }
 ```
 
-### Authorization Policies
+### Notifications (v2.1)
 
 ```php
-final class PostPolicy
-{
-    public function update(User $user, Post $post): bool
-    {
-        return $user->id === $post->author->id || $user->hasRole('admin');
-    }
+use MonkeysLegion\Notifications\NotificationDispatcher;
+use MonkeysLegion\Notifications\Messages\SlackMessage;
 
-    public function delete(User $user, Post $post): bool
-    {
-        return $user->hasRole('admin');
-    }
-
-    public function publish(User $user, Post $post): bool
-    {
-        return $user->id === $post->author->id
-            || $user->hasRole('admin')
-            || $user->hasRole('editor');
-    }
-}
+$notifier->send('alerts', new SlackMessage(
+    channel: '#alerts',
+    text: 'Deploy completed successfully',
+));
 ```
 
-### Backed Enums
+### Webhooks (v2.1)
 
 ```php
-enum OrderStatus: string
-{
-    case Pending    = 'pending';
-    case Confirmed  = 'confirmed';
-    case Processing = 'processing';
-    case Shipped    = 'shipped';
-    case Delivered  = 'delivered';
-    case Cancelled  = 'cancelled';
+use MonkeysLegion\Webhooks\WebhookManager;
 
-    public function isFinal(): bool
-    {
-        return match ($this) {
-            self::Delivered, self::Cancelled => true,
-            default => false,
-        };
-    }
-
-    public function label(): string
-    {
-        return match ($this) {
-            self::Pending    => 'Pending Review',
-            self::Shipped    => 'In Transit',
-            default          => $this->name,
-        };
-    }
-
-    public function color(): string
-    {
-        return match ($this) {
-            self::Pending    => '#f59e0b',
-            self::Confirmed  => '#3b82f6',
-            self::Processing => '#8b5cf6',
-            self::Shipped    => '#06b6d4',
-            self::Delivered  => '#10b981',
-            self::Cancelled  => '#ef4444',
-        };
-    }
-
-    /** @return list<self> */
-    public static function active(): array
-    {
-        return array_filter(self::cases(), fn(self $s) => !$s->isFinal());
-    }
-}
-
-enum UserRole: string
-{
-    case Admin  = 'admin';
-    case Editor = 'editor';
-    case User   = 'user';
-
-    /** @return list<string> */
-    public function permissions(): array
-    {
-        return match ($this) {
-            self::Admin  => ['*'],
-            self::Editor => ['posts.*', 'comments.*'],
-            self::User   => ['posts.view', 'comments.view', 'comments.create'],
-        };
-    }
-
-    public function isAdmin(): bool
-    {
-        return $this === self::Admin;
-    }
-}
+$webhooks->dispatch('order.created', [
+    'order_id' => $order->id,
+    'total'    => $order->total,
+]);
+// HMAC-signed, retried with exponential backoff
 ```
 
-### PSR-15 Middleware
+### Markdown (v2.1)
 
 ```php
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
+use MonkeysLegion\Markdown\MarkdownRenderer;
 
-final class TimingMiddleware implements MiddlewareInterface
-{
-    public function process(
-        ServerRequestInterface $request,
-        RequestHandlerInterface $handler,
-    ): ResponseInterface {
-        $start = hrtime(true);
-
-        $response = $handler->handle($request);
-
-        $durationMs = (hrtime(true) - $start) / 1e6;
-
-        return $response->withHeader(
-            'Server-Timing',
-            sprintf('total;dur=%.2f', $durationMs),
-        );
-    }
-}
+$html = $renderer->render('# Hello **World**');
 ```
 
-### Repositories
+### Search (v2.1)
 
 ```php
-use MonkeysLegion\Query\Repository\EntityRepository;
+use MonkeysLegion\Search\SearchManager;
 
-/**
- * @extends EntityRepository<User>
- */
-final class UserRepository extends EntityRepository
-{
-    public function findByEmail(string $email): ?User
-    {
-        return $this->findOneBy(['email' => $email]);
-    }
-
-    /** @return list<User> */
-    public function findActiveUsers(): array
-    {
-        return $this->findBy(
-            criteria: ['status' => 'active'],
-            orderBy: ['created_at' => 'DESC'],
-        );
-    }
-}
-
-// EntityRepository<T> provides:
-// - find(int $id): ?T
-// - findOrFail(int $id): T              (throws NotFoundException)
-// - findBy(array $criteria, ...): list<T>
-// - findOneBy(array $criteria): ?T
-// - persist(T $entity): void
-// - remove(T $entity): void
-// - delete(int $id): void
-// - flush(): void
+$results = $search->index('posts')->search('monkeyslegion', limit: 10);
 ```
 
 ---
@@ -653,1097 +439,181 @@ database {
     name   = ${DB_NAME:monkeyslegion}
     user   = ${DB_USER:root}
     pass   = ${DB_PASS:}
-
-    options {
-        charset   = utf8mb4
-        collation = utf8mb4_unicode_ci
-        strict    = true
-    }
-
-    pool {
-        min  = 2
-        max  = 10
-        idle = 300
-    }
 }
 ```
 
 ```mlc
-# config/cache.mlc
-cache {
-    default = redis
-
-    stores {
-        file {
-            driver = file
-            path   = ${CACHE_PATH:storage/cache}
-            ttl    = 3600
-        }
-
-        redis {
-            driver = redis
-            host   = ${REDIS_HOST:127.0.0.1}
-            port   = ${REDIS_PORT:6379}
-            prefix = ml_cache_
-            ttl    = 3600
-        }
-    }
+# config/feature-flags.mlc
+feature_flags {
+    driver = ${FEATURE_FLAGS_DRIVER:memory}
+    table  = "feature_flags"
 }
 ```
 
 ```mlc
-# config/auth.mlc
-auth {
-    default_guard = jwt
-
-    guards {
-        jwt {
-            driver             = jwt
-            secret             = ${JWT_SECRET}
-            access_ttl         = ${JWT_ACCESS_TTL:1800}
-            refresh_ttl        = ${JWT_REFRESH_TTL:604800}
-            algorithm          = HS256
-            issuer             = ${APP_URL:http://localhost}
-        }
-
-        session {
-            driver       = session
-            user_provider = database
-        }
+# config/inertia.mlc
+inertia {
+    root_view = "layouts.inertia-app"
+    ssr {
+        enabled = ${INERTIA_SSR:false}
+        url     = "http://localhost:13714"
     }
 }
 ```
 
-The only PHP config file is `config/app.php` — reserved exclusively for DI container bindings:
-
-```php
-return [
-    LoggerInterface::class => fn() => new Logger('app'),
-    EventDispatcherInterface::class => fn($c) => $c->get(EventDispatcher::class),
-];
-```
+The only PHP config file is `config/app.php` — reserved exclusively for DI container bindings.
 
 ---
 
-## 📦 Package Ecosystem (Detailed)
+## 📦 Package Ecosystem
 
-MonkeysLegion is built as a modular ecosystem of packages. Below is comprehensive documentation for each.
-
----
-
-### 🔧 Core Framework
-
-#### `monkeyslegion` (Meta-package)
-
-Installs the complete MonkeysLegion stack:
-
-```bash
-composer require monkeyscloud/monkeyslegion
-```
-
-#### `monkeyslegion-core`
-
-Core runtime: kernel, `Application` builder, service provider scanner, bootstrapping.
-
-#### `monkeyslegion-di`
-
-PSR-11 dependency injection with attributes:
-
-```php
-use MonkeysLegion\DI\Attributes\Singleton;
-use MonkeysLegion\DI\Attributes\ServiceProvider;
-
-#[Singleton]
-final class PaymentGateway { /* auto-registered as singleton */ }
-
-#[ServiceProvider]
-final class AppProvider
-{
-    public function register(): void
-    {
-        // Bind interfaces to implementations
-    }
-}
-```
-
-#### `monkeyslegion-mlc`
-
-Production-ready `.mlc` configuration file parser:
-
-- 🔒 **Secure** — Path traversal prevention, file permission checks
-- ⚡ **Fast** — File-based caching with automatic invalidation
-- 🎯 **Type-Safe** — Strong typing with `getString()`, `getInt()`, `getBool()`, `getArray()`
-
-```php
-use MonkeysLegion\Mlc\Loader;
-use MonkeysLegion\Mlc\Parser;
-
-$loader = new Loader(new Parser(), config_path());
-$config = $loader->load(['app', 'database', 'cache']);
-
-$port   = $config->getInt('database.port', 3306);
-$debug  = $config->getBool('app.debug', false);
-$hosts  = $config->getArray('database.hosts', []);
-$secret = $config->getRequired('app.secret');  // throws if missing
-```
-
----
-
-### 🌐 HTTP & Routing
-
-#### `monkeyslegion-http`
-
-PSR-7 HTTP message implementations with factory methods:
-
-```php
-use MonkeysLegion\Http\Message\Response;
-
-// Response factories (v2)
-Response::json(['data' => $users]);
-Response::json(['error' => 'Not found'], 404);
-Response::html($renderedHtml);
-Response::noContent();  // 204
-Response::redirect('/dashboard', 302);
-```
-
-#### `monkeyslegion-router`
-
-Attribute-based HTTP router with middleware, named routes, constraints, and caching.
-
-**Attribute-Based Controllers (v2):**
-
-```php
-use MonkeysLegion\Router\Attributes\Route;
-use MonkeysLegion\Router\Attributes\RoutePrefix;
-use MonkeysLegion\Router\Attributes\Middleware;
-use MonkeysLegion\Router\Attributes\Throttle;
-use MonkeysLegion\Auth\Attribute\Authenticated;
-use MonkeysLegion\Auth\Attribute\RequiresRole;
-use MonkeysLegion\Auth\Attribute\RequiresPermission;
-use MonkeysLegion\Auth\Attribute\Can;
-
-#[RoutePrefix('/api/v2/posts')]
-#[Middleware(['cors'])]
-final class PostController
-{
-    // Public endpoint — no auth needed
-    #[Route('GET', '/', name: 'posts.index', summary: 'List posts', tags: ['Posts'])]
-    public function index(ServerRequestInterface $request): Response
-    {
-        $search = $request->getQueryParams()['q'] ?? null;
-        $posts = $search !== null
-            ? $this->posts->search($search)
-            : $this->posts->findPublished();
-        return PostResource::collection($posts);
-    }
-
-    // Auth required
-    #[Route('POST', '/', name: 'posts.create')]
-    #[Authenticated]
-    public function create(CreatePostRequest $dto, ServerRequestInterface $request): Response
-    {
-        $post = $this->service->createPost($dto, $request->getAttribute('user'));
-        return PostResource::make($post, 201);
-    }
-
-    // Permission-based
-    #[Route('POST', '/{id:\d+}/publish', name: 'posts.publish')]
-    #[RequiresPermission('posts.publish')]
-    public function publish(string $id): Response
-    {
-        $post = $this->service->publish((int) $id);
-        return PostResource::make($post);
-    }
-
-    // Policy-based
-    #[Route('DELETE', '/{id:\d+}', name: 'posts.destroy')]
-    #[Can('delete', Post::class)]
-    public function destroy(string $id): Response
-    {
-        $this->service->deletePost((int) $id);
-        return Response::noContent();
-    }
-}
-```
-
-**Route Constraints:**
-
-```php
-#[Route('GET', '/{id:\d+}')]          // Digits only
-#[Route('GET', '/{slug:slug}')]       // Slug format (a-z0-9-)
-#[Route('GET', '/{uuid:uuid}')]       // UUID format
-#[Route('GET', '/{email:email}')]     // Email format
-#[Route('GET', '/{amount:numeric}')] // Numeric values
-#[Route('GET', '/{name:alpha}')]      // Alphabetic only
-#[Route('GET', '/{code:alphanum}')]   // Alphanumeric
-#[Route('GET', '/{page?}')]           // Optional parameter
-```
-
-**Middleware Registration:**
-
-```php
-// config/middleware.mlc
-middleware {
-    global = ["cors", "timing"]
-
-    aliases {
-        cors     = "MonkeysLegion\\Router\\Middleware\\CorsMiddleware"
-        throttle = "MonkeysLegion\\Router\\Middleware\\ThrottleMiddleware"
-        auth     = "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware"
-        timing   = "App\\Middleware\\TimingMiddleware"
-    }
-
-    groups {
-        api = ["cors", "throttle:60,1", "auth"]
-        web = ["cors", "csrf", "session"]
-    }
-}
-```
-
-**URL Generation:**
-
-```php
-$url = $router->url('users.show', ['id' => 123]);
-// Output: /api/v2/users/123
-
-$url = $router->url('users.show', ['id' => 123], absolute: true);
-// Output: https://example.com/api/v2/users/123
-
-// Extra params become query string
-$url = $router->url('posts.index', ['q' => 'php', 'page' => 2]);
-// Output: /api/v2/posts?q=php&page=2
-```
-
-**Route Caching (Production):**
-
-```php
-use MonkeysLegion\Router\RouteCache;
-
-$cache = new RouteCache(__DIR__ . '/var/cache');
-
-if ($cache->has()) {
-    $collection->import($cache->load());
-} else {
-    // Register all routes...
-    $cache->save($collection->export()['routes'], $collection->export()['namedRoutes']);
-}
-
-// Clear on deploy
-$cache->clear();
-```
-
-**OpenAPI Metadata:**
-
-```php
-#[Route(
-    'GET', '/users',
-    name: 'users.index',
-    summary: 'List all users',
-    description: 'Returns a paginated list of users with optional filters',
-    tags: ['Users', 'API'],
-    meta: ['version' => '2.0', 'deprecated' => false],
-)]
-public function index(): Response { }
-```
-
----
-
-### 💾 Database & ORM
-
-#### `monkeyslegion-database`
-
-Native PDO MySQL 8.4 connection manager. Configured via `.mlc`:
-
-```mlc
-# config/database.mlc
-database {
-    driver = mysql
-    host   = ${DB_HOST:127.0.0.1}
-    port   = ${DB_PORT:3306}
-    name   = ${DB_NAME:monkeyslegion}
-    user   = ${DB_USER:root}
-    pass   = ${DB_PASS:}
-}
-```
-
-#### `monkeyslegion-query`
-
-Fluent Query Builder & Micro-ORM with EntityRepository.
-
-**Basic Queries:**
-
-```php
-use MonkeysLegion\Query\QueryBuilder;
-
-$qb = new QueryBuilder($connection);
-
-// Simple query
-$users = $qb->from('users')
-    ->where('status', '=', 'active')
-    ->orderBy('created_at', 'DESC')
-    ->limit(10)
-    ->fetchAll();
-
-// With joins
-$posts = $qb->from('posts', 'p')
-    ->leftJoin('users', 'u', 'u.id', '=', 'p.user_id')
-    ->select(['p.*', 'u.name as author'])
-    ->where('p.published', '=', true)
-    ->fetchAll();
-```
-
-**WHERE Clauses:**
-
-```php
-$qb->where('status', '=', 'active')
-   ->where('age', '>', 18)
-   ->orWhere('role', '=', 'admin');
-
-// IN / BETWEEN / NULL
-$qb->whereIn('id', [1, 2, 3, 4, 5])
-   ->whereBetween('age', 18, 65)
-   ->whereNull('deleted_at');
-
-// Grouped conditions
-$qb->where('status', '=', 'active')
-   ->whereGroup(function($q) {
-       $q->where('role', '=', 'admin')
-         ->orWhere('role', '=', 'moderator');
-   });
-// → WHERE status = 'active' AND (role = 'admin' OR role = 'moderator')
-```
-
-**Insert / Update / Delete:**
-
-```php
-$userId = $qb->insert('users', ['name' => 'Alice', 'email' => 'alice@example.com']);
-
-$qb->insertBatch('users', [
-    ['name' => 'Alice', 'email' => 'alice@example.com'],
-    ['name' => 'Bob',   'email' => 'bob@example.com'],
-]);
-
-$qb->update('users', ['status' => 'inactive'])
-    ->where('last_login', '<', date('Y-m-d', strtotime('-1 year')))
-    ->execute();
-
-$qb->delete('users')->where('status', '=', 'deleted')->execute();
-```
-
-**Aggregates & Pagination:**
-
-```php
-$total    = $qb->from('users')->count();
-$revenue  = $qb->from('orders')->sum('amount');
-$avgPrice = $qb->from('products')->avg('price');
-
-$result = $qb->from('posts')
-    ->where('published', '=', true)
-    ->paginate(page: 2, perPage: 15);
-// Returns: ['data' => [...], 'total' => 150, 'page' => 2, 'lastPage' => 10]
-```
-
-**Transactions:**
-
-```php
-$result = $qb->transaction(function($qb) {
-    $userId = $qb->insert('users', ['name' => 'Alice']);
-    $qb->insert('profiles', ['user_id' => $userId]);
-    return $userId;
-});
-```
-
-#### `monkeyslegion-entity`
-
-Attribute-based data-mapper with v2 property hooks:
-
-```php
-use MonkeysLegion\Entity\Attributes\Entity;
-use MonkeysLegion\Entity\Attributes\Field;
-use MonkeysLegion\Entity\Attributes\Id;
-use MonkeysLegion\Entity\Attributes\Timestamps;
-use MonkeysLegion\Entity\Attributes\SoftDeletes;
-use MonkeysLegion\Entity\Attributes\ManyToOne;
-
-#[Entity(table: 'posts')]
-#[Timestamps]
-#[SoftDeletes]
-final class Post
-{
-    #[Id]
-    #[Field(type: 'unsignedBigInt', autoIncrement: true)]
-    public private(set) int $id;
-
-    #[Field(type: 'string', length: 255)]
-    public string $title;
-
-    // Auto-slugification hook
-    #[Field(type: 'string', length: 300)]
-    public string $slug {
-        set(string $value) {
-            $s = preg_replace('/[^a-z0-9\s-]/', '', strtolower(trim($value))) ?? '';
-            $this->slug = trim(preg_replace('/[\s-]+/', '-', $s) ?? '', '-');
-        }
-    }
-
-    #[Field(type: 'text')]
-    public string $body;
-
-    // Computed excerpt — no DB column
-    public string $excerpt {
-        get => mb_strimwidth(strip_tags($this->body), 0, 160, '…');
-    }
-
-    public bool $isPublished {
-        get => $this->published_at !== null;
-    }
-
-    #[ManyToOne(target: User::class)]
-    public User $author;
-
-    #[Field(type: 'datetime', nullable: true)]
-    public ?\DateTimeImmutable $published_at = null;
-
-    public function publish(): void { $this->published_at = new \DateTimeImmutable(); }
-    public function unpublish(): void { $this->published_at = null; }
-}
-```
-
-#### `monkeyslegion-migration`
-
-Entity-schema diff engine and SQL migration runner:
-
-```bash
-php ml make:migration           # Generate migration from entity diff
-php ml migrate                  # Run pending migrations
-php ml rollback                 # Revert last migration
-php ml schema:update            # Sync entities → database
-php ml schema:update --dump     # Show SQL without executing
-```
-
----
-
-### 🔐 Authentication & Security
-
-#### `monkeyslegion-auth`
-
-Comprehensive authentication and authorization:
-
-- 🔐 **JWT Authentication** — Stateless auth with access/refresh token pairs
-- 👥 **RBAC** — Role-based access control with permission inheritance + wildcards
-- 🔑 **Two-Factor (2FA)** — TOTP compatible with Google Authenticator
-- 🌐 **OAuth** — Google, GitHub providers (easily extensible)
-- 🗝️ **API Keys** — Scoped keys for M2M authentication
-- ⏱️ **Rate Limiting** — Brute force protection
-
-**JWT Setup (v2 — via `.mlc`):**
-
-```mlc
-# config/auth.mlc
-auth {
-    default_guard = jwt
-    guards {
-        jwt {
-            driver     = jwt
-            secret     = ${JWT_SECRET}
-            access_ttl = 1800        # 30 minutes
-            refresh_ttl = 604800     # 7 days
-            algorithm  = HS256
-        }
-    }
-}
-```
-
-**Auth Controller (v2):**
-
-```php
-#[RoutePrefix('/api/v2/auth')]
-#[Middleware(['cors'])]
-final class AuthController
-{
-    public function __construct(
-        private readonly UserRepository $users,
-        private readonly UserService $userService,
-    ) {}
-
-    #[Route('POST', '/login', name: 'auth.login')]
-    #[Throttle(max: 5, per: 60)]
-    public function login(LoginRequest $dto): Response
-    {
-        $user = $this->users->findByEmail($dto->email);
-
-        if ($user === null || !password_verify($dto->password, $user->password_hash)) {
-            return Response::json(['error' => 'Invalid credentials'], 401);
-        }
-
-        return Response::json([
-            'data' => [
-                'message' => 'Login successful',
-                'user_id' => $user->id,
-                // In production: generate JWT via AuthService
-            ],
-        ]);
-    }
-
-    #[Route('POST', '/register', name: 'auth.register')]
-    #[Throttle(max: 3, per: 60)]
-    public function register(CreateUserRequest $dto): Response
-    {
-        $existing = $this->users->findByEmail($dto->email);
-        if ($existing !== null) {
-            return Response::json([
-                'error'   => 'Validation failed',
-                'details' => ['email' => 'Email already registered'],
-            ], 422);
-        }
-
-        $user = $this->userService->createUser($dto);
-
-        return Response::json([
-            'data' => ['message' => 'Registration successful', 'email' => $user->email],
-        ], 201);
-    }
-
-    #[Route('POST', '/logout', name: 'auth.logout')]
-    #[Authenticated]
-    public function logout(ServerRequestInterface $request): Response
-    {
-        return Response::json(['data' => ['message' => 'Logged out successfully']]);
-    }
-}
-```
-
-**Authorization Attributes (v2):**
-
-```php
-#[Authenticated]                        // Must be logged in
-#[RequiresRole('admin')]                // Must have 'admin' role
-#[RequiresRole('admin', 'moderator')]   // Must have ANY listed role
-#[RequiresPermission('posts.create')]   // Must have specific permission
-#[Can('update', Post::class)]          // Policy-based (PostPolicy::update)
-#[Throttle(max: 60, per: 1)]           // Rate limiting
-```
-
-**RBAC with Wildcards:**
-
-```php
-// Roles and permissions are stored on the User entity
-// Permission matching supports wildcards:
-$user->hasPermission('posts.view');    // exact match
-$user->hasPermission('posts.*');       // wildcard: posts.view, posts.create, etc.
-$user->hasPermission('*');             // super-admin: matches everything
-```
-
-**2FA Setup:**
-
-```php
-use MonkeysLegion\Auth\TwoFactor\TotpProvider;
-use MonkeysLegion\Auth\Service\TwoFactorService;
-
-$twoFactor = new TwoFactorService(new TotpProvider(), issuer: 'YourApp');
-
-// Generate setup data (QR code)
-$setup = $twoFactor->generateSetup($user->email);
-// Returns: secret, qr_code (base64), uri, recovery_codes
-
-// Verify and enable
-$twoFactor->enable($setup['secret'], $code, $user->id);
-```
-
----
-
-### 📁 Caching & Storage
-
-#### `monkeyslegion-cache`
-
-PSR-16 compliant cache with multiple drivers (File, Redis, Memcached, Array).
-
-**Configuration (v2 `.mlc`):**
-
-```mlc
-cache {
-    default = redis
-    stores {
-        file  { driver = file, path = storage/cache }
-        redis { driver = redis, host = ${REDIS_HOST:127.0.0.1}, port = 6379 }
-    }
-}
-```
-
-**Usage:**
-
-```php
-use MonkeysLegion\Cache\Cache;
-
-Cache::set('key', 'value', 3600);
-$value = Cache::get('key', 'default');
-Cache::delete('key');
-
-// Remember pattern
-$users = Cache::remember('users', 3600, function() {
-    return $this->users->findAll();
-});
-
-// Tagging
-Cache::tags(['users', 'premium'])->set('user:1', $user, 3600);
-Cache::tags(['users'])->clear();
-
-// Incrementing
-Cache::increment('counter');
-Cache::decrement('counter', 5);
-```
-
-#### `monkeyslegion-files`
-
-Production-ready file storage and upload management:
-
-- 🚀 **Chunked Uploads** — Resume-capable multipart uploads
-- ☁️ **Multi-Storage** — Local, S3, MinIO, DigitalOcean, GCS
-- 🖼️ **Image Processing** — Thumbnails, optimization, watermarks
-- 🔒 **Security** — Signed URLs, rate limiting
-
-```php
-use MonkeysLegion\Files\FilesManager;
-
-$path = $files->put($_FILES['upload']['tmp_name']);
-$contents = $files->get($path);
-$url = ml_files_sign_url('/files/' . $path, ttl: 600);
-```
-
-**Image Processing:**
-
-```php
-use MonkeysLegion\Files\Image\ImageProcessor;
-
-$processor = new ImageProcessor(driver: 'gd', quality: 85);
-$thumbPath  = $processor->thumbnail($path, 300, 300, 'cover');
-$optimized  = $processor->optimize($path, quality: 80);
-$webp       = $processor->convert($path, 'webp');
-$watermarked = $processor->watermark($path, $watermarkPath, 'bottom-right');
-```
-
-**Chunked Uploads:**
-
-```php
-use MonkeysLegion\Files\Upload\ChunkedUploadManager;
-
-$uploadId = $chunked->initiate('large-video.mp4', $totalSize, 'video/mp4');
-
-foreach ($chunks as $i => $chunk) {
-    $chunked->uploadChunk($uploadId, $i, $chunk['data'], $chunk['size']);
-}
-
-$finalPath = $chunked->complete($uploadId);
-$progress  = $chunked->getProgress($uploadId);
-// ['uploaded_chunks' => 5, 'total_chunks' => 10, 'percent' => 50]
-```
-
----
-
-### 🎨 Templating & Views
-
-#### `monkeyslegion-template`
-
-**MLView** template engine with components, slots, and caching:
-
-```php
-// resources/views/welcome.ml.php
-
-{{-- Escaped output --}}
-<h1>{{ $title }}</h1>
-
-{{-- Raw HTML --}}
-{!! $html !!}
-
-{{-- Control structures --}}
-@if ($user->isAdmin())
-    <span class="badge">Admin</span>
-@endif
-
-@foreach ($items as $item)
-    <li>{{ $item->name }}</li>
-@endforeach
-
-{{-- Components --}}
-<x-alert type="success">
-    Operation completed!
-</x-alert>
-
-{{-- Layout inheritance --}}
-@extends('layouts.app')
-
-@section('content')
-    <p>Page content here</p>
-@endsection
-
-{{-- Slots --}}
-<x-card>
-    @slot('header')
-        Card Title
-    @endslot
-    Card body content
-</x-card>
-```
-
----
-
-### 📧 Communication & Events
-
-#### `monkeyslegion-mail`
-
-Feature-rich mail package with DKIM, queues, and templates:
-
-**Configuration (v2 `.mlc`):**
-
-```mlc
-# config/mail.mlc
-mail {
-    default = smtp
-    from {
-        address = ${MAIL_FROM_ADDRESS:noreply@example.com}
-        name    = ${MAIL_FROM_NAME:MonkeysLegion}
-    }
-    smtp {
-        host       = ${MAIL_HOST:smtp.mailtrap.io}
-        port       = ${MAIL_PORT:587}
-        encryption = ${MAIL_ENCRYPTION:tls}
-        username   = ${MAIL_USERNAME:}
-        password   = ${MAIL_PASSWORD:}
-    }
-}
-```
-
-**Sending (v2):**
-
-```php
-use MonkeysLegion\Mail\Mailer;
-
-$mailer->send(
-    'user@example.com',
-    'Welcome to Our App',
-    '<h1>Welcome!</h1><p>Thanks for joining us.</p>',
-    'text/html'
-);
-```
-
-**Mailable Classes:**
-
-```php
-use MonkeysLegion\Mail\Mail\Mailable;
-
-class OrderConfirmationMail extends Mailable
-{
-    public function __construct(
-        private array $order,
-        private array $customer,
-    ) {
-        parent::__construct();
-    }
-
-    public function build(): self
-    {
-        return $this->view('emails.order-confirmation')
-                    ->subject('Order Confirmation #' . $this->order['id'])
-                    ->withData(['order' => $this->order, 'customer' => $this->customer])
-                    ->attach('/path/to/invoice.pdf');
-    }
-}
-
-// Send or queue
-$mail = new OrderConfirmationMail($order, $customer);
-$mail->setTo('john@example.com')->send();
-$mail->setTo('john@example.com')->queue();
-```
-
-#### `monkeyslegion-events`
-
-PSR-14 event dispatcher with attribute-based listener discovery:
-
-```php
-// Register listeners via attributes — no manual wiring needed
-#[Listener(UserCreated::class)]
-final class SendWelcomeEmail { /* ... */ }
-
-#[Listener(PostPublished::class)]
-final class NotifyAdminOnPost { /* ... */ }
-
-// Dispatch events
-$this->events->dispatch(new UserCreated($user));
-$this->events->dispatch(new PostPublished($post));
-```
-
----
-
-### 🌍 Internationalization
-
-#### `monkeyslegion-i18n`
-
-Production-ready I18n & localization:
-
-- 🌍 **Multiple Sources** — JSON, PHP, database loaders
-- 📝 **ICU Pluralization** — Plural rules for 200+ languages
-- 🎯 **Auto Detection** — URL, session, headers, cookies
-
-**Translation Files:**
+The `monkeyscloud/monkeyslegion` meta-package (^2.1) requires all sub-packages transitively. You only need one dependency:
 
 ```json
-// resources/lang/en/messages.json
 {
-  "welcome": "Welcome!",
-  "greeting": "Hello, :name!",
-  "items": "{0} No items|{1} One item|[2,*] :count items"
-}
-```
-
-**Usage:**
-
-```php
-use MonkeysLegion\I18n\TranslatorFactory;
-
-$translator = TranslatorFactory::create([
-    'locale'   => 'es',
-    'fallback' => 'en',
-    'path'     => base_path('resources/lang'),
-]);
-
-echo $translator->trans('messages.welcome');
-// Output: ¡Bienvenido!
-
-echo $translator->trans('messages.greeting', ['name' => 'Jorge']);
-// Output: ¡Hola, Jorge!
-
-echo $translator->choice('messages.items', 5);
-// Output: 5 artículos
-```
-
-**Helper Functions:**
-
-```php
-trans('messages.welcome');
-trans('messages.greeting', ['name' => 'Jorge']);
-trans_choice('cart.items', $count);
-```
-
----
-
-### 📊 Observability & Logging
-
-#### `monkeyslegion-telemetry`
-
-Prometheus metrics, distributed tracing, and structured logging:
-
-**Configuration (v2 `.mlc`):**
-
-```mlc
-# config/logging.mlc
-logging {
-    default = stack
-
-    channels {
-        stack {
-            driver   = stack
-            channels = ["daily", "stderr"]
-        }
-        daily {
-            driver = daily
-            path   = ${LOG_PATH:storage/logs/app.log}
-            days   = 14
-            level  = ${LOG_LEVEL:debug}
-        }
-        stderr {
-            driver = stream
-            stream = php://stderr
-            level  = error
-        }
+    "require": {
+        "monkeyscloud/monkeyslegion": "^2.1"
     }
 }
 ```
 
-**Metrics:**
+### Core Packages
 
-```php
-use MonkeysLegion\Telemetry\Telemetry;
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion` | 2.1.2 | Meta-package — bridges skeleton to all sub-packages |
+| `monkeyslegion-core` | 2.1.0 | Kernel, Application builder, GDPR, health checks, OPcache |
+| `monkeyslegion-di` | 2.0.1 | PSR-11 DI container with `#[Singleton]`, `#[Provider]` |
+| `monkeyslegion-mlc` | 2.0.0 | `.mlc` config parser |
+| `monkeyslegion-contracts` | 2.0.0 | Shared interfaces |
+| `monkeyslegion-env` | 2.0.0 | Environment loader |
 
-Telemetry::counter('http_requests_total', 1, ['method' => 'GET', 'status' => '200']);
-Telemetry::gauge('active_connections', 42);
-Telemetry::histogram('request_duration_seconds', 0.123, ['endpoint' => '/api/users']);
+### HTTP & Routing
 
-$stopTimer = Telemetry::timer('operation_duration_seconds');
-$this->heavyOperation();
-$duration = $stopTimer(['operation' => 'heavy_task']);
-```
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-http` | 2.1.0 | PSR-7 messages + 12 middleware (CSP, Compression, etc.) |
+| `monkeyslegion-router` | 2.2.0 | Attribute routing, `#[ApiVersion]`, `#[Deprecated]` |
+| `monkeyslegion-session` | 2.0.0 | Session management, CSRF |
+| `monkeyslegion-validation` | 2.1.0 | DTO validation, `#[NotPwned]` HIBP check |
 
-**Distributed Tracing:**
+### Database & ORM
 
-```php
-$result = Telemetry::trace('fetch-user', function () use ($userId) {
-    return $this->users->find($userId);
-}, SpanKind::CLIENT, ['user.id' => $userId]);
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-database` | 2.2.0 | PDO MySQL, factories, nested transactions |
+| `monkeyslegion-query` | 2.1.0 | Query builder, `whereHas`, `load()`, SQL safety |
+| `monkeyslegion-entity` | 2.1.0 | Entity mapper, casts (JSON, Enum, DateTime, etc.) |
+| `monkeyslegion-migration` | 2.0.0 | Schema diff + migration runner |
 
-// Nested traces (automatic parent-child)
-$result = Telemetry::trace('process-order', function () use ($order) {
-    $inventory = Telemetry::trace('check-inventory', fn() => $this->inventory->check($order));
-    $payment   = Telemetry::trace('process-payment', fn() => $this->payment->charge($order));
-    return compact('inventory', 'payment');
-});
+### Auth & Security
 
-$traceId = Telemetry::traceId();
-```
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-auth` | 2.2.0 | JWT, RBAC, 2FA, OAuth (6 providers), API keys, audit |
+| `monkeyslegion-permissions` | 1.1.0 | Fine-grained permission system |
+| `monkeyslegion-encryption` | 1.0.1 | Encryption utilities |
 
----
+### Frontend
 
-### 🛠 CLI & Development
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-inertia` | 1.0.0 | Inertia.js adapter with SSR |
+| `monkeyslegion-vite` | 1.0.0 | Vite asset pipeline, `@vite` directive, route exporter |
+| `monkeyslegion-template` | 2.0.0 | MLView Blade-like template engine |
 
-#### `monkeyslegion-cli`
+### New Ecosystem Packages (v2.1)
 
-Command-line interface and scaffolding:
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-feature-flags` | 1.0.1 | Memory/Database/Redis feature flag drivers |
+| `monkeyslegion-webhooks` | 1.0.1 | HMAC signing, retry, delivery tracking |
+| `monkeyslegion-markdown` | 1.0.1 | Pure PHP Markdown renderer |
+| `monkeyslegion-search` | 1.1.0 | Null/Database/Meilisearch search engines |
+| `monkeyslegion-notifications` | 1.1.0 | Mail/Slack/Teams/Webhook channels |
+| `monkeyslegion-testing` | 1.0.0 | HTTP testing DSL, fakes, snapshots |
 
-```bash
-# General
-php ml key:generate              # Generate APP_KEY
-php ml cache:clear               # Clear caches
-php ml route:list                # Display routes with methods, middleware
-php ml tinker                    # Interactive REPL
+### Infrastructure
 
-# Database
-php ml db:create                 # Create database
-php ml make:migration            # Generate migration
-php ml migrate                   # Run pending migrations
-php ml rollback                  # Undo last migration
-php ml db:seed                   # Run seeders
-
-# Scaffolding
-php ml make:entity User          # Generate entity with property hooks
-php ml make:controller User      # Generate controller with #[Route] attributes
-php ml make:middleware Auth       # Generate PSR-15 middleware
-php ml make:policy User           # Generate authorization policy
-
-# API
-php ml openapi:export            # Export OpenAPI 3.1 spec
-
-# Mail
-php ml mail:test user@test.com   # Test sending
-php ml make:mail WelcomeMail     # Generate Mailable class
-php ml make:dkim-pkey storage/keys  # Generate DKIM keys
-php ml mail:work                 # Process mail queue
-
-# Cache
-php ml cache:clear               # Clear default store
-php ml cache:clear --store=redis # Clear specific store
-```
-
-#### `monkeyslegion-dev-server`
-
-Hot-reload development server:
-
-```bash
-composer serve                   # Start on localhost:8000
-composer server:start:public     # Start on 0.0.0.0:8000
-composer server:stop             # Stop server
-composer server:restart          # Restart server
-```
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `monkeyslegion-cli` | 2.1.0 | 35+ commands, React/Vue presets, TypeScript generator |
+| `monkeyslegion-cache` | 2.0.1 | PSR-16 cache (File, Redis, Memcached) |
+| `monkeyslegion-queue` | 2.0.0 | Background job processing |
+| `monkeyslegion-schedule` | 1.2.0 | Task scheduling + health monitor |
+| `monkeyslegion-mail` | 2.0.0 | SMTP, DKIM, queued mail |
+| `monkeyslegion-files` | 2.0.0 | Multi-driver storage, image processing |
+| `monkeyslegion-events` | 2.0.0 | PSR-14 event dispatcher |
+| `monkeyslegion-i18n` | 2.1.0 | Internationalization |
+| `monkeyslegion-telemetry` | 2.1.0 | Prometheus, OTLP tracing, structured logging |
+| `monkeyslegion-devtools` | 2.1.0 | Debug toolbar with 8 panels |
+| `monkeyslegion-openapi` | 1.1.0 | OpenAPI 3.1 + Swagger UI + versioning |
+| `monkeyslegion-resources` | 1.1.0 | JSON:API resources + TypeScript generator |
 
 ---
 
-### 🔧 Helper Functions
+## 🔧 Helper Functions
 
 ```php
 // Path helpers
-base_path('config/app.mlc');     // → /var/www/my-app/config/app.mlc
-app_path('Entity');               // → /var/www/my-app/app/Entity
-config_path('auth.mlc');         // → /var/www/my-app/config/auth.mlc
-storage_path('logs/app.log');    // → /var/www/my-app/storage/logs/app.log
+base_path('config/app.mlc');
+app_path('Entity');
+config_path('auth.mlc');
+storage_path('logs/app.log');
 
 // Asset helpers (versioned URLs)
-asset('css/app.css');            // → /assets/css/app.css?v=1713312000
+asset('css/app.css');
 
 // Translation helpers
 trans('messages.welcome');
 trans('messages.greeting', ['name' => 'Jorge']);
 
 // CSRF helpers
-csrf_token();                    // → random 64-char hex string
-csrf_field();                    // → <input type="hidden" name="_csrf" .../>
+csrf_token();
+csrf_field();
 
 // Auth helpers
-auth_user_id();                  // → int|null
-auth_check();                    // → bool
+auth_user_id();
+auth_check();
 ```
 
 ---
 
 ## 🧪 Testing
 
-### Test Suite (139 tests, 289 assertions)
-
 ```bash
-# Run all unit tests
-composer test
-
-# Run specific suites
-php vendor/bin/phpunit --testsuite=Unit
-php vendor/bin/phpunit --testsuite=Integration
-php vendor/bin/phpunit --testsuite=Feature
-php vendor/bin/phpunit --testsuite=Performance
-
-# Run with coverage (requires PCOV/Xdebug)
-php vendor/bin/phpunit --coverage-text
-
-# Run benchmarks
-php tests/Performance/benchmark_detailed.php
+composer test                    # All tests
+composer test:unit               # Unit tests only
+composer test:feature            # Feature tests only
+composer test:integration        # Integration tests only
+composer test:performance        # Benchmarks
+composer test:coverage           # Coverage report
 ```
 
-### Test Structure
-
-| Suite | Tests | Coverage |
-|-------|-------|----------|
-| **Entity** (User, Post, Role, Comment, RBAC) | 30 | Property hooks, computed props, validation, relationships |
-| **Enum** (UserRole, OrderStatus) | 11 | Backed values, business logic, `isFinal()`, `color()` |
-| **DTO** (all 4 request types) | 16 | Construction, readonly, nullable, validation attributes |
-| **Service** (User, Post, Auth) | 10 | Create, find, delete, auth attempt, token invalidation |
-| **Controller** (Home, Page, Auth, User, Post) | 17 | All endpoints, 401/404/422 error handling |
-| **Resource** (User, Post) | 9 | `toArray`, `make`, `collection`, empty collection |
-| **Event/Listener** | 9 | Construction, timestamps, dispatch, `#[Listener]` attributes |
-| **Policy** (PostPolicy) | 7 | Author/admin/editor authorization scenarios |
-| **Job** (SendWelcomeEmail) | 4 | Handle found/not-found, `failed()`, `ShouldQueue` |
-| **Middleware** (Timing) | 2 | Server-Timing header injection, passthrough |
-| **Provider** (AppProvider) | 3 | Register, `#[Provider]` attribute, instantiation |
-| **Helpers** | 4 | `base_path()`, `app_path()`, CSRF token/field |
-| **Performance** | 11 | Entity creation, hooks, serialization benchmarks |
-
-### Test Harness
+### Testing Toolkit (v2.1)
 
 ```php
-// IntegrationTestCase — DI bootstrapping + PSR-15 pipeline
-use Tests\Integration\IntegrationTestCase;
+use MonkeysLegion\Testing\TestCase;
+use MonkeysLegion\Testing\Concerns\RefreshDatabase;
 
-final class UserApiTest extends IntegrationTestCase
+final class UserApiTest extends TestCase
 {
-    public function testListUsersReturns200(): void
+    use RefreshDatabase;
+
+    public function test_create_user(): void
     {
-        $request  = $this->createRequest('GET', '/api/v2/users');
-        $response = $this->dispatch($request);
+        $response = $this->post('/api/users', [
+            'name' => 'Bob',
+            'email' => 'bob@example.com',
+        ]);
 
-        $this->assertStatus($response, 200);
-        $this->assertJsonResponse($response, ['data' => [...]]);
-    }
-}
-
-// FeatureTestCase — Full HTTP pipeline via Application::create()->boot()
-use Tests\Feature\FeatureTestCase;
-
-final class HomePageTest extends FeatureTestCase
-{
-    public function testHomePageReturns200(): void
-    {
-        $request  = $this->createRequest('GET', '/');
-        $response = $this->dispatch($request);
-
-        $this->assertStatus($response, 200);
-        $this->assertStringContainsString('MonkeysLegion', (string) $response->getBody());
+        $response->assertStatus(201);
+        $response->assertJsonPath('data.name', 'Bob');
     }
 }
 ```
+
+**Available fakes:** `QueueFake`, `MailFake`, `EventFake` — all with assertion methods.
 
 ---
 
@@ -1751,29 +621,17 @@ final class HomePageTest extends FeatureTestCase
 
 ### Benchmarks (PHP 8.5, Apple Silicon)
 
-| Operation | Ops/sec | vs Laravel 12 | vs Symfony 7 |
-|-----------|---------|--------------|--------------|
-| Entity creation | **6.3M** | ~140x | ~114x |
-| DTO construction | **10.9M** | ~60x | ~54x |
-| Property hooks (email normalize) | **11.1M** | N/A (PHP 8.4 exclusive) |
-| Computed properties (displayName) | **41M** | N/A (PHP 8.4 exclusive) |
-| Enum operations (label+color+isFinal) | **8.7M** | ~25x | ~22x |
-| Resource serialization (50-item) | **43.8K** | ~5.5x | ~3.6x |
-| JSON encode+decode (50-item) | **21.5K** | — | — |
-| **Peak memory** | **4 MB** | ~22 MB | ~14 MB |
-
-### HTTP Throughput (estimated)
-
-| Framework | req/sec |
+| Operation | Ops/sec |
 |-----------|---------|
-| **MonkeysLegion v2** | **~12,500** |
-| Slim 4 + PSR-15 | ~8,200 |
-| Symfony 7.2 | ~4,800 |
-| Laravel 12 | ~2,100 |
-| CakePHP 5 | ~1,800 |
+| Entity creation | **6.3M** |
+| DTO construction | **10.9M** |
+| Property hooks (email normalize) | **11.1M** |
+| Computed properties (displayName) | **41M** |
+| Enum operations | **8.7M** |
+| Resource serialization (50-item) | **43.8K** |
+| **Peak memory** | **4 MB** |
 
 ```bash
-# Run full benchmark suite
 php tests/Performance/benchmark_detailed.php
 ```
 
@@ -1784,19 +642,17 @@ php tests/Performance/benchmark_detailed.php
 - **PHP 8.4+** — Required for property hooks and asymmetric visibility
 - **MySQL 8.4** — Recommended database
 - **Composer 2.x** — Dependency management
+- **Node.js 18+** — For Vite + Inertia.js (optional, frontend only)
 
 ### Recommended PHP Extensions
 
-| Extension         | Purpose                                 |
-| ----------------- | --------------------------------------- |
-| `pdo_mysql`       | Database connectivity                   |
-| `redis`           | Caching, rate limiting, session storage |
-| `mbstring`        | Multi-byte string handling              |
-| `json`            | JSON processing                         |
-| `gd` or `imagick` | Image processing                        |
-| `intl`            | Advanced I18n formatting                |
-| `posix`           | CLI process management                  |
-| `pcntl`           | Signal handling                         |
+| Extension | Purpose |
+|-----------|---------|
+| `pdo_mysql` | Database connectivity |
+| `redis` | Caching, rate limiting, sessions, feature flags |
+| `mbstring` | Multi-byte string handling |
+| `gd` or `imagick` | Image processing |
+| `intl` | Advanced I18n formatting |
 
 ---
 
@@ -1810,9 +666,7 @@ php tests/Performance/benchmark_detailed.php
 - **`final readonly`** for events, DTOs
 - **PSR-14** for events, **PSR-15** for middleware, **PSR-7** for messages
 - **PHPStan Level 9** enforced
-- **PHPUnit 11** with attributes (`#[Test]`, `#[CoversClass]`, `#[DataProvider]`)
-
-See [monkeyslegion_v2_code_standards.md](monkeyslegion_v2_code_standards.md) for the complete standards document.
+- **PHPUnit 11** with attributes
 
 ---
 
@@ -1822,7 +676,7 @@ See [monkeyslegion_v2_code_standards.md](monkeyslegion_v2_code_standards.md) for
 2. Create a feature branch 🌱
 3. Submit a PR 🚀
 
-Happy hacking with **MonkeysLegion**! 🎉
+Happy hacking with **MonKeysLegion**! 🎉
 
 ---
 

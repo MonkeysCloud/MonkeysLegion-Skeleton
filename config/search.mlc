@@ -1,0 +1,16 @@
+# Search Configuration
+#
+# Driver options: null, database, meilisearch
+
+search {
+    driver = ${SEARCH_DRIVER:null}
+
+    meilisearch {
+        host = ${MEILISEARCH_HOST:http://localhost:7700}
+        key  = ${MEILISEARCH_KEY:""}
+    }
+
+    database {
+        mode = "fulltext"
+    }
+}

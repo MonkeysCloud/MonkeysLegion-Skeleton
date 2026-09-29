@@ -1,0 +1,10 @@
+# Apex Dashboard Configuration
+
+apex {
+    enabled = ${APEX_ENABLED:true}
+    path    = "/_apex"
+    auth {
+        username = ${APEX_USERNAME:admin}
+        password = ${APEX_PASSWORD:""}
+    }
+}

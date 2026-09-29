@@ -1,0 +1,14 @@
+# Markdown Configuration
+#
+# The markdown renderer is pure PHP with no external dependencies.
+
+markdown {
+    extensions {
+        strikethrough = true
+        task_lists    = true
+        tables        = true
+    }
+
+    escape_html   = true
+    allow_scripts = false
+}

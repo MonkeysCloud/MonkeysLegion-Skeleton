@@ -1,0 +1,14 @@
+# Inertia.js Configuration
+#
+# Server-side rendering (SSR) is optional. When enabled, the Node.js
+# SSR server pre-renders page components for faster first paint and SEO.
+# Falls back to client-side rendering if the SSR server is unreachable.
+
+inertia {
+    root_view = "layouts.inertia-app"
+
+    ssr {
+        enabled = ${INERTIA_SSR:false}
+        url     = "http://localhost:13714"
+    }
+}

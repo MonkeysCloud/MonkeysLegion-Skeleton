@@ -1,0 +1,55 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# OAuth / Socialite Configuration — MonKeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Configure OAuth providers for social login.
+# Each provider needs client_id and client_secret from the provider's developer portal.
+# The redirect_uri should point to: https://your-app.com/oauth/callback/{provider}
+
+services {
+    oauth {
+        google {
+            client_id     = ${GOOGLE_CLIENT_ID:""}
+            client_secret = ${GOOGLE_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/google"}
+            scopes        = ["openid", "email", "profile"]
+        }
+
+        github {
+            client_id     = ${GITHUB_CLIENT_ID:""}
+            client_secret = ${GITHUB_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/github"}
+            scopes        = ["read:user", "user:email"]
+        }
+
+        gitlab {
+            client_id     = ${GITLAB_CLIENT_ID:""}
+            client_secret = ${GITLAB_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/gitlab"}
+            scopes        = ["read_user"]
+            url           = "https://gitlab.com"     # Self-hosted: https://gitlab.example.com
+        }
+
+        facebook {
+            client_id     = ${FACEBOOK_CLIENT_ID:""}
+            client_secret = ${FACEBOOK_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/facebook"}
+            scopes        = ["email", "public_profile"]
+        }
+
+        x {
+            client_id     = ${X_CLIENT_ID:""}
+            client_secret = ${X_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/x"}
+            scopes        = ["users.read", "tweet.read"]
+        }
+
+        microsoft {
+            client_id     = ${MICROSOFT_CLIENT_ID:""}
+            client_secret = ${MICROSOFT_CLIENT_SECRET:""}
+            redirect_uri  = ${OAUTH_REDIRECT_URI:"http://localhost:8080/oauth/callback/microsoft"}
+            scopes        = ["User.Read"]
+            tenant        = "common"                 # or specific tenant ID
+        }
+    }
+}

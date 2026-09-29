@@ -2,6 +2,16 @@
 /vendor/
 /composer.lock
 
+# Node / frontend dependencies
+/node_modules/
+
+# Vite build output
+/public/assets/build/
+/public/hot
+
+# TypeScript build info
+*.tsbuildinfo
+
 # Build / distribution artifacts
 /build/
 /dist/
@@ -39,8 +49,19 @@
 /.phpunit.cache/
 /phpunit.result.cache
 
+# Vite / npm cache
+/.vite/
+/.npm/
+
 # PHPStan cache
 /var/cache/phpstan/
+
+# Local package development repos (published on Packagist)
+/packages/
+
+# AI assistant workspace
+/.monkeyscode/
+/PLAN.md
 
 # OS-specific files
 .DS_Store

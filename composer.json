@@ -1,103 +1,103 @@
 {
-  "name": "monkeyscloud/monkeyslegion-skeleton",
-  "description": "Starter project for the MonkeysLegion framework",
-  "type": "project",
-  "license": "MIT",
-  "keywords": [
-    "framework",
-    "monkeyslegion",
-    "php",
-    "skeleton",
-    "boilerplate",
-    "starter",
-    "mvc",
-    "api",
-    "psr-7",
-    "psr-15"
-  ],
-  "authors": [
-    {
-      "name": "MonkeysCloud Team",
-      "email": "jorge@monkeys.cloud",
-      "homepage": "https://monkeyslegion.com",
-      "role": "Developer"
-    }
-  ],
-  "homepage": "https://github.com/monkeyscloud/monkeyslegion-skeleton",
-  "support": {
-    "issues": "https://github.com/monkeyscloud/monkeyslegion-skeleton/issues",
-    "source": "https://github.com/monkeyscloud/monkeyslegion-skeleton"
-  },
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "require": {
-    "php": "^8.4",
-    "monkeyscloud/monkeyslegion": "^2.0",
-    "laminas/laminas-diactoros": "^3.8",
-    "monolog/monolog": "^3.10",
-    "monkeyscloud/monkeyslegion-cli": "^2.0.1"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^11.0",
-    "http-interop/http-factory-tests": "^2.2",
-    "phpstan/phpstan": "^2.1",
-    "squizlabs/php_codesniffer": "^4.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "App\\": "app/"
+    "name": "monkeyscloud/monkeyslegion-skeleton",
+    "description": "Starter project for the MonKeysLegion framework",
+    "type": "project",
+    "license": "MIT",
+    "keywords": [
+        "framework",
+        "monkeyslegion",
+        "php",
+        "skeleton",
+        "boilerplate",
+        "starter",
+        "mvc",
+        "api",
+        "psr-7",
+        "psr-15"
+    ],
+    "authors": [
+        {
+            "name": "MonKeysCloud Team",
+            "email": "jorge@monkeyscloud.com",
+            "homepage": "https://monkeyslegion.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/monkeyscloud/monkeyslegion-skeleton",
+    "support": {
+        "issues": "https://github.com/monkeyscloud/monkeyslegion-skeleton/issues",
+        "source": "https://github.com/monkeyscloud/monkeyslegion-skeleton"
     },
-    "files": [
-      "src/helpers.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "Tests\\": "tests/"
-    }
-  },
-  "config": {
-    "process-timeout": 0
-  },
-  "scripts": {
-    "post-create-project-cmd": [
-      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-      "@php vendor/bin/ml key:generate"
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.4",
+        "monkeyscloud/monkeyslegion": "^2.1",
+        "laminas/laminas-diactoros": "^3.8",
+        "monolog/monolog": "^3.10"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0",
+        "monkeyscloud/monkeyslegion-testing": "^1.0",
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "process-timeout": 0,
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "scripts": {
+        "post-create-project-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php vendor/bin/ml key:generate"
+        ],
+        "post-install-cmd": [
+            "@php vendor/bin/ml key:generate --if-missing"
+        ],
+        "dev": "php -S localhost:8080 server.php",
+        "serve": "php vendor/bin/dev-server",
+        "server:start": "php vendor/bin/dev-server",
+        "server:start:public": "php vendor/bin/dev-server 0.0.0.0 8000",
+        "server:stop": "php vendor/bin/dev-server stop",
+        "server:restart": "php vendor/bin/dev-server restart",
+        "server:status": "php vendor/bin/dev-server status",
+        "test": "phpunit",
+        "test:unit": "phpunit --testsuite=Unit",
+        "test:integration": "phpunit --testsuite=Integration",
+        "test:feature": "phpunit --testsuite=Feature",
+        "test:performance": "phpunit --testsuite=Performance",
+        "test:coverage": "phpunit --coverage-html coverage",
+        "phpstan": "phpstan analyse app src tests --level=9",
+        "cs": "phpcs --standard=PSR12 app src tests",
+        "cs-fix": "phpcbf --standard=PSR12 app src tests",
+        "check": [
+            "@cs",
+            "@phpstan",
+            "@test"
+        ]
+    },
+    "bin": [
+        "bin/ml",
+        "bin/dev-server",
+        "bin/dev-router.php"
     ],
-    "post-install-cmd": [
-      "@php vendor/bin/ml key:generate --if-missing"
-    ],
-    "dev": "php -S localhost:8080 server.php",
-    "serve": "php vendor/bin/dev-server",
-    "server:start": "php vendor/bin/dev-server",
-    "server:start:public": "php vendor/bin/dev-server 0.0.0.0 8000",
-    "server:stop": "php vendor/bin/dev-server stop",
-    "server:restart": "php vendor/bin/dev-server restart",
-    "server:status": "php vendor/bin/dev-server status",
-    "test": "phpunit",
-    "test:unit": "phpunit --testsuite=Unit",
-    "test:integration": "phpunit --testsuite=Integration",
-    "test:feature": "phpunit --testsuite=Feature",
-    "test:performance": "phpunit --testsuite=Performance",
-    "test:coverage": "phpunit --coverage-html coverage",
-    "phpstan": "phpstan analyse app src tests --level=9",
-    "cs": "phpcs --standard=PSR12 app src tests",
-    "cs-fix": "phpcbf --standard=PSR12 app src tests",
-    "check": [
-      "@cs",
-      "@phpstan",
-      "@test"
-    ]
-  },
-  "bin": [
-    "bin/ml",
-    "bin/dev-server",
-    "bin/dev-router.php"
-  ],
-  "extra": {
-    "branch-alias": {
-      "dev-main": "1.0.x-dev",
-      "dev-2.0": "2.0.x-dev"
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.1.x-dev"
+        }
     }
-  }
 }

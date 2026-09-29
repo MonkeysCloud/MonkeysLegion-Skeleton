@@ -1,0 +1,21 @@
+# Telemetry Configuration
+
+telemetry {
+    enabled = ${TELEMETRY_ENABLED:false}
+
+    metrics {
+        driver = "memory"  # memory | prometheus | otlp
+        path   = "/metrics"
+    }
+
+    tracing {
+        enabled  = ${TRACING_ENABLED:false}
+        exporter = "otlp"  # otlp | none
+        endpoint = ${OTLP_ENDPOINT:http://localhost:4318}
+    }
+
+    logging {
+        format = "json"  # json | line
+        include_stacktraces = ${APP_DEBUG:false}
+    }
+}

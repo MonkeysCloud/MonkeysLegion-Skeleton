@@ -1,0 +1,19 @@
+# Notifications Configuration
+#
+# Channels: mail, slack, teams, webhook, database
+
+notifications {
+    channels = ["mail"]
+
+    slack {
+        webhook_url = ${SLACK_WEBHOOK_URL:""}
+    }
+
+    teams {
+        webhook_url = ${TEAMS_WEBHOOK_URL:""}
+    }
+
+    database {
+        table = "notifications"
+    }
+}

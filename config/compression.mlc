@@ -1,0 +1,7 @@
+# HTTP Compression Configuration
+
+compression {
+    enabled  = ${COMPRESSION_ENABLED:true}
+    min_size = 1024  # Don't compress responses smaller than this (bytes)
+    level    = 6     # 1 (fast) to 9 (best)
+}

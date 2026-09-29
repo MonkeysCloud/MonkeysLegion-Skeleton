@@ -1,0 +1,102 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Observability Configuration — MonKeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Controls OpenAPI documentation, health checks, structured logging,
+# distributed tracing, and Prometheus metrics collection.
+
+openapi {
+    enabled    = ${OPENAPI_ENABLED:true}
+    title      = ${APP_NAME:"MonKeysLegion API"}
+    version    = "1.0.0"
+    description = "API documentation auto-generated from route attributes."
+
+    # Where the spec JSON and Swagger UI are served
+    json_path  = "/openapi.json"
+    ui_path    = "/docs"
+    ui_theme   = "swagger"          # "swagger" or "redoc"
+    dark_mode  = false
+
+    # Swagger UI endpoints (alternative paths)
+    swagger_path = "/_swagger"
+    redoc_path   = "/_redoc"
+
+    # Server URLs for the spec (empty = use request host)
+    servers    = []
+}
+
+health {
+    enabled   = ${HEALTH_ENABLED:true}
+
+    # Simple endpoint for load balancers (200/503)
+    simple_path    = "/health"
+    # Detailed JSON breakdown
+    detailed_path  = "/health/detailed"
+
+    # Cache results for N seconds to avoid hammering dependencies
+    cache_ttl = 5
+
+    # Which checks to enable
+    checks    = ["database", "cache", "disk_space"]
+
+    # Disk space check configuration
+    disk_path              = "/"
+    disk_threshold_percent = 90
+}
+
+logging {
+    # Use structured JSON format (vs freeform text)
+    structured = ${LOG_STRUCTURED:true}
+    format     = "json"             # "json" or "text"
+
+    # Auto-injected fields
+    inject_request_id    = true
+    inject_correlation_id = true
+    inject_user_id       = true
+    inject_route         = true
+    inject_duration      = true
+}
+
+tracing {
+    enabled  = ${OTEL_ENABLED:false}
+    exporter = "otlp"               # "otlp", "json", "console", "memory"
+
+    # OTLP/HTTP endpoint (default: OpenTelemetry Collector)
+    endpoint = ${OTEL_EXPORTER_OTLP_ENDPOINT:"http://localhost:4318/v1/traces"}
+
+    # Sampling: 1.0 = all, 0.1 = 10%, 0.0 = none
+    sampling_rate = ${OTEL_TRACES_SAMPLER_ARG:1.0}
+
+    # Service identification
+    service_name    = ${OTEL_SERVICE_NAME:"monkeyslegion-app"}
+    service_version = "2.0.0"
+
+    # Timeout for export requests (seconds)
+    timeout = 5
+}
+
+metrics {
+    enabled    = ${METRICS_ENABLED:true}
+
+    # Prometheus metrics endpoint
+    path       = "/metrics"
+
+    # Namespace prefix for all metrics
+    namespace  = "ml"
+
+    # Standard metrics to collect
+    standard_metrics = [
+        "http_requests_total",
+        "http_request_duration_seconds",
+        "http_requests_in_flight",
+        "memory_usage_bytes",
+        "memory_peak_bytes",
+    ]
+
+    # Storage backend: "memory", "redis", "apc"
+    storage = "memory"
+
+    # Redis configuration (if storage = "redis")
+    redis_host = "127.0.0.1"
+    redis_port = 6379
+}

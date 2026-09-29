@@ -1,0 +1,20 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Webhooks Configuration — MonKeysLegion v2
+# ═══════════════════════════════════════════════════════════════════════════════
+
+webhooks {
+    # Driver: memory | database
+    driver = ${WEBHOOKS_DRIVER:memory}
+
+    # HMAC signing secret (used for outbound signing and inbound verification)
+    secret = ${WEBHOOK_SECRET:""}
+
+    # Hash algorithm: sha256, sha512
+    algorithm = "sha256"
+
+    # HTTP timeout in seconds
+    timeout = 30
+
+    # Maximum retry attempts for failed deliveries
+    max_retries = 3
+}
