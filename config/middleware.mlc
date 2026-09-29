@@ -11,32 +11,26 @@ middleware {
         "MonkeysLegion\\Http\\Middleware\\CorrelationIdMiddleware",
         "MonkeysLegion\\Http\\Middleware\\SecurityHeadersMiddleware",
         "MonkeysLegion\\Http\\Middleware\\CspMiddleware",
-        "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware",
+        "MonkeysLegion\\Framework\\Middleware\\MaintenanceModeMiddleware",
         "MonkeysLegion\\Http\\Middleware\\ErrorHandlerMiddleware",
         "MonkeysLegion\\Http\\Middleware\\LoggingMiddleware",
-        "MonkeysLegion\\Core\\Middleware\\CorsMiddleware",
-        "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware",
+        "MonkeysLegion\\Http\\Middleware\\CorsMiddleware",
         "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware",
         "MonkeysLegion\\Session\\Middleware\\SessionMiddleware",
         "MonkeysLegion\\Session\\Middleware\\VerifyCsrfToken",
         "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware",
-        "MonkeysLegion\\Auth\\Middleware\\AuthorizationMiddleware",
         "MonkeysLegion\\Http\\Middleware\\ConditionalMiddleware",
         "MonkeysLegion\\Http\\Middleware\\CompressionMiddleware",
-        "MonkeysLegion\\Http\\Middleware\\ContentNegotiationMiddleware",
-        "MonkeysLegion\\Validation\\Middleware\\ValidationMiddleware",
-        "MonkeysLegion\\Http\\OpenApi\\OpenApiMiddleware"
+        "MonkeysLegion\\Telemetry\\Middleware\\RequestMetricsMiddleware",
     ]
 
     # ─── Route-level Middleware Aliases ────────────────────────────────────────
     # Shorthand aliases usable in #[Middleware(['auth', 'throttle:60,1'])]
     aliases {
         auth       = "MonkeysLegion\\Auth\\Middleware\\AuthenticationMiddleware"
-        cors       = "MonkeysLegion\\Core\\Middleware\\CorsMiddleware"
         csrf       = "MonkeysLegion\\Session\\Middleware\\VerifyCsrfToken"
         throttle   = "MonkeysLegion\\Http\\Middleware\\RateLimitMiddleware"
-        locale     = "MonkeysLegion\\I18n\\Middleware\\LocaleMiddleware"
-        devtools   = "MonkeysLegion\\DevTools\\Middleware\\DevToolsMiddleware"
+        cors       = "MonkeysLegion\\Http\\Middleware\\CorsMiddleware"
         csp        = "MonkeysLegion\\Http\\Middleware\\CspMiddleware"
         signed     = "MonkeysLegion\\Http\\Middleware\\SignedUrlMiddleware"
         deprecated = "MonkeysLegion\\Http\\Middleware\\DeprecationMiddleware"
@@ -44,4 +38,16 @@ middleware {
         feature    = "MonkeysLegion\\FeatureFlags\\Middleware\\FeatureFlagMiddleware"
         webhook    = "MonkeysLegion\\Webhooks\\Middleware\\VerifyWebhookSignatureMiddleware"
     }
+}
+
+# ─── Rate limiting ────────────────────────────────────────────────────────────
+rate_limit {
+    max_requests   = 5000
+    window_seconds = 60
+}
+
+# ─── Maintenance mode bypass ──────────────────────────────────────────────────
+maintenance {
+    allowed_ips = []
+    secret      = ${MAINTENANCE_SECRET:""}
 }
