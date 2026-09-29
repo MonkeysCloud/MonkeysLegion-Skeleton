@@ -35,7 +35,7 @@ chmod -R 775 \
 if [ ! -d "$WORKDIR/vendor" ] || [ ! -f "$WORKDIR/vendor/autoload.php" ]; then
     echo "📦 Installing Composer dependencies..."
     cd "$WORKDIR"
-docker compose exec app composer update monkeyscloud/monkeyslegion --no-interaction
+composer install --no-interaction --prefer-dist --optimize-autoloader
 else
     echo "✅ Composer dependencies already present."
 fi
