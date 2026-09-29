@@ -28,7 +28,7 @@
         "issues": "https://github.com/monkeyscloud/monkeyslegion-skeleton/issues",
         "source": "https://github.com/monkeyscloud/monkeyslegion-skeleton"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
         "php": "^8.4",
