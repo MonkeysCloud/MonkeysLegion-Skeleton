@@ -13,15 +13,27 @@ export default defineConfig({
         },
     },
     server: {
+        host: '0.0.0.0',
         port: 5173,
+        strictPort: true,
         hmr: {
             host: 'localhost',
+            port: 5173,
+        },
+        // In Docker, proxy non-asset requests to the PHP app
+        proxy: {
+            '/build': {
+                target: 'http://localhost:8000',
+                changeOrigin: true,
+            },
         },
     },
     publicDir: false,
     build: {
+        // Must match config/vite.mlc: build_path = "public/build"
         outDir: 'public/build',
         manifest: 'manifest.json',
+        emptyOutDir: true,
         rollupOptions: {
             input: 'resources/js/app.tsx',
         },

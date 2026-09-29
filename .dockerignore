@@ -1,0 +1,58 @@
+# ── Dependencies (installed inside containers) ────────────────────────────────
+vendor/
+node_modules/
+
+# ── Git ───────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+.github/
+
+# ── Docker artifacts ──────────────────────────────────────────────────────────
+# Exclude docker compose/README but KEEP docker/php/* and docker/nginx/* (needed by Dockerfiles)
+docker/README.md
+docker-compose.yml
+.dockerignore
+
+# ── Cache & runtime (regenerated inside container) ───────────────────────────
+var/cache/*
+!var/cache/.gitkeep
+var/log/*
+!var/log/.gitkeep
+var/sessions/*
+!var/sessions/.gitkeep
+var/migrations/*
+!var/migrations/.gitkeep
+storage/cache/*
+!storage/cache/.gitkeep
+storage/logs/*
+!storage/logs/.gitkeep
+coverage/
+.phpunit.cache/
+phpunit.result.cache
+.vite/
+.npm/
+
+# ── Build output (regenerated) ────────────────────────────────────────────────
+public/assets/build/
+public/hot
+*.tsbuildinfo
+build/
+dist/
+
+# ── IDE & OS files ────────────────────────────────────────────────────────────
+.idea/
+.vscode/
+.monkeyscode/
+.DS_Store
+Thumbs.db
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+docs/
+*.md
+!AGENTS.md
+LICENSE
+
+# ── Test artifacts ────────────────────────────────────────────────────────────
+phpunit.xml
+phpstan.neon
+phpbench.json

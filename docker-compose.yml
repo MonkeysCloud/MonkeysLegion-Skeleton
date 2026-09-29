@@ -1,0 +1,209 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# MonkeysLegion v2 — Docker Compose (Full Development Environment)
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Services:
+#   app         PHP-FPM 8.4     (framework application)
+#   nginx       nginx:alpine     (web server → PHP-FPM, port 8000)
+#   postgres    PostgreSQL 16    (database, port 5432)
+#   redis       Redis 7          (cache + session + queue, port 6379)
+#   meilisearch Meilisearch v1   (search engine, port 7700)
+#   node        Vite dev server  (HMR, port 5173)             [default profile]
+#   node-build  Vite production  (one-shot build)             [build profile]
+#   mailpit     Mailpit          (SMTP + web UI, ports 1025/8025)
+#   adminer     Adminer          (DB management UI, port 8080)
+#
+# Usage:
+#   docker compose up -d                              # start all services
+#   docker compose run --rm node-build                # build production assets
+#   docker compose exec app php vendor/bin/ml list    # run CLI commands
+#   docker compose exec app composer test             # run tests
+#   docker compose down                              # stop everything
+#   docker compose down -v                           # stop + delete data volumes
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+
+    # ── PHP-FPM Application ───────────────────────────────────────────────────
+    app:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+        container_name: ml-app
+        restart: unless-stopped
+        working_dir: /var/www/html
+        volumes:
+            - .:/var/www/html
+            # Anonymous volume: container-installed vendor takes precedence over host
+            - /var/www/html/vendor
+            # Anonymous volume: container-managed var/cache
+            - /var/www/html/var/cache
+        env_file:
+            - .env
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        networks:
+            - ml-network
+
+    # ── Nginx Web Server ──────────────────────────────────────────────────────
+    nginx:
+        image: nginx:alpine
+        container_name: ml-nginx
+        restart: unless-stopped
+        ports:
+            - "8000:80"
+        volumes:
+            - .:/var/www/html:ro
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+        depends_on:
+            - app
+        networks:
+            - ml-network
+
+    # ── PostgreSQL 16 ─────────────────────────────────────────────────────────
+    postgres:
+        image: postgres:16-alpine
+        container_name: ml-postgres
+        restart: unless-stopped
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: ${DB_DATABASE:-ml_skeleton}
+            POSTGRES_USER: ${DB_USERNAME:-ml}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:-ml_secret}
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-ml} -d ${DB_DATABASE:-ml_skeleton}"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        networks:
+            - ml-network
+
+    # ── Redis 7 (cache + session + queue) ─────────────────────────────────────
+    redis:
+        image: redis:7-alpine
+        container_name: ml-redis
+        restart: unless-stopped
+        ports:
+            - "6379:6379"
+        command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+        volumes:
+            - redis_data:/data
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 3s
+            retries: 10
+            start_period: 5s
+        networks:
+            - ml-network
+
+    # ── Meilisearch (search engine) ───────────────────────────────────────────
+    meilisearch:
+        image: getmeili/meilisearch:v1
+        container_name: ml-meilisearch
+        restart: unless-stopped
+        ports:
+            - "7700:7700"
+        environment:
+            MEILI_NO_ANALYTICS: "true"
+            MEILI_ENV: development
+            # MEILI_MASTER_KEY: ${MEILISEARCH_KEY:-}
+        volumes:
+            - meili_data:/meili_data
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+        networks:
+            - ml-network
+
+    # ── Node / Vite Dev Server (HMR) ──────────────────────────────────────────
+    # Runs by default with `docker compose up`
+    node:
+        build:
+            context: .
+            dockerfile: docker/node/Dockerfile
+        container_name: ml-node
+        restart: unless-stopped
+        ports:
+            - "5173:5173"
+        volumes:
+            - .:/var/www/html
+            # Anonymous volume: container-installed node_modules takes precedence
+            - /var/www/html/node_modules
+        working_dir: /var/www/html
+        command: npm run dev -- --host 0.0.0.0
+        networks:
+            - ml-network
+
+    # ── Node / Vite Production Build (one-shot) ───────────────────────────────
+    # Run with: docker compose run --rm node-build
+    # Outputs to public/build/manifest.json (mounted to host)
+    node-build:
+        build:
+            context: .
+            dockerfile: docker/node/Dockerfile
+        container_name: ml-node-build
+        profiles: ["build"]
+        volumes:
+            - .:/var/www/html
+            - /var/www/html/node_modules
+        working_dir: /var/www/html
+        command: npm run build
+        networks:
+            - ml-network
+
+    # ── Mailpit (local SMTP + web inbox) ──────────────────────────────────────
+    mailpit:
+        image: axllent/mailpit:latest
+        container_name: ml-mailpit
+        restart: unless-stopped
+        ports:
+            - "1025:1025"   # SMTP
+            - "8025:8025"   # Web UI
+        environment:
+            MP_SMTP_AUTH_ACCEPT_ANY: 1
+            MP_SMTP_AUTH_ALLOW_INSECURE: 1
+        volumes:
+            - mailpit_data:/data
+        networks:
+            - ml-network
+
+    # ── Adminer (lightweight DB management UI) ────────────────────────────────
+    adminer:
+        image: adminer:latest
+        container_name: ml-adminer
+        restart: unless-stopped
+        ports:
+            - "8080:8080"
+        environment:
+            ADMINER_DEFAULT_SERVER: postgres
+        depends_on:
+            - postgres
+        networks:
+            - ml-network
+
+# ── Named Volumes (persistent data) ───────────────────────────────────────────
+volumes:
+    pg_data:
+        driver: local
+    redis_data:
+        driver: local
+    meili_data:
+        driver: local
+    mailpit_data:
+        driver: local
+
+# ── Network ───────────────────────────────────────────────────────────────────
+networks:
+    ml-network:
+        driver: bridge

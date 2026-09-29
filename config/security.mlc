@@ -7,7 +7,8 @@ security {
     # ── Security Headers ──────────────────────────────────────────────────────
     # Preset: strict | relaxed | api
     headers {
-        preset          = ${SECURITY_HEADERS_PRESET:"strict"}
+        # Use 'api' preset — includes security headers WITHOUT CSP (CspMiddleware handles CSP)
+        preset          = ${SECURITY_HEADERS_PRESET:"api"}
         hsts_max_age    = 63072000
         hsts_subdomains = true
         hsts_preload    = true
@@ -21,16 +22,18 @@ security {
     # Directive keys use underscores (MLC keys cannot contain hyphens).
     # The {nonce} placeholder is replaced per-request with a random nonce.
     csp {
+        # In development/skeleton: report-only mode so nothing is blocked.
+        # Set CSP_REPORT_ONLY=false when you are ready to enforce.
         enabled     = ${CSP_ENABLED:true}
-        report_only = ${CSP_REPORT_ONLY:false}
+        report_only = ${CSP_REPORT_ONLY:true}
 
         directives {
             default_src     = "'self'"
             script_src      = "'self' {nonce} 'strict-dynamic'"
-            style_src       = "'self' {nonce}"
+            style_src       = "'self' 'unsafe-inline' {nonce} https://fonts.googleapis.com"
             img_src         = "'self' data:"
-            connect_src     = "'self'"
-            font_src        = "'self'"
+            connect_src     = "'self' https://fonts.googleapis.com"
+            font_src        = "'self' https://fonts.gstatic.com"
             object_src      = "'none'"
             base_uri        = "'self'"
             frame_ancestors = "'none'"
